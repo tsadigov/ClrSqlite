@@ -28,12 +28,9 @@ namespace Community.CsharpSqlite.Ast
 
 		public static void heightOfExprList (this ExprList _this, ref int pnHeight)
 		{
-			if (_this != null) {
-				int i;
-				for (i = 0; i < _this.Count; i++) {
+			if (_this != null) 
+				for (var i = 0; i < _this.Count; i++) 
 					_this[i].pExpr.heightOfExpr (ref pnHeight);
-				}
-			}
 		}
 	}
 }

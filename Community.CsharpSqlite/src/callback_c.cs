@@ -163,7 +163,7 @@ sqlite3ValueFree(ref pTmp);
 		/// from the main database is substituted, if one is available.
 		///
 		///</summary>
-		static SqlResult sqlite3CheckCollSeq(Parse pParse,CollSeq pColl) {
+		public static SqlResult sqlite3CheckCollSeq(Parse pParse,CollSeq pColl) {
 			if(pColl!=null) {
 				string zName=pColl.zName;
 				Connection db=pParse.db;

@@ -1091,10 +1091,10 @@ namespace Community.CsharpSqlite.Ast
                                     j++;
                                 }
                             }
-                            regRecord = pParse.sqlite3GetTempReg();
+                            regRecord = pParse.allocTempReg();
                             v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, regBase, nCol, regRecord);
                             v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, sAggInfo.sortingIdx, regRecord);
-                            pParse.sqlite3ReleaseTempReg(regRecord);
+                            pParse.deallocTempReg(regRecord);
                             pParse.sqlite3ReleaseTempRange(regBase, nCol);
                             pWInfo.sqlite3WhereEnd();
                             v.sqlite3VdbeAddOp2(OpCode.OP_Sort, sAggInfo.sortingIdx, addrEnd);
@@ -1690,10 +1690,10 @@ namespace Community.CsharpSqlite.Ast
                             iCont = v.sqlite3VdbeMakeLabel();
                             SelectMethods.computeLimitRegisters(pParse, p, iBreak);
                             v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, tab1, iBreak);
-                            r1 = pParse.sqlite3GetTempReg();
+                            r1 = pParse.allocTempReg();
                             iStart = v.sqlite3VdbeAddOp2(OpCode.OP_RowKey, tab1, r1);
                             v.sqlite3VdbeAddOp4Int(OpCode.OP_NotFound, tab2, iCont, r1, 0);
-                            pParse.sqlite3ReleaseTempReg(r1);
+                            pParse.deallocTempReg(r1);
                             SelectMethods.selectInnerLoop(pParse, p, p.ResultingFieldList, tab1, p.ResultingFieldList.Count, null, -1, dest, iCont, iBreak);
                             v.sqlite3VdbeResolveLabel(iCont);
                             v.sqlite3VdbeAddOp2(OpCode.OP_Next, tab1, iStart);
@@ -1849,9 +1849,9 @@ namespace Community.CsharpSqlite.Ast
             // OVERLOADS, so I don't need to rewrite parse.c
             public static Select sqlite3SelectNew(Sqlite3.Parse pParse, int null_2, SrcList pSrc, int null_4, int null_5, int null_6, int null_7, int isDistinct, int null_9, int null_10)
             {
-                return sqlite3SelectNew(pParse, null, pSrc, null, null, null, null, isDistinct, null, null);
+                return Create(pParse, null, pSrc, null, null, null, null, isDistinct, null, null);
             }
-            public static Select sqlite3SelectNew(Sqlite3.Parse pParse,/*which columns to include in the result */ExprList pEList, /*the FROM clause "> which tables to scan */SrcList pSrc, /*the WHERE clause */Expr pWhere,
+            public static Select Create(Sqlite3.Parse pParse,/*which columns to include in the result */ExprList pEList, /*the FROM clause "> which tables to scan */SrcList pSrc, /*the WHERE clause */Expr pWhere,
                 /*the GROUP BY clause */ExprList pGroupBy,/*the HAVING clause */Expr pHaving, /*the ORDER BY clause*/ExprList pOrderBy,/*true if the DISTINCT keyword is present */int isDistinct,
                 /*LIMIT value.  NULL means not used */Expr pLimit,/*OFFSET value.  NULL means no offset */Expr pOffset
             )

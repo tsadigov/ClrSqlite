@@ -55,188 +55,124 @@ using yDbMask = System.Int64;
     using Compiler.Parser;
 #endif
     public partial class Sqlite3 {
-		public class Parse {
-			Connection _db;
-			public Connection db {
-				get {
-					return _db;
-				}
-				set {
-					_db=value;
-				}
-			}
-			///
-			///<summary>
-			///The main database structure 
-			///</summary>
-			public SqlResult rc;
-			///
-			///<summary>
-			///Return code from execution 
-			///</summary>
-			public string zErrMsg;
-			///
-			///<summary>
-			///An error message 
-			///</summary>
-			public Vdbe pVdbe;
-			///
-			///<summary>
-			///An engine for executing database bytecode 
-			///</summary>
-			public u8 colNamesSet;
-			///
-			///<summary>
-			///TRUE after  OpCode.Op_ColumnName has been issued to pVdbe 
-			///</summary>
-			public u8 nameClash;
-			///
-			///<summary>
-			///A permanent table name clashes with temp table name 
-			///</summary>
-			public u8 checkSchema;
-			///
-			///<summary>
-			///Causes schema cookie check after an error 
-			///</summary>
-			public u8 nested;
-			///
-			///<summary>
-			///Number of nested calls to the parser/code generator 
-			///</summary>
-			public u8 parseError;
-			///
-			///<summary>
-			///True after a parsing error.  Ticket #1794 
-			///</summary>
-			public u8 nTempReg;
-			///
-			///<summary>
-			///Number of temporary registers in aTempReg[] 
-			///</summary>
-			u8 _nTempInUse;
-			public u8 nTempInUse {
-				get {
-					return _nTempInUse;
-				}
-				set {
-					_nTempInUse=value;
-				}
-			}
-			///
-			///<summary>
-			///Number of aTempReg[] currently checked out 
-			///</summary>
-			public int[] aTempReg {
-				get;
-				set;
-			}
-			///
-			///<summary>
-			///Holding area for temporary registers 
-			///</summary>
-			int _nRangeReg;
-			public int nRangeReg {
-				get {
-					return _nRangeReg;
-				}
-				set {
-					_nRangeReg=value;
-				}
-			}
-			///
-			///<summary>
-			///Size of the temporary register block 
-			///</summary>
-			public int iRangeReg;
-			///
-			///<summary>
-			///First register in temporary register block 
-			///</summary>
-			public int nErr;
-			///
-			///<summary>
-			///Number of errors seen 
-			///</summary>
-			public int nTab;
-			///
-			///<summary>
-			///Number of previously allocated VDBE cursors 
-			///</summary>
-			int _nMem;
-			public int nMem {
-				get {
-					return _nMem;
-				}
-				set {
-					_nMem=value;
-				}
-			}
-			///
-			///<summary>
-			///Number of memory cells used so far 
-			///</summary>
-			public int nSet;
-			///
-			///<summary>
-			///Number of sets used so far 
-			///</summary>
-			public int ckBase;
-			///
-			///<summary>
-			///Base register of data during check constraints 
-			///</summary>
-			public int iCacheLevel;
-			///
-			///<summary>
-			///ColCache valid when aColCache[].iLevel<=iCacheLevel 
-			///</summary>
-			public int iCacheCnt;
-			///
-			///<summary>
-			///Counter used to generate aColCache[].lru values 
-			///</summary>
-			public u8 nColCache;
-			///
-			///<summary>
-			///Number of entries in the column cache 
-			///</summary>
-			public u8 iColCache;
-			///
-			///<summary>
-			///Next entry of the cache to replace 
-			///</summary>
-			public sqliteinth.yColCache[] aColCache;
-			///
-			///<summary>
-			///One for each valid column cache entry 
-			///</summary>
-			public yDbMask writeMask;
-			///
-			///<summary>
-			///Start a write transaction on these databases 
-			///</summary>
-			public yDbMask cookieMask;
-			///
-			///<summary>
-			///Bitmask of schema verified databases 
-			///</summary>
-			public u8 isMultiWrite;
-			///
-			///<summary>
-			///True if statement may affect/insert multiple rows 
-			///</summary>
-			public u8 mayAbort;
-			///
-			///<summary>
-			///True if statement may throw an ABORT exception 
-			///</summary>
-			public int cookieGoto;
-			///
-			///<summary>
-			///Address of OpCode.OP_Goto to cookie verifier subroutine 
-			///</summary>
-			public int[] cookieValue;
+        public class Parse : VdbeFacade {
+
+            public SqlResult rc;
+            ///
+            ///<summary>
+            ///Return code from execution 
+            ///</summary>
+            public string zErrMsg;
+            ///
+            ///<summary>
+            ///An error message 
+            ///</summary>
+
+            public u8 colNamesSet;
+            ///
+            ///<summary>
+            ///TRUE after  OpCode.Op_ColumnName has been issued to pVdbe 
+            ///</summary>
+            public u8 nameClash;
+            ///
+            ///<summary>
+            ///A permanent table name clashes with temp table name 
+            ///</summary>
+            public u8 checkSchema;
+            ///
+            ///<summary>
+            ///Causes schema cookie check after an error 
+            ///</summary>
+            public u8 nested;
+            ///
+            ///<summary>
+            ///Number of nested calls to the parser/code generator 
+            ///</summary>
+            public u8 parseError;
+            ///
+            ///<summary>
+            ///True after a parsing error.  Ticket #1794 
+            ///</summary>
+
+            u8 _nTempInUse;
+            public u8 nTempInUse {
+                get {
+                    return _nTempInUse;
+                }
+                set {
+                    _nTempInUse = value;
+                }
+            }
+            ///
+            ///<summary>
+            ///Number of aTempReg[] currently checked out 
+            ///</summary>
+
+
+            public int nErr;
+            ///
+            ///<summary>
+            ///Number of errors seen 
+            ///</summary>
+            public int nTab;
+            ///
+            ///<summary>
+            ///Number of previously allocated VDBE cursors 
+            ///</summary>
+
+            public int nSet;
+            ///
+            ///<summary>
+            ///Number of sets used so far 
+            ///</summary>
+            public int ckBase;
+            ///
+            ///<summary>
+            ///Base register of data during check constraints 
+            ///</summary>
+
+            public int iCacheCnt;
+            ///
+            ///<summary>
+            ///Counter used to generate aColCache[].lru values 
+            ///</summary>
+            public u8 nColCache;
+            ///
+            ///<summary>
+            ///Number of entries in the column cache 
+            ///</summary>
+            public u8 iColCache;
+            ///
+            ///<summary>
+            ///Next entry of the cache to replace 
+            ///</summary>
+
+            public yDbMask writeMask;
+            ///
+            ///<summary>
+            ///Start a write transaction on these databases 
+            ///</summary>
+            public yDbMask cookieMask;
+            ///
+            ///<summary>
+            ///Bitmask of schema verified databases 
+            ///</summary>
+            public u8 isMultiWrite;
+            ///
+            ///<summary>
+            ///True if statement may affect/insert multiple rows 
+            ///</summary>
+            public u8 mayAbort;
+            ///
+            ///<summary>
+            ///True if statement may throw an ABORT exception 
+            ///</summary>
+            public int cookieGoto;
+            ///
+            ///<summary>
+            ///Address of OpCode.OP_Goto to cookie verifier subroutine 
+            ///</summary>
+            public int[] cookieValue;
             ///
             ///<summary>
             ///Values of cookies to verify 
@@ -249,50 +185,50 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
             ///Register holding rowid of CREATE TABLE entry 
             ///</summary>
             public int regRowid;
-			///
-			///<summary>
-			///Register holding root page number for new objects 
-			///</summary>
-			public int regRoot;
-			///
-			///<summary>
-			///Information about AUTOINCREMENT counters 
-			///</summary>
-			public AutoincInfo pAinc;
-			///<summary>
-			///</summary>
-			///<param name="Max args passed to user function by sub">program </param>
-			///
-			///<summary>
-			///Information used while coding trigger programs. 
-			///</summary>
-			
-			public int nMaxArg;
-			///
-			///<summary>
-			///Parse structure for main program (or NULL) 
-			///</summary>
-			public Parse pToplevel;
-			///
-			///<summary>
-			///Table triggers are being coded for 
-			///</summary>
-			public Table pTriggerTab;
-			///
-			///<summary>
-			///Mask of old.* columns referenced 
-			///</summary>
-			public u32 oldmask;
-			///
-			///<summary>
-			///Mask of new.* columns referenced 
-			///</summary>
-			public u32 newmask;
-			///<summary>
-			///TokenType.TK_UPDATE, TokenType.TK_INSERT or TokenType.TK_DELETE 
-			///</summary>
-			
-			public u8 eTriggerOp;
+            ///
+            ///<summary>
+            ///Register holding root page number for new objects 
+            ///</summary>
+            public int regRoot;
+            ///
+            ///<summary>
+            ///Information about AUTOINCREMENT counters 
+            ///</summary>
+            public AutoincInfo pAinc;
+            ///<summary>
+            ///</summary>
+            ///<param name="Max args passed to user function by sub">program </param>
+            ///
+            ///<summary>
+            ///Information used while coding trigger programs. 
+            ///</summary>
+
+            public int nMaxArg;
+            ///
+            ///<summary>
+            ///Parse structure for main program (or NULL) 
+            ///</summary>
+            public Parse pToplevel;
+            ///
+            ///<summary>
+            ///Table triggers are being coded for 
+            ///</summary>
+            public Table pTriggerTab;
+            ///
+            ///<summary>
+            ///Mask of old.* columns referenced 
+            ///</summary>
+            public u32 oldmask;
+            ///
+            ///<summary>
+            ///Mask of new.* columns referenced 
+            ///</summary>
+            public u32 newmask;
+            ///<summary>
+            ///TokenType.TK_UPDATE, TokenType.TK_INSERT or TokenType.TK_DELETE 
+            ///</summary>
+
+            public u8 eTriggerOp;
             public TokenType eTriggerOperator
             {
                 get
@@ -301,39 +237,40 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
                 }
             }
 
-			///
-			///<summary>
-			///Default ON CONFLICT policy for trigger steps 
-			///</summary>
-			public OnConstraintError eOrconf;
-			///
-			
-			public u8 disableTriggers;
-			///
-			///<summary>
-			///True to disable triggers 
-			///</summary>
-			public double nQueryLoop;
-			///
-			///<summary>
-			///Estimated number of iterations of a query 
-			///</summary>
-			///
-			///<summary>
-			///Above is constant between recursions.  Below is reset before and after
-			///each recursion 
-			///</summary>
-			public int nVar;
-			///
-			///<summary>
-			///Number of '?' variables seen in the SQL so far 
-			///</summary>
-			public int nzVar;
-			///
+            ///
+            ///<summary>
+            ///Default ON CONFLICT policy for trigger steps 
+            ///</summary>
+            public OnConstraintError eOrconf;
+            ///
+
+            public u8 disableTriggers;
+            ///
+            ///<summary>
+            ///True to disable triggers 
+            ///</summary>
+            public double nQueryLoop;
+            ///
+            ///<summary>
+            ///Estimated number of iterations of a query 
+            ///</summary>
+            ///
+            ///<summary>
+            ///Above is constant between recursions.  Below is reset before and after
+            ///each recursion 
+            ///</summary>
+            public int nVar;
+            ///
+            ///<summary>
+            ///Number of '?' variables seen in the SQL so far 
+            ///</summary>
+            public int nzVar {
+                get { return azVar.Count; }
+            }			
 			///<summary>
 			///Number of available slots in azVar[] 
 			///</summary>
-			public string[] azVar;
+			public MyCollection<string> azVar=new MyCollection<string>();
 			///
 			///<summary>
 			///Pointers to names of parameters 
@@ -388,8 +325,11 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
                 get { return m_zTail; }
                 set { m_zTail = value; }
 			}
-			///
-			///<summary>
+
+            
+
+            ///
+            ///<summary>
             ///A table being constructed by CREATE TABLE 
             ///</summary>
             public Table pNewTable;
@@ -475,9 +415,8 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			}
 			public void ResetMembers()// Need to clear all the following variables during each recursion
 			 {
-				nVar=0;
-				nzVar=0;
-				azVar=null;
+				nVar=0;				
+				azVar=new MyCollection<string>();
 				nAlias=0;
 				nAliasAlloc=0;
 				aAlias=null;
@@ -503,8 +442,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			public void RestoreMembers()// Need to clear all the following variables during each recursion
 			 {
 				if(SaveBuf[nested]!=null) {
-					nVar=SaveBuf[nested].nVar;
-					nzVar=SaveBuf[nested].nzVar;
+					nVar=SaveBuf[nested].nVar;					
 					azVar=SaveBuf[nested].azVar;
 					nAlias=SaveBuf[nested].nAlias;
 					nAliasAlloc=SaveBuf[nested].nAliasAlloc;
@@ -531,8 +469,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			public void SaveMembers()// Need to clear all the following variables during each recursion
 			 {
 				SaveBuf[nested]=new Parse();
-				SaveBuf[nested].nVar=nVar;
-				SaveBuf[nested].nzVar=nzVar;
+				SaveBuf[nested].nVar=nVar;				
 				SaveBuf[nested].azVar=azVar;
 				SaveBuf[nested].nAlias=nAlias;
 				SaveBuf[nested].nAliasAlloc=nAliasAlloc;
@@ -668,55 +605,26 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 			///</summary>
 			void sqlite3AlterFinishAddColumn(Token pColDef) {
 				Table pNew;
-				///
-				///<summary>
 				///Copy of pParse.pNewTable 
-				///</summary>
 				Table pTab;
-				///
-				///<summary>
 				///Table being altered 
-				///</summary>
 				int iDb;
-				///
-				///<summary>
 				///Database number 
-				///</summary>
 				string zDb;
-				///
-				///<summary>
 				///Database name 
-				///</summary>
 				string zTab;
-				///
-				///<summary>
 				///Table name 
-				///</summary>
 				string zCol;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Null">terminated column definition </param>
+				///Null-terminated column definitior
 				Column pCol;
-				///
-				///<summary>
 				///The new column 
-				///</summary>
 				Expr pDflt;
-				///
-				///<summary>
 				///Default value for the new column 
-				///</summary>
 				Connection db;
-				///
-				///<summary>
 				///The database connection; 
-				///</summary>
 				db=this.db;
 				if(this.nErr!=0///
-				///<summary>
 				///|| db.mallocFailed != 0 
-				///</summary>
 				)
 					return;
 				pNew=this.pNewTable;
@@ -736,22 +644,15 @@ if( sqlite3AuthCheck(pParse, SQLITE_ALTER_TABLE, zDb, pTab.zName, 0) ){
 return;
 }
 #endif
-				///
-				///<summary>
 				///If the default value for the new column was specified with a
 				///literal NULL, then set pDflt to 0. This simplifies checking
 				///for an SQL NULL default below.
-				///</summary>
 				if(pDflt!=null&&pDflt.Operator==TokenType.TK_NULL) {
 					pDflt=null;
 				}
-				///
-				///<summary>
 				///Check that the new column is not specified as PRIMARY KEY or UNIQUE.
 				///If there is a NOT NULL constraint, then the default value for the
 				///column must not be NULL.
-				///
-				///</summary>
 				if(pCol.isPrimKey!=0) {
 					utilc.sqlite3ErrorMsg(this,"Cannot add a PRIMARY KEY column");
 					return;
@@ -769,12 +670,8 @@ return;
 					utilc.sqlite3ErrorMsg(this,"Cannot add a NOT NULL column with default value NULL");
 					return;
 				}
-				///
-				///<summary>
 				///Ensure the default expression is something that sqlite3ValueFromExpr()
 				///can handle (i.e. not CURRENT_TIME etc.)
-				///
-				///</summary>
 				if(pDflt!=null) {
 					sqlite3_value pVal=null;
                     if (vdbemem_cs.sqlite3ValueFromExpr(db, pDflt, SqliteEncoding.UTF8, sqliteinth.SQLITE_AFF_NONE, ref pVal) != 0)
@@ -788,10 +685,7 @@ return;
 					}
                     vdbemem_cs.sqlite3ValueFree(ref pVal);
 				}
-				///
-				///<summary>
 				///Modify the CREATE TABLE statement. 
-				///</summary>
 				zCol=pColDef.zRestSql.Substring(0,pColDef.Length).Replace(";"," ").Trim();
 				//sqlite3DbStrNDup(db, (char*)pColDef.z, pColDef.n);
 				if(zCol!=null) {
@@ -805,48 +699,38 @@ return;
 					db.DbFree(ref zCol);
 					db.flags=savedDbFlags;
 				}
-				///
-				///<summary>
 				///If the default value of the new column is NULL, then set the file
 				///format to 2. If the default value of the new column is not NULL,
 				///the file format becomes 3.
-				///
-				///</summary>
-				this.sqlite3MinimumFileFormat(iDb,pDflt!=null?3:2);
-				///
-				///<summary>
+				this.codegenMinimumFileFormat(iDb,pDflt!=null?3:2);
 				///Reload the schema of the modified table. 
-				///</summary>
 				this.reloadTableSchema(pTab,pTab.zName);
 			}
-			public///<summary>
+
+            ///<summary>
 			/// Generate code to make sure the file format number is at least minFormat.
 			/// The generated code will increase the file format number if necessary.
 			///</summary>
-			void sqlite3MinimumFileFormat(int iDb,int minFormat) {
-				Vdbe v;
-				v=this.sqlite3GetVdbe();
-				///
-				///<summary>
+			public void codegenMinimumFileFormat(int iDb,int minFormat) {
+				var v=this.sqlite3GetVdbe();
 				///The VDBE should have been allocated before this routine is called.
 				///If that allocation failed, we would have quit before reaching this
 				///point 
-				///</summary>
 				if(Sqlite3.ALWAYS(v)) {
-					int r1=this.sqlite3GetTempReg();
-					int r2=this.sqlite3GetTempReg();
-					int j1;
-                    v.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, r1, BTreeProp.FILE_FORMAT);
-                    vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
-					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,minFormat,r2);
-					j1=v.sqlite3VdbeAddOp3(OpCode.OP_Ge,r2,0,r1);
-                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, r2);
+					int r1=this.allocTempReg(), r2=this.allocTempReg();
+				
+                    v.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, r1, BTreeProp.FILE_FORMAT);      //r1=cookie[FILE_FORMAT]
+                    vdbeaux.markUsed(v, iDb);
+					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,minFormat,r2);                            //r2=minFormat
+					var j1=v.sqlite3VdbeAddOp3(OpCode.OP_Ge,r2,0,r1);                               //if(r2>r1)
+                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, r2);  //  cookie[FileFormat]=r2
 					v.sqlite3VdbeJumpHere(j1);
-					this.sqlite3ReleaseTempReg(r1);
-					this.sqlite3ReleaseTempReg(r2);
+
+					this.deallocTempReg(r1,r2);
 				}
 			}
-			public///<summary>
+
+            ///<summary>
 			/// Parameter zName is the name of a table that is about to be altered
 			/// (either with ALTER TABLE ... RENAME TO or ALTER TABLE ... ADD COLUMN).
 			/// If the table is a system table, this function leaves an error message
@@ -854,7 +738,7 @@ return;
 			///
 			/// Or, if zName is not a system table, zero is returned.
 			///</summary>
-			SqlResult isSystemTable(string zName) {
+			public SqlResult isSystemTable(string zName) {
 				if(zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
 					utilc.sqlite3ErrorMsg(this,"table %s may not be altered",zName);
 					return (SqlResult)1;
@@ -1102,7 +986,8 @@ goto exit_rename_table;
 				db.DbFree(ref zName);
 				db.flags=savedDbFlags;
 			}
-			public///<summary>
+
+            ///<summary>
 			/// Generate code to drop and reload the internal representation of table
 			/// pTab from the database, including triggers and temporary triggers.
 			/// Argument zName is the name of the table in the database schema at
@@ -1110,59 +995,39 @@ goto exit_rename_table;
 			/// pTab.zName if this function is being called to code part of an
 			/// "ALTER TABLE RENAME TO" statement.
 			///</summary>
-			void reloadTableSchema(Table pTab,string zName) {
-				Vdbe v;
-				string zWhere;
-				int iDb;
-				///
-				///<summary>
+            public void reloadTableSchema(Table pTab,string zName) {
 				///Index of database containing pTab 
-				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
 				Trigger pTrig;
 				#endif
-				v=this.sqlite3GetVdbe();
+				var v=this.sqlite3GetVdbe();
 				if(NEVER(v==null))
 					return;
 				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				iDb= this.db.indexOf(pTab.pSchema);
+				var iDb= this.db.indexOf(pTab.pSchema);
 				Debug.Assert(iDb>=0);
 				#if !SQLITE_OMIT_TRIGGER
-				///
-				///<summary>
 				///Drop any table triggers from the internal schema. 
-				///</summary>
                 pTab.sqlite3TriggerList(this).linkedList().ForEach(
                     trg => {
                         int iTrigDb = this.db.indexOf( trg.pSchema);
                         Debug.Assert(iTrigDb == iDb || iTrigDb == 1);
                         v.sqlite3VdbeAddOp4(OpCode.OP_DropTrigger, iTrigDb, 0, 0, trg.zName, 0);
                     }
-                );
-
-                
+                );            
 				#endif
-				///
-				///<summary>
 				///Drop the table and index from the internal schema. 
-				///</summary>
 				v.sqlite3VdbeAddOp4( OpCode.OP_DropTable,iDb,0,0,pTab.zName,0);
-				///
-				///<summary>
 				///Reload the table, index and permanent trigger schemas. 
-				///</summary>
-				zWhere=io.sqlite3MPrintf(this.db,"tbl_name=%Q",zName);
+				var zWhere=io.sqlite3MPrintf(this.db,"tbl_name=%Q",zName);
 				if(zWhere==null)
 					return;
-				v.sqlite3VdbeAddParseSchemaOp(iDb,zWhere);
+				v.codegenAddParseSchemaOp(iDb,zWhere);
 				#if !SQLITE_OMIT_TRIGGER
-				///
-				///<summary>
 				///Now, if the table is not stored in the temp database, reload any temp
 				///triggers. Don't use IN(...) in case SQLITE_OMIT_SUBQUERY is defined.
-				///</summary>
 				if((zWhere=this.whereTempTriggers(pTab))!="") {
-					v.sqlite3VdbeAddParseSchemaOp(1,zWhere);
+					v.codegenAddParseSchemaOp(1,zWhere);
 				}
 				#endif
 			}
@@ -2274,7 +2139,7 @@ goto attach_end;
 						///<summary>
 						///Address of MustBeInt instruction 
 						///</summary>
-						int regTemp=this.sqlite3GetTempReg();
+						int regTemp=this.allocTempReg();
 						///
 						///<summary>
 						///Invoke MustBeInt to coerce the child key value to an integer (i.e. 
@@ -2300,12 +2165,12 @@ goto attach_end;
 						v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,iOk);
 						v.sqlite3VdbeJumpHere(v.sqlite3VdbeCurrentAddr()-2);
 						v.sqlite3VdbeJumpHere(iMustBeInt);
-						this.sqlite3ReleaseTempReg(regTemp);
+						this.deallocTempReg(regTemp);
 					}
 					else {
 						int nCol=pFKey.nCol;
 						int regTemp=this.sqlite3GetTempRange(nCol);
-						int regRec=this.sqlite3GetTempReg();
+						int regRec=this.allocTempReg();
                         KeyInfo pKey = pIdx.sqlite3IndexKeyinfo(this);
 						v.sqlite3VdbeAddOp3( OpCode.OP_OpenRead,iCur,pIdx.tnum,iDb);
 						v.sqlite3VdbeChangeP4(-1,pKey, P4Usage.P4_KEYINFO_HANDOFF);
@@ -2346,7 +2211,7 @@ goto attach_end;
 						v.sqlite3VdbeAddOp3( OpCode.OP_MakeRecord,regTemp,nCol,regRec);
 						v.sqlite3VdbeChangeP4(-1,v.sqlite3IndexAffinityStr(pIdx), P4Usage.P4_TRANSIENT);
 						v.sqlite3VdbeAddOp4Int( OpCode.OP_Found,iCur,iOk,regRec,0);
-						this.sqlite3ReleaseTempReg(regRec);
+						this.deallocTempReg(regRec);
 						this.sqlite3ReleaseTempRange(regTemp,nCol);
 					}
 				}
@@ -3236,7 +3101,7 @@ goto attach_end;
 						if(pRaise!=null) {
 							pRaise.affinity=(char)OnConstraintError.OE_Abort;
 						}
-						pSelect=Select.sqlite3SelectNew(this,CollectionExtensions.Append(null,pRaise),build.sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
+						pSelect=Select.Create(this,CollectionExtensions.Append(null,pRaise),build.sqlite3SrcListAppend(db,0,tFrom,null),pWhere,null,null,null,0,null,null);
 						pWhere=null;
 					}
 					///
@@ -3402,6 +3267,8 @@ goto attach_end;
             ConsoleColor.Gray
         )
     };
+            
+
             static string pad(String str, int length)
             {
                 var left = (length - str.Length) / 2;
@@ -3531,6 +3398,7 @@ sqlite3ParserStackPeak(pEngine)
 				}
 				if(this.pVdbe!=null&&this.nErr>0&&this.nested==0) {
                     vdbeaux.sqlite3VdbeDelete(ref this.pVdbe);
+                    this.pVdbe = this.pVdbe;//trigger setter
 					this.pVdbe=null;
 				}
 				#if !SQLITE_OMIT_SHARED_CACHE
@@ -4028,8 +3896,8 @@ isView = false;
 						///Address of jump to M 
 						///</summary>
 						srcTab=this.nTab++;
-						regRec=this.sqlite3GetTempReg();
-						regTempRowid=this.sqlite3GetTempReg();
+						regRec=this.allocTempReg();
+						regTempRowid=this.allocTempReg();
                         v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, srcTab, nColumn);
 						addrTop=v.sqlite3VdbeAddOp1(OpCode.OP_Yield,dest.iParm);
 						addrIf=v.sqlite3VdbeAddOp1(OpCode.OP_If,regEof);
@@ -4038,8 +3906,8 @@ isView = false;
 						v.sqlite3VdbeAddOp3( OpCode.OP_Insert,srcTab,regRec,regTempRowid);
 						v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,addrTop);
 						v.sqlite3VdbeJumpHere(addrIf);
-						this.sqlite3ReleaseTempReg(regRec);
-						this.sqlite3ReleaseTempReg(regTempRowid);
+						this.deallocTempReg(regRec);
+						this.deallocTempReg(regTempRowid);
 					}
 				}
 				else {
@@ -4594,7 +4462,7 @@ isView = false;
 					int j1,j2,j3,j4,j5;
 					int iRec;
 					int memId=p.regCtr;
-					iRec=this.sqlite3GetTempReg();
+					iRec=this.allocTempReg();
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pDb.pSchema));
                     this.sqlite3OpenTable(0, p.iDb, pDb.pSchema.pSeqTab, OpCode.OP_OpenWrite);
 					j1=v.sqlite3VdbeAddOp1(OpCode.OP_NotNull,memId+1);
@@ -4613,7 +4481,7 @@ isView = false;
 					v.sqlite3VdbeAddOp3( OpCode.OP_Insert,0,iRec,memId+1);
                     v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
                     v.sqlite3VdbeAddOp0(OpCode.OP_Close);
-					this.sqlite3ReleaseTempReg(iRec);
+					this.deallocTempReg(iRec);
 				}
 			}
 			public void autoIncStep(int memId,int regRowid) {
@@ -4867,12 +4735,12 @@ isView = false;
 						}
 						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=0) {
 							build.sqlite3MultiWrite(this);
-							this.sqlite3GenerateRowDelete(pTab,baseCur,regRowid,0,pTrigger,OnConstraintError.OE_Replace);
+							this.codegenRowDelete(pTab,baseCur,regRowid,0,pTrigger,OnConstraintError.OE_Replace);
 						}
 						else
 							if(pTab.pIndex!=null) {
 								build.sqlite3MultiWrite(this);
-								this.sqlite3GenerateRowIndexDelete(pTab,baseCur,0);
+								this.codegenRowIndexDelete(pTab,baseCur,0);
 							}
 						seenReplace=true;
 						break;
@@ -4953,7 +4821,7 @@ isView = false;
 					///<summary>
 					///Check to see if the new index entry will be unique 
 					///</summary>
-					regR=this.sqlite3GetTempReg();
+					regR=this.allocTempReg();
                     v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regOldRowid, regR);
                     j3 = v.sqlite3VdbeAddOp4(OpCode.OP_IsUnique, baseCur + iCur + 1, 0, regR, regIdx,//regR, SQLITE_INT_TO_PTR(regIdx),
 					 P4Usage.P4_INT32);
@@ -5000,13 +4868,13 @@ isView = false;
 							TriggerType iDummy;
 							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_DELETE,null,out iDummy);
 						}
-						this.sqlite3GenerateRowDelete(pTab,baseCur,regR,0,pTrigger,OnConstraintError.OE_Replace);
+						this.codegenRowDelete(pTab,baseCur,regR,0,pTrigger,OnConstraintError.OE_Replace);
 						seenReplace=true;
 						break;
 					}
 					}
 					v.sqlite3VdbeJumpHere(j3);
-					this.sqlite3ReleaseTempReg(regR);
+					this.deallocTempReg(regR);
 				}
 				//if ( pbMayReplace )
 				{
@@ -5071,7 +4939,7 @@ isView = false;
 					}
 				}
 				regData=regRowid+1;
-				regRec=this.sqlite3GetTempReg();
+				regRec=this.allocTempReg();
 				v.sqlite3VdbeAddOp3( OpCode.OP_MakeRecord,regData,pTab.nCol,regRec);
 				v.sqlite3TableAffinityStr(pTab);
 				this.sqlite3ExprCacheAffinityChange(regData,pTab.nCol);
@@ -5738,7 +5606,7 @@ aXRef[j] = -1;
 					oldmask|= TriggerParser.sqlite3TriggerColmask(this,pTrigger,pChanges,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onError);
 					for(i=0;i<pTab.nCol;i++) {
 						if(aXRef[i]<0||oldmask==0xffffffff||(i<32&&0!=(oldmask&(1<<i)))) {
-							v.sqlite3ExprCodeGetColumnOfTable(pTab,iCur,i,regOld+i);
+							v.codegenExprCodeGetColumnOfTable(pTab,iCur,i,regOld+i);
 						}
 						else {
                             v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regOld + i);
@@ -5787,7 +5655,7 @@ aXRef[j] = -1;
 								sqliteinth.testcase(i==31);
 								sqliteinth.testcase(i==32);
 								v.sqlite3VdbeAddOp3( OpCode.OP_Column,iCur,i,regNew+i);
-								v.sqlite3ColumnDefault(pTab,i,regNew+i);
+								v.codegenColumnDefault(pTab,i,regNew+i);
 							}
 					}
 				}
@@ -5811,50 +5679,32 @@ aXRef[j] = -1;
 					///<param name="documentation.">documentation.</param>
 					///<param name=""></param>
                     v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iCur, addr, regOldRowid);
-					///
-					///<summary>
-					///</summary>
 					///<param name="If it did not delete it, the row">trigger may still have modified </param>
 					///<param name="some of the columns of the row being updated. Load the values for ">some of the columns of the row being updated. Load the values for </param>
 					///<param name="all columns not modified by the update statement into their ">all columns not modified by the update statement into their </param>
 					///<param name="registers in case this has happened.">registers in case this has happened.</param>
-					///<param name=""></param>
 					for(i=0;i<pTab.nCol;i++) {
 						if(aXRef[i]<0&&i!=pTab.iPKey) {
 							v.sqlite3VdbeAddOp3( OpCode.OP_Column,iCur,i,regNew+i);
-							v.sqlite3ColumnDefault(pTab,i,regNew+i);
+							v.codegenColumnDefault(pTab,i,regNew+i);
 						}
 					}
 				}
 				if(!isView) {
 					int j1;
-					///
-					///<summary>
 					///Address of jump instruction 
-					///</summary>
 					///
-					///<summary>
 					///Do constraint checks. 
-					///</summary>
 					int iDummy;
 					this.sqlite3GenerateConstraintChecks(pTab,iCur,regNewRowid,aRegIdx,(chngRowid?regOldRowid:0),true,onError,addr,out iDummy);
-					///
-					///<summary>
 					///Do FK constraint checks. 
-					///</summary>
 					if(hasFK) {
 						this.sqlite3FkCheck(pTab,regOldRowid,0);
 					}
-					///
-					///<summary>
 					///Delete the index entries associated with the current record.  
-					///</summary>
 					j1=v.sqlite3VdbeAddOp3( OpCode.OP_NotExists,iCur,0,regOldRowid);
-					this.sqlite3GenerateRowIndexDelete(pTab,iCur,aRegIdx);
-					///
-					///<summary>
+					this.codegenRowIndexDelete(pTab,iCur,aRegIdx);
 					///If changing the record number, delete the old record.  
-					///</summary>
 					if(hasFK||chngRowid) {
 						v.sqlite3VdbeAddOp2( OpCode.OP_Delete,iCur,0);
 					}
@@ -5862,17 +5712,11 @@ aXRef[j] = -1;
 					if(hasFK) {
 						this.sqlite3FkCheck(pTab,0,regNewRowid);
 					}
-					///
-					///<summary>
 					///Insert the new index entries and the new record. 
-					///</summary>
 					this.sqlite3CompleteInsertion(pTab,iCur,regNewRowid,aRegIdx,true,false,false);
-					///
-					///<summary>
 					///Do any ON CASCADE, SET NULL or SET DEFAULT operations required to
 					///handle rows (possibly in other tables) that refer via a foreign key
 					///to the row just updated. 
-					///</summary>
 					if(hasFK) {
 						this.sqlite3FkActions(pTab,pChanges,regOldRowid);
 					}
@@ -6039,7 +5883,7 @@ aXRef[j] = -1;
 					}
 					pEList=pEList.Append(pExpr);
 				}
-				pSelect=Select.sqlite3SelectNew(this,pEList,pSrc,pWhere,null,null,null,0,null,null);
+				pSelect=Select.Create(this,pEList,pSrc,pWhere,null,null,null,0,null,null);
 				///
 				///<summary>
 				///Create the ephemeral table into which the update results will
@@ -6167,7 +6011,7 @@ aXRef[j] = -1;
 					//{
 					//  SelectMethods.sqlite3SelectDelete( db, ref pDup );
 					//}
-					pDup=Select.sqlite3SelectNew(this,null,pFrom,pWhere,null,null,null,0,null,null);
+					pDup=Select.Create(this,null,pFrom,pWhere,null,null,null,0,null,null);
 				}
                 dest.Init( SelectResultType.EphemTab, iCur);
 				Select.sqlite3Select(this,pDup,ref dest);
@@ -6483,7 +6327,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 						///<summary>
 						///True to count changes 
 						///</summary>
-						this.sqlite3GenerateRowDelete(pTab,iCur,iRowid,count,pTrigger,OnConstraintError.OE_Default);
+						this.codegenRowDelete(pTab,iCur,iRowid,count,pTrigger,OnConstraintError.OE_Default);
 					}
 					///
 					///<summary>
@@ -6533,260 +6377,124 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				exprc.Delete(db,ref pWhere);
 				return;
 			}
-			public void sqlite3GenerateRowDelete(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Table containing the row to be deleted 
-			///</summary>
-			int iCur,///
-			///<summary>
-			///VdbeCursor number for the table 
-			///</summary>
-			int iRowid,///
-			///<summary>
-			///Memory cell that contains the rowid to delete 
-			///</summary>
-			int count,///
-			///<summary>
-			///</summary>
-			///<param name="If non">zero, increment the row change counter </param>
-			Trigger pTrigger,///
-			///<summary>
-			///List of triggers to (potentially) fire 
-			///</summary>
-			OnConstraintError onconf///
-			///<summary>
-			///Default ON CONFLICT policy for triggers 
-			///</summary>
+
+			public void codegenRowDelete(///
+			    Table pTab,///
+			    ///Table containing the row to be deleted 
+			    int iCur,///
+			    ///VdbeCursor number for the table 
+			    int iRowid,///
+			    ///Memory cell that contains the rowid to delete 
+			    int count,///
+			    ///<param name="If non">zero, increment the row change counter </param>
+			    Trigger pTrigger,///
+			    ///List of triggers to (potentially) fire 
+			    OnConstraintError onconf///
+			    ///Default ON CONFLICT policy for triggers 
 			) {
 				Vdbe v=this.pVdbe;
-				///
-				///<summary>
 				///Vdbe 
-				///</summary>
 				int iOld=0;
-				///
-				///<summary>
 				///First register in OLD.* array 
-				///</summary>
-				int iLabel;
 				///
-				///<summary>
-				///Label resolved to end of generated code 
-				///</summary>
-				///
-				///<summary>
 				///Vdbe is guaranteed to have been allocated by this stage. 
-				///</summary>
 				Debug.Assert(v!=null);
-				///
-				///<summary>
-				///Seek cursor iCur to the row to delete. If this row no longer exists 
-				///(this can happen if a trigger program has already deleted it), do
-				///not attempt to delete it or fire any DELETE triggers.  
-				///</summary>
-				iLabel=v.sqlite3VdbeMakeLabel();
+                ///Seek cursor iCur to the row to delete. If this row no longer exists 
+                ///(this can happen if a trigger program has already deleted it), do
+                ///not attempt to delete it or fire any DELETE triggers.
+                ///
+                ///Label resolved to end of generated code 
+
+                var iLabel =v.sqlite3VdbeMakeLabel();
                 v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iCur, iLabel, iRowid);
-				///
-				///<summary>
 				///If there are any triggers to fire, allocate a range of registers to
 				///use for the old.* references in the triggers.  
-				///</summary>
 				if(this.sqlite3FkRequired(pTab,null,0)!=0||pTrigger!=null) {
-					u32 mask;
-					///
-					///<summary>
-					///Mask of OLD.* columns in use 
-					///</summary>
-					int iCol;
-					///
-					///<summary>
-					///Iterator used while populating OLD.* 
-					///</summary>
-					///
-					///<summary>
-					///TODO: Could use temporary registers here. Also could attempt to
-					///avoid copying the contents of the rowid register.  
-					///</summary>
-					mask= TriggerParser.sqlite3TriggerColmask(this,pTrigger,null,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onconf);
+                    ///Iterator used while populating OLD.* 
+                    ///
+                    ///TODO: Could use temporary registers here. Also could attempt to
+                    ///avoid copying the contents of the rowid register.  
+                    ///Mask of OLD.* columns in use 
+
+                    var mask = TriggerParser.sqlite3TriggerColmask(this,pTrigger,null,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onconf);
 					mask|=this.sqlite3FkOldmask(pTab);
 					iOld=this.nMem+1;
 					this.nMem+=(1+pTab.nCol);
-					///
-					///<summary>
-					///</summary>
 					///<param name="Populate the OLD.* pseudo">table register array. These values will be </param>
 					///<param name="used by any BEFORE and AFTER triggers that exist.  ">used by any BEFORE and AFTER triggers that exist.  </param>
                     v.sqlite3VdbeAddOp2(OpCode.OP_Copy, iRowid, iOld);
-					for(iCol=0;iCol<pTab.nCol;iCol++) {
+					for(var iCol=0;iCol<pTab.nCol;iCol++) {
 						if(mask==0xffffffff||(mask&(1<<iCol))!=0) {
-							v.sqlite3ExprCodeGetColumnOfTable(pTab,iCur,iCol,iOld+iCol+1);
+							v.codegenExprCodeGetColumnOfTable(pTab,iCur,iCol,iOld+iCol+1);
 						}
 					}
-                    ///
-                    ///<summary>
                     ///Invoke BEFORE DELETE trigger programs. 
-                    ///</summary>
                     TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
-					///
-					///<summary>
 					///Seek the cursor to the row to be deleted again. It may be that
 					///the BEFORE triggers coded above have already removed the row
 					///being deleted. Do not attempt to delete the row a second time, and 
 					///do not fire AFTER triggers.  
-					///</summary>
                     v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iCur, iLabel, iRowid);
-					///
-					///<summary>
 					///Do FK processing. This call checks that any FK constraints that
 					///refer to this table (i.e. constraints attached to other tables) 
 					///are not violated by deleting this row.  
-					///</summary>
 					this.sqlite3FkCheck(pTab,iOld,0);
 				}
-				///
-				///<summary>
 				///Delete the index and table entries. Skip this step if pTab is really
 				///a view (in which case the only effect of the DELETE statement is to
 				///fire the INSTEAD OF triggers).  
-				///</summary>
 				if(pTab.pSelect==null) {
-					this.sqlite3GenerateRowIndexDelete(pTab,iCur,0);
+					this.codegenRowIndexDelete(pTab,iCur,0);
                     v.sqlite3VdbeAddOp2( OpCode.OP_Delete, iCur, (count != 0 ? (int)OpFlag.OPFLAG_NCHANGE : 0));
 					if(count!=0) {
 						v.sqlite3VdbeChangeP4(-1,pTab.zName, P4Usage.P4_TRANSIENT);
 					}
 				}
-				///
-				///<summary>
 				///Do any ON CASCADE, SET NULL or SET DEFAULT operations required to
 				///handle rows (possibly in other tables) that refer via a foreign key
 				///to the row just deleted. 
-				///</summary>
 				this.sqlite3FkActions(pTab,null,iOld);
-                ///
-                ///<summary>
                 ///Invoke AFTER DELETE trigger programs. 
-                ///</summary>
                 TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
-				///
-				///<summary>
 				///Jump here if the row had already been deleted before any BEFORE
 				///trigger programs were invoked. Or if a trigger program throws a 
 				///RAISE(IGNORE) exception.  
-				///</summary>
 				v.sqlite3VdbeResolveLabel(iLabel);
 			}
-			public void sqlite3GenerateRowIndexDelete(///
-			///<summary>
-			///Parsing and code generating context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Table containing the row to be deleted 
-			///</summary>
-			int iCur,///
-			///<summary>
-			///VdbeCursor number for the table 
-			///</summary>
-			int nothing///
-			///<summary>
-			///Only delete if aRegIdx!=0 && aRegIdx[i]>0 
-			///</summary>
+			public void codegenRowIndexDelete(///
+			    Table pTab,///
+			    ///Table containing the row to be deleted 
+			    int iCur,///
+			    ///VdbeCursor number for the table 
+			    int nothing///
+			    ///Only delete if aRegIdx!=0 && aRegIdx[i]>0 
 			) {
 				int[] aRegIdx=null;
-				this.sqlite3GenerateRowIndexDelete(pTab,iCur,aRegIdx);
+				this.codegenRowIndexDelete(pTab,iCur,aRegIdx);
 			}
-			public void sqlite3GenerateRowIndexDelete(///
-			///<summary>
-			///Parsing and code generating context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Table containing the row to be deleted 
-			///</summary>
-			int iCur,///
-			///<summary>
-			///VdbeCursor number for the table 
-			///</summary>
-			int[] aRegIdx///
-			///<summary>
-			///Only delete if aRegIdx!=0 && aRegIdx[i]>0 
-			///</summary>
+			public void codegenRowIndexDelete(
+			    Table pTab,
+                ///Table containing the row to be deleted 
+			    int iCur,///
+			    ///VdbeCursor number for the table 
+			    int[] aRegIdx///
+			    ///Only delete if aRegIdx!=0 && aRegIdx[i]>0 
 			) {
-				int i;
-				Index pIdx;
-				int r1;
-				for(i=1,pIdx=pTab.pIndex;pIdx!=null;i++,pIdx=pIdx.pNext) {
-					if(aRegIdx!=null&&aRegIdx[i-1]==0)
-						continue;
-					r1=this.sqlite3GenerateIndexKey(pIdx,iCur,0,false);
-					this.pVdbe.sqlite3VdbeAddOp3( OpCode.OP_IdxDelete,iCur+i,r1,pIdx.nColumn+1);
-				}
+                pTab.pIndex.path(x => x.pNext).ForEach(
+(Action<Index, int>)((pIdx, idx) => {//start with 1
+                        var i = idx + 1;
+                        if (aRegIdx != null && aRegIdx[i - 1] == 0)
+                            return;
+                        var r1 = this.codegenGenerateIndexKey(pIdx, iCur, 0, false);
+                        this.pVdbe.sqlite3VdbeAddOp3(OpCode.OP_IdxDelete, iCur + i, r1, pIdx.nColumn + 1);
+                    })
+                );
+                
 			}
-			public int sqlite3GenerateIndexKey(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			Index pIdx,///
-			///<summary>
-			///The index for which to generate a key 
-			///</summary>
-			int iCur,///
-			///<summary>
-			///VdbeCursor number for the pIdx.pTable table 
-			///</summary>
-			int regOut,///
-			///<summary>
-			///Write the new index key to this register 
-			///</summary>
-			bool doMakeRec///
-			///<summary>
-			///Run the  OpCode.OP_MakeRecord instruction if true 
-			///</summary>
-			) {
-				Vdbe v=this.pVdbe;
-				int j;
-				Table pTab=pIdx.pTable;
-				int regBase;
-				int nCol;
-				nCol=pIdx.nColumn;
-				regBase=this.sqlite3GetTempRange(nCol+1);
-                v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iCur, regBase + nCol);
-				for(j=0;j<nCol;j++) {
-					int idx=pIdx.aiColumn[j];
-					if(idx==pTab.iPKey) {
-                        v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regBase + nCol, regBase + j);
-					}
-					else {
-						v.sqlite3VdbeAddOp3( OpCode.OP_Column,iCur,idx,regBase+j);
-						v.sqlite3ColumnDefault(pTab,idx,-1);
-					}
-				}
-				if(doMakeRec) {
-					string zAff;
-                    if (pTab.pSelect != null || (this.db.flags & SqliteFlags.SQLITE_IdxRealAsInt) != 0)
-                    {
-						zAff="";
-					}
-					else {
-						zAff=v.sqlite3IndexAffinityStr(pIdx);
-					}
-					v.sqlite3VdbeAddOp3( OpCode.OP_MakeRecord,regBase,nCol+1,regOut);
-					v.sqlite3VdbeChangeP4(-1,zAff, P4Usage.P4_TRANSIENT);
-				}
-				this.sqlite3ReleaseTempRange(regBase,nCol+1);
-				return regBase;
-			}
+			
 			public Expr sqlite3ExprSetCollByToken(Expr pExpr,Token pCollName) {
 				string zColl;
-				///
-				///<summary>
 				///Dequoted name of collation sequence 
-				///</summary>
 				CollSeq pColl;
 				Connection db=this.db;
 				zColl=build.sqlite3NameFromToken(db,pCollName);
@@ -6795,99 +6503,9 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				db.DbFree(ref zColl);
 				return pExpr;
 			}
-			public CollSeq sqlite3ExprCollSeq(Expr pExpr) {
-				CollSeq pColl=null;
-				Expr p=pExpr;
-				while(Sqlite3.ALWAYS(p)) {
-					TokenType op;
-					pColl=pExpr.CollatingSequence;
-					if(pColl!=null)
-						break;
-					op=p.Operator;
-					if(p.pTab!=null&&(op==TokenType.TK_AGG_COLUMN||op==TokenType.TK_COLUMN||op==TokenType.TK_REGISTER||op==TokenType.TK_TRIGGER)) {
-						///
-						///<summary>
-						///</summary>
-						///<param name="op==TokenType.TK_REGISTER && p">>pTab!=0 happens when pExpr was originally</param>
-						///<param name="a TokenType.TK_COLUMN but was previously evaluated and cached in a register ">a TokenType.TK_COLUMN but was previously evaluated and cached in a register </param>
-						string zColl;
-						int j=p.iColumn;
-						if(j>=0) {
-							Connection db=this.db;
-							zColl=p.pTab.aCol[j].zColl;
-							pColl=db.sqlite3FindCollSeq(sqliteinth.ENC(db),zColl,0);
-							pExpr.CollatingSequence=pColl;
-						}
-						break;
-					}
-					if(op!=TokenType.TK_CAST&&op!=TokenType.TK_UPLUS) {
-						break;
-					}
-					p=p.pLeft;
-				}
-				if(sqlite3CheckCollSeq(this,pColl)!=0) {
-					pColl=null;
-				}
-				return pColl;
-			}
-			public CollSeq sqlite3BinaryCompareCollSeq(Expr pLeft,Expr pRight) {
-				CollSeq pColl;
-				Debug.Assert(pLeft!=null);
-				if((pLeft.Flags&ExprFlags.EP_ExpCollate)!=0) {
-					Debug.Assert(pLeft.CollatingSequence!=null);
-					pColl=pLeft.CollatingSequence;
-				}
-				else
-					if(pRight!=null&&((pRight.Flags&ExprFlags.EP_ExpCollate)!=0)) {
-						Debug.Assert(pRight.CollatingSequence!=null);
-						pColl=pRight.CollatingSequence;
-					}
-					else {
-						pColl=this.sqlite3ExprCollSeq(pLeft);
-						if(pColl==null) {
-							pColl=this.sqlite3ExprCollSeq(pRight);
-						}
-					}
-				return pColl;
-			}
-			public int codeCompare(///
-			///<summary>
-			///The parsing (and code generating) context 
-			///</summary>
-			Expr pLeft,///
-			///<summary>
-			///The left operand 
-			///</summary>
-			Expr pRight,///
-			///<summary>
-			///The right operand 
-			///</summary>
-			OpCode opcode,///
-			///<summary>
-			///The comparison opcode 
-			///</summary>
-			int in1,int in2,///
-			///<summary>
-			///Register holding operands 
-			///</summary>
-			int dest,///
-			///<summary>
-			///Jump here if true.  
-			///</summary>
-			int jumpIfNull///
-			///<summary>
-			///If true, jump if either operand is NULL 
-			///</summary>
-			) {
-				int p5;
-				int addr;
-				CollSeq p4;
-				p4=this.sqlite3BinaryCompareCollSeq(pLeft,pRight);
-				p5=pLeft.binaryCompareP5(pRight,jumpIfNull);
-				addr=this.pVdbe.sqlite3VdbeAddOp4(opcode,in2,dest,in1,p4, P4Usage.P4_COLLSEQ);
-				this.pVdbe.sqlite3VdbeChangeP5((u8)p5);
-				return addr;
-			}
+			
+			
+			
 			public SqlResult sqlite3ExprCheckHeight(int nHeight) {
 				var rc=SqlResult.SQLITE_OK;
 				int mxHeight=this.db.aLimit[Globals.SQLITE_LIMIT_EXPR_DEPTH];
@@ -7040,38 +6658,9 @@ return;
 					return;
 				}
 			}
-			public void sqlite3ExprCacheRemove(int iReg,int nReg) {
-				int i;
-				int iLast=iReg+nReg-1;
-				sqliteinth.yColCache p;
-                for (i = 0; i < sqliteinth.SQLITE_N_COLCACHE; i++)//p=pParse.aColCache... p++)
-				 {
-					p=this.aColCache[i];
-					int r=p.iReg;
-					if(r>=iReg&&r<=iLast) {
-						this.cacheEntryClear(p);
-						p.iReg=0;
-					}
-				}
-			}
-			public void sqlite3ExprCachePush() {
-				this.iCacheLevel++;
-			}
-			public void sqlite3ExprCachePop(int N) {
-				int i;
-				sqliteinth.yColCache p;
-				Debug.Assert(N>0);
-				Debug.Assert(this.iCacheLevel>=N);
-				this.iCacheLevel-=N;
-                for (i = 0; i < sqliteinth.SQLITE_N_COLCACHE; i++)// p++)
-				 {
-					p=this.aColCache[i];
-					if(p.iReg!=0&&p.iLevel>this.iCacheLevel) {
-						this.cacheEntryClear(p);
-						p.iReg=0;
-					}
-				}
-			}
+			
+			
+			
 			public void sqlite3ExprCachePinRegister(int iReg) {
 				int i;
 				sqliteinth.yColCache p;
@@ -7118,7 +6707,7 @@ return;
 					}
 				}
 				Debug.Assert(v!=null);
-				v.sqlite3ExprCodeGetColumnOfTable(pTab,iTable,iColumn,iReg);
+				v.codegenExprCodeGetColumnOfTable(pTab,iTable,iColumn,iReg);
 				this.sqlite3ExprCacheStore(iTable,iColumn,iReg);
 				return iReg;
 			}
@@ -7152,64 +6741,32 @@ return;
 					}
 				}
 			}
-			public void sqlite3ExprCodeCopy(int iFrom,int iTo,int nReg) {
-				int i;
-				if(NEVER(iFrom==iTo))
-					return;
-				for(i=0;i<nReg;i++) {
-                    this.pVdbe.sqlite3VdbeAddOp2(OpCode.OP_Copy, iFrom + i, iTo + i);
-				}
-			}
+			
 			public int usedAsColumnCache(int iFrom,int iTo) {
 				return 0;
 			}
-			public int sqlite3ExprCodeTarget(Expr pExpr,int target) {
+			public override int sqlite3ExprCodeTarget(Expr pExpr,int target) {
 				Vdbe v=this.pVdbe;
-				///
-				///<summary>
 				///The VM under construction 
-				///</summary>
-				TokenType op;
-				///
-				///<summary>
-				///The opcode being coded 
-				///</summary>
 				int inReg=target;
-				///
-				///<summary>
 				///Results stored in register inReg 
-				///</summary>
 				int regFree1=0;
-				///
-				///<summary>
-				///</summary>
 				///<param name="If non">zero free this temporary register </param>
 				int regFree2=0;
-				///
-				///<summary>
-				///</summary>
 				///<param name="If non">zero free this temporary register </param>
 				int r1=0,r2=0,r3=0,r4=0;
-				///
-				///<summary>
 				///Various register numbers 
-				///</summary>
 				Connection db=this.db;
-				///
-				///<summary>
 				///The database connection 
-				///</summary>
 				Debug.Assert(target>0&&target<=this.nMem);
 				if(v==null) {
 					//Debug.Assert( pParse.db.mallocFailed != 0 );
 					return 0;
 				}
-				if(pExpr==null) {
-					op=TokenType.TK_NULL;
-				}
-				else {
-					op=pExpr.Operator;
-				}
+
+				///The opcode being coded 
+                var op= pExpr?.Operator??TokenType.TK_NULL;
+                
 				switch(op) {
 				case TokenType.TK_AGG_COLUMN:
 				{
@@ -7225,18 +6782,12 @@ return;
 							v.sqlite3VdbeAddOp3( OpCode.OP_Column,pAggInfo.sortingIdx,pCol.iSorterColumn,target);
 							break;
 						}
-					///
-					///<summary>
 					///Otherwise, fall thru into the TokenType.TK_COLUMN case 
-					///</summary>
 				}
 				goto case TokenType.TK_COLUMN;
 				case TokenType.TK_COLUMN: {
 					if(pExpr.iTable<0) {
-						///
-						///<summary>
 						///This only happens when coding check constraints 
-						///</summary>
 						Debug.Assert(this.ckBase>0);
 						inReg=pExpr.iColumn+this.ckBase;
 					}
@@ -7246,13 +6797,13 @@ return;
 					break;
 				}
 				case TokenType.TK_INTEGER: {
-					this.codeInteger(pExpr,false,target);
+					codeInteger(pExpr,false,target);
 					break;
 				}
 				#if !SQLITE_OMIT_FLOATING_POINT
 				case TokenType.TK_FLOAT: {
 					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
-					exprc.codeReal(v,pExpr.u.zToken,false,target);
+					codeReal(v,pExpr.u.zToken,false,target);
 					break;
 				}
 				#endif
@@ -7302,10 +6853,7 @@ return;
 				}
 				#if !SQLITE_OMIT_CAST
 				case TokenType.TK_CAST: {
-					///
-					///<summary>
 					///Expressions of the form:   CAST(pLeft AS token) 
-					///</summary>
 					int aff;
                     OpCode to_op;
 					inReg=this.sqlite3ExprCodeTarget(pExpr.pLeft,target);
@@ -7414,17 +6962,17 @@ return;
 					Expr pLeft=pExpr.pLeft;
 					Debug.Assert(pLeft!=null);
 					if(pLeft.Operator==TokenType.TK_INTEGER) {
-						this.codeInteger(pLeft,true,target);
+						codeInteger(pLeft,true,target);
 						#if !SQLITE_OMIT_FLOATING_POINT
 					}
 					else
 						if(pLeft.Operator==TokenType.TK_FLOAT) {
 							Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
-							exprc.codeReal(v,pLeft.u.zToken,true,target);
+							codeReal(v,pLeft.u.zToken,true,target);
 							#endif
 						}
 						else {
-							regFree1=r1=this.sqlite3GetTempReg();
+							regFree1=r1=this.allocTempReg();
 							v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,r1);
 							r2=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree2);
 							v.sqlite3VdbeAddOp3(OpCode.OP_Subtract,r2,r1,target);
@@ -7473,82 +7021,48 @@ return;
 				}
 				case TokenType.TK_CONST_FUNC:
 				case TokenType.TK_FUNCTION: {
-					ExprList pFarg;
-					///
-					///<summary>
-					///List of function arguments 
-					///</summary>
-					int nFarg;
-					///
-					///<summary>
-					///Number of function arguments 
-					///</summary>
-					FuncDef pDef;
-					///
-					///<summary>
-					///The function definition object 
-					///</summary>
+					
+					
 					int nId;
-					///
-					///<summary>
 					///Length of the function name in bytes 
-					///</summary>
 					string zId;
-					///
-					///<summary>
 					///The function name 
-					///</summary>
 					int constMask=0;
-					///
-					///<summary>
 					///Mask of function arguments that are constant 
-					///</summary>
-					int i;
-					///
-					///<summary>
-					///Loop counter 
-					///</summary>
 					SqliteEncoding enc=sqliteinth.ENC(db);
-					///
-					///<summary>
 					///The text encoding used by this database 
-					///</summary>
 					CollSeq pColl=null;
-					///
-					///<summary>
 					///A collating sequence 
-					///</summary>
 					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
 					sqliteinth.testcase(op==TokenType.TK_CONST_FUNC);
 					sqliteinth.testcase(op==TokenType.TK_FUNCTION);
-					if(pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly)) {
+                            ExprList pFarg;
+                            ///List of function arguments 
+                            if (pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly)) {
 						pFarg=null;
 					}
 					else {
 						pFarg=pExpr.x.pList;
 					}
-					nFarg=pFarg!=null?pFarg.Count:0;
+                            ///Number of function arguments 
+                            var nFarg =pFarg!=null?pFarg.Count:0;
 					Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
 					zId=pExpr.u.zToken;
 					nId=StringExtensions.Strlen30(zId);
-                    pDef = FuncDefTraverse.sqlite3FindFunction(this.db, zId, nId, nFarg, enc, 0);
+                    var pDef = FuncDefTraverse.sqlite3FindFunction(this.db, zId, nId, nFarg, enc, 0);
 					if(pDef==null) {
 						utilc.sqlite3ErrorMsg(this,"unknown function: %.*s()",nId,zId);
 						break;
 					}
-					///
-					///<summary>
-					///</summary>
 					///<param name="Attempt a direct implementation of the built">in COALESCE() and</param>
 					///<param name="IFNULL() functions.  This avoids unnecessary evalation of">IFNULL() functions.  This avoids unnecessary evalation of</param>
 					///<param name="arguments past the first non">NULL argument.</param>
-					///<param name=""></param>
                     if ((pDef.flags & FuncFlags.SQLITE_FUNC_COALESCE) != 0)
                     {
 						int endCoalesce=v.sqlite3VdbeMakeLabel();
 						Debug.Assert(nFarg>=2);
 						this.sqlite3ExprCode(pFarg.a[0].pExpr,target);
-						for(i=1;i<nFarg;i++) {
+						for(var i=1;i<nFarg;i++) {
                             v.sqlite3VdbeAddOp2(OpCode.OP_NotNull, target, endCoalesce);
 							this.sqlite3ExprCacheRemove(target,1);
 							this.sqlite3ExprCachePush();
@@ -7561,16 +7075,10 @@ return;
 					if(pFarg!=null) {
 						r1=this.sqlite3GetTempRange(nFarg);
 						this.sqlite3ExprCachePush();
-						///
-						///<summary>
 						///Ticket 2ea2425d34be 
-						///</summary>
 						this.sqlite3ExprCodeExprList(pFarg,r1,true);
 						this.sqlite3ExprCachePop(1);
-						///
-						///<summary>
 						///Ticket 2ea2425d34be 
-						///</summary>
 					}
 					else {
 						r1=0;
@@ -7598,7 +7106,7 @@ return;
                             pDef = VTableMethodsExtensions.sqlite3VtabOverloadFunction(db, pDef, nFarg, pFarg.a[0].pExpr);
 						}
 					#endif
-					for(i=0;i<nFarg;i++) {
+					for(var i=0;i<nFarg;i++) {
 						if(i<32&&pFarg.a[i].pExpr.sqlite3ExprIsConstant()!=0) {
 							constMask|=(1<<i);
 						}
@@ -7659,19 +7167,19 @@ return;
 					r2=this.sqlite3ExprCodeTemp(pRight,ref regFree2);
 					sqliteinth.testcase(regFree1==0);
 					sqliteinth.testcase(regFree2==0);
-					r3=this.sqlite3GetTempReg();
-					r4=this.sqlite3GetTempReg();
+					r3=this.allocTempReg();
+					r4=this.allocTempReg();
                     this.codeCompare(pLeft, pRight,  OpCode.OP_Ge, r1, r2, r3, sqliteinth.SQLITE_STOREP2);
 					pLItem=pExpr.x.pList[1];
 					// pLItem++;
 					pRight=pLItem.pExpr;
-					this.sqlite3ReleaseTempReg(regFree2);
+					this.deallocTempReg(regFree2);
 					r2=this.sqlite3ExprCodeTemp(pRight,ref regFree2);
 					sqliteinth.testcase(regFree2==0);
                     this.codeCompare(pLeft, pRight,  OpCode.OP_Le, r1, r2, r4, sqliteinth.SQLITE_STOREP2);
                     v.sqlite3VdbeAddOp3(OpCode.OP_And, r3, r4, target);
-					this.sqlite3ReleaseTempReg(r3);
-					this.sqlite3ReleaseTempReg(r4);
+					this.deallocTempReg(r3);
+					this.deallocTempReg(r4);
 					break;
 				}
 				case TokenType.TK_UPLUS: {
@@ -7752,55 +7260,25 @@ return;
 				default: {
 					Debug.Assert(op==TokenType.TK_CASE);
 					int endLabel;
-					///
-					///<summary>
 					///GOTO label for end of CASE stmt 
-					///</summary>
 					int nextCase;
-					///
-					///<summary>
 					///GOTO label for next WHEN clause 
-					///</summary>
 					int nExpr;
-					///
-					///<summary>
 					///2x number of WHEN terms 
-					///</summary>
 					int i;
-					///
-					///<summary>
 					///Loop counter 
-					///</summary>
 					ExprList pEList;
-					///
-					///<summary>
 					///List of WHEN terms 
-					///</summary>
 					IList<ExprList_item> aListelem;
-					///
-					///<summary>
 					///Array of WHEN terms 
-					///</summary>
 					Expr opCompare=new Expr();
-					///
-					///<summary>
 					///The X==Ei expression 
-					///</summary>
 					Expr cacheX;
-					///
-					///<summary>
 					///Cached expression X 
-					///</summary>
 					Expr pX;
-					///
-					///<summary>
 					///The X expression 
-					///</summary>
 					Expr pTest=null;
-					///
-					///<summary>
 					///X==Ei (form A) or just Ei (form B) 
-					///</summary>
 					#if !NDEBUG
 																																																																																																																																			            int iCacheLevel = pParse.iCacheLevel;
             //VVA_ONLY( int iCacheLevel = pParse.iCacheLevel; )
@@ -7822,10 +7300,7 @@ return;
 						opCompare.Operator=TokenType.TK_EQ;
 						opCompare.pLeft=cacheX;
 						pTest=opCompare;
-						///
-						///<summary>
 						///Ticket b351d95f9cd5ef17e9d9dbae18f5ca8611190001:
-						///</summary>
 						///<param name="The value in regFree1 might get SCopy">ed into the file result.</param>
 						///<param name="So make sure that the regFree1 register is not reused for other">So make sure that the regFree1 register is not reused for other</param>
 						///<param name="purposes and possibly overwritten.  ">purposes and possibly overwritten.  </param>
@@ -7893,22 +7368,11 @@ return;
 				}
 				#endif
 				}
-				this.sqlite3ReleaseTempReg(regFree1);
-				this.sqlite3ReleaseTempReg(regFree2);
+				this.deallocTempReg(regFree1);
+				this.deallocTempReg(regFree2);
 				return inReg;
 			}
-			public int sqlite3ExprCodeTemp(Expr pExpr,ref int pReg) {
-				int r1=this.sqlite3GetTempReg();
-				int r2=this.sqlite3ExprCodeTarget(pExpr,r1);
-				if(r2==r1) {
-					pReg=r1;
-				}
-				else {
-					this.sqlite3ReleaseTempReg(r1);
-					pReg=0;
-				}
-				return r2;
-			}
+			
 			public int sqlite3ExprCode(Expr pExpr,int target) {
 				int inReg;
 				Debug.Assert(target>0&&target<=this.nMem);
@@ -7964,441 +7428,17 @@ return;
 				w.pParse=this;
 				w.sqlite3WalkExpr(ref pExpr);
 			}
-			public int sqlite3ExprCodeExprList(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			ExprList pList,///
-			///<summary>
-			///The expression list to be coded 
-			///</summary>
-			int target,///
-			///<summary>
-			///Where to write results 
-			///</summary>
-			bool doHardCopy///
-			///<summary>
-			///Make a hard copy of every element 
-			///</summary>
-			) {
-				ExprList_item pItem;
-				int i,n;
-				Debug.Assert(pList!=null);
-				Debug.Assert(target>0);
-				Debug.Assert(this.pVdbe!=null);
-				///
-				///<summary>
-				///Never gets this far otherwise 
-				///</summary>
-				n=pList.Count;
-				for(i=0;i<n;i++)// pItem++)
-				 {
-					pItem=pList.a[i];
-					Expr pExpr=pItem.pExpr;
-					int inReg=this.sqlite3ExprCodeTarget(pExpr,target+i);
-					if(inReg!=target+i) {
-                        this.pVdbe.sqlite3VdbeAddOp2(doHardCopy ? OpCode.OP_Copy : OpCode.OP_SCopy, inReg, target + i);
-					}
-				}
-				return n;
-			}
-			public void exprCodeBetween(///
-			///<summary>
-			///Parsing and code generating context 
-			///</summary>
-			Expr pExpr,///
-			///<summary>
-			///The BETWEEN expression 
-			///</summary>
-			int dest,///
-			///<summary>
-			///Jump here if the jump is taken 
-			///</summary>
-			int jumpIfTrue,///
-			///<summary>
-			///Take the jump if the BETWEEN is true 
-			///</summary>
-			int jumpIfNull///
-			///<summary>
-			///Take the jump if the BETWEEN is NULL 
-			///</summary>
-			) {
-				Expr exprAnd=new Expr();
-				///
-				///<summary>
-				///The AND operator in  x>=y AND x<=z  
-				///</summary>
-				Expr compLeft=new Expr();
-				///
-				///<summary>
-				///The  x>=y  term 
-				///</summary>
-				Expr compRight=new Expr();
-				///
-				///<summary>
-				///The  x<=z  term 
-				///</summary>
-				Expr exprX;
-				///
-				///<summary>
-				///The  x  subexpression 
-				///</summary>
-				int regFree1=0;
-				///
-				///<summary>
-				///Temporary use register 
-				///</summary>
-				Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
-				exprX=pExpr.pLeft.Clone();
-				exprAnd.Operator=TokenType.TK_AND;
-				exprAnd.pLeft=compLeft;
-				exprAnd.pRight=compRight;
-				compLeft.Operator = TokenType.TK_GE;
-				compLeft.pLeft=exprX;
-				compLeft.pRight=pExpr.x.pList.a[0].pExpr;
-				compRight.Operator = TokenType.TK_LE;
-				compRight.pLeft=exprX;
-				compRight.pRight=pExpr.x.pList.a[1].pExpr;
-				exprX.iTable=this.sqlite3ExprCodeTemp(exprX,ref regFree1);
-				exprX.Operator = TokenType.TK_REGISTER;
-				if(jumpIfTrue!=0) {
-					this.sqlite3ExprIfTrue(exprAnd,dest,jumpIfNull);
-				}
-				else {
-					this.sqlite3ExprIfFalse(exprAnd,dest,jumpIfNull);
-				}
-				this.sqlite3ReleaseTempReg(regFree1);
-				///
-				///<summary>
-				///Ensure adequate test coverage 
-				///</summary>
-				sqliteinth.testcase(jumpIfTrue==0&&jumpIfNull==0&&regFree1==0);
-				sqliteinth.testcase(jumpIfTrue==0&&jumpIfNull==0&&regFree1!=0);
-				sqliteinth.testcase(jumpIfTrue==0&&jumpIfNull!=0&&regFree1==0);
-				sqliteinth.testcase(jumpIfTrue==0&&jumpIfNull!=0&&regFree1!=0);
-				sqliteinth.testcase(jumpIfTrue!=0&&jumpIfNull==0&&regFree1==0);
-				sqliteinth.testcase(jumpIfTrue!=0&&jumpIfNull==0&&regFree1!=0);
-				sqliteinth.testcase(jumpIfTrue!=0&&jumpIfNull!=0&&regFree1==0);
-				sqliteinth.testcase(jumpIfTrue!=0&&jumpIfNull!=0&&regFree1!=0);
-			}
-			public void sqlite3ExprIfTrue(Expr pExpr,int dest,int jumpIfNull) {
-				Vdbe v=this.pVdbe;
-				int regFree1=0;
-				int regFree2=0;
-				int r1=0,r2=0;
-				Debug.Assert(jumpIfNull==sqliteinth.SQLITE_JUMPIFNULL||jumpIfNull==0);
-				if(NEVER(v==null))
-					return;
-				///
-				///<summary>
-				///Existance of VDBE checked by caller 
-				///</summary>
-				if(NEVER(pExpr==null))
-					return;
-				///
-				///<summary>
-				///No way this can happen 
-				///</summary>
-				var op=pExpr.Operator;
-				switch(op) {
-				case TokenType.TK_AND: {
-					int d2=v.sqlite3VdbeMakeLabel();
-					sqliteinth.testcase(jumpIfNull==0);
-					this.sqlite3ExprCachePush();
-					this.sqlite3ExprIfFalse(pExpr.pLeft,d2,jumpIfNull^sqliteinth.SQLITE_JUMPIFNULL);
-					this.sqlite3ExprIfTrue(pExpr.pRight,dest,jumpIfNull);
-					v.sqlite3VdbeResolveLabel(d2);
-					this.sqlite3ExprCachePop(1);
-					break;
-				}
-				case TokenType.TK_OR: {
-					sqliteinth.testcase(jumpIfNull==0);
-					this.sqlite3ExprIfTrue(pExpr.pLeft,dest,jumpIfNull);
-					this.sqlite3ExprIfTrue(pExpr.pRight,dest,jumpIfNull);
-					break;
-				}
-				case TokenType.TK_NOT: {
-					sqliteinth.testcase(jumpIfNull==0);
-					this.sqlite3ExprIfFalse(pExpr.pLeft,dest,jumpIfNull);
-					break;
-				}
-				case TokenType.TK_LT:
-				case TokenType.TK_LE:
-				case TokenType.TK_GT:
-				case TokenType.TK_GE:
-				case TokenType.TK_NE:
-				case TokenType.TK_EQ: {
-					Debug.Assert(TokenType.TK_LT== (TokenType)OpCode.OP_Lt);
-					Debug.Assert(TokenType.TK_LE== (TokenType)OpCode.OP_Le);
-					Debug.Assert(TokenType.TK_GT== (TokenType)OpCode.OP_Gt);
-					Debug.Assert(TokenType.TK_GE== (TokenType)OpCode.OP_Ge);
-					Debug.Assert(TokenType.TK_EQ== (TokenType)OpCode.OP_Eq);
-                    Debug.Assert(TokenType.TK_NE == (TokenType)OpCode.OP_Ne);
-					sqliteinth.testcase(op==TokenType.TK_LT);
-					sqliteinth.testcase(op==TokenType.TK_LE);
-					sqliteinth.testcase(op==TokenType.TK_GT);
-					sqliteinth.testcase(op==TokenType.TK_GE);
-					sqliteinth.testcase(op==TokenType.TK_EQ);
-					sqliteinth.testcase(op==TokenType.TK_NE);
-					sqliteinth.testcase(jumpIfNull==0);
-					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
-					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
-					this.codeCompare(pExpr.pLeft,pExpr.pRight,(OpCode)op,r1,r2,dest,jumpIfNull);
-					sqliteinth.testcase(regFree1==0);
-					sqliteinth.testcase(regFree2==0);
-					break;
-				}
-				case TokenType.TK_IS:
-				case TokenType.TK_ISNOT: {
-					sqliteinth.testcase(op==TokenType.TK_IS);
-					sqliteinth.testcase(op==TokenType.TK_ISNOT);
-					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
-					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
-					op=(op==TokenType.TK_IS)?TokenType.TK_EQ:TokenType.TK_NE;
-					this.codeCompare(pExpr.pLeft,pExpr.pRight,(OpCode)op,r1,r2,dest,sqliteinth.SQLITE_NULLEQ);
-					sqliteinth.testcase(regFree1==0);
-					sqliteinth.testcase(regFree2==0);
-					break;
-				}
-				case TokenType.TK_ISNULL:
-				case TokenType.TK_NOTNULL: {
-                    Debug.Assert(TokenType.TK_ISNULL == (TokenType)OpCode.OP_IsNull);
-                    Debug.Assert(TokenType.TK_NOTNULL == (TokenType)OpCode.OP_NotNull);
-					sqliteinth.testcase(op==TokenType.TK_ISNULL);
-                    sqliteinth.testcase(op == TokenType.TK_NOTNULL);
-					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
-					v.sqlite3VdbeAddOp2(op,r1,dest);
-					sqliteinth.testcase(regFree1==0);
-					break;
-				}
-				case TokenType.TK_BETWEEN: {
-					sqliteinth.testcase(jumpIfNull==0);
-					this.exprCodeBetween(pExpr,dest,1,jumpIfNull);
-					break;
-				}
-				#if SQLITE_OMIT_SUBQUERY
-																																																																																																					        case TokenType.TK_IN:
-          {
-            int destIfFalse = sqlite3VdbeMakeLabel( v );
-            int destIfNull = jumpIfNull != 0 ? dest : destIfFalse;
-            exprc.sqlite3ExprCodeIN( pParse, pExpr, destIfFalse, destIfNull );
-            sqlite3VdbeAddOp2( v, OpCode.OP_Goto, 0, dest );
-            sqlite3VdbeResolveLabel( v, destIfFalse );
-            break;
-          }
-#endif
-				default: {
-					r1=this.sqlite3ExprCodeTemp(pExpr,ref regFree1);
-					v.sqlite3VdbeAddOp3( OpCode.OP_If,r1,dest,jumpIfNull!=0?1:0);
-					sqliteinth.testcase(regFree1==0);
-					sqliteinth.testcase(jumpIfNull==0);
-					break;
-				}
-				}
-				this.sqlite3ReleaseTempReg(regFree1);
-				this.sqlite3ReleaseTempReg(regFree2);
-			}
-			public void sqlite3ExprIfFalse(Expr pExpr,int dest,int jumpIfNull) {
-				Vdbe v=this.pVdbe;
-				
-				int regFree1=0;
-				int regFree2=0;
-				int r1=0,r2=0;
-				Debug.Assert(jumpIfNull==sqliteinth.SQLITE_JUMPIFNULL||jumpIfNull==0);
-				if(NEVER(v==null))
-					return;
-				///
-				///<summary>
-				///Existance of VDBE checked by caller 
-				///</summary>
-				if(pExpr==null)
-					return;
-				///
-				///<summary>
-				///The value of pExpr.op and op are related as follows:
-				///
-				///pExpr.op            op
-				///</summary>
-				///<param name=""></param>
-				///<param name="TokenType.TK_ISNULL           OpCode.OP_NotNull">TokenType.TK_ISNULL           OpCode.OP_NotNull</param>
-				///<param name="TokenType.TK_NOTNULL          OpCode.OP_IsNull">TokenType.TK_NOTNULL          OpCode.OP_IsNull</param>
-				///<param name="TokenType.TK_NE               OpCode.OP_Eq">TokenType.TK_NE               OpCode.OP_Eq</param>
-				///<param name="TokenType.TK_EQ               OpCode.OP_Ne">TokenType.TK_EQ               OpCode.OP_Ne</param>
-				///<param name="TokenType.TK_GT               OpCode.OP_Le">TokenType.TK_GT               OpCode.OP_Le</param>
-				///<param name="TokenType.TK_LE               OpCode.OP_Gt">TokenType.TK_LE               OpCode.OP_Gt</param>
-				///<param name="TokenType.TK_GE               OpCode.OP_Lt">TokenType.TK_GE               OpCode.OP_Lt</param>
-				///<param name="TokenType.TK_LT               OpCode.OP_Ge">TokenType.TK_LT               OpCode.OP_Ge</param>
-				///<param name=""></param>
-				///<param name="For other values of pExpr.op, op is undefined and unused.">For other values of pExpr.op, op is undefined and unused.</param>
-				///<param name="The value of TokenType.TK_ and  OpCode.OP_ constants are arranged such that we">The value of TokenType.TK_ and  OpCode.OP_ constants are arranged such that we</param>
-				///<param name="can compute the mapping above using the following expression.">can compute the mapping above using the following expression.</param>
-				///<param name="Assert()s verify that the computation is correct.">Assert()s verify that the computation is correct.</param>
-				///<param name=""></param>
-				var op=(TokenType)((((int)pExpr.Operator+((int)TokenType.TK_ISNULL&1))^1)-((int)TokenType.TK_ISNULL&1));
-				///
-				///<summary>
-				///Verify correct alignment of TokenType.TK_ and  OpCode.OP_ constants
-				///
-				///</summary>
-                Debug.Assert(pExpr.Operator != TokenType.TK_ISNULL || op == (TokenType)OpCode.OP_NotNull);
-				Debug.Assert(pExpr.Operator != TokenType.TK_NOTNULL||op== (TokenType)OpCode.OP_IsNull);
-                Debug.Assert(pExpr.Operator != TokenType.TK_NE || op == (TokenType)OpCode.OP_Eq);
-                Debug.Assert(pExpr.Operator != TokenType.TK_EQ || op == (TokenType)OpCode.OP_Ne);
-                Debug.Assert(pExpr.Operator != TokenType.TK_LT || op == (TokenType)OpCode.OP_Ge);
-                Debug.Assert(pExpr.Operator != TokenType.TK_LE || op == (TokenType)OpCode.OP_Gt);
-                Debug.Assert(pExpr.Operator != TokenType.TK_GT || op == (TokenType)OpCode.OP_Le);
-                Debug.Assert(pExpr.Operator != TokenType.TK_GE || op == (TokenType)OpCode.OP_Lt);
-				switch(pExpr.Operator) {
-				case TokenType.TK_AND: {
-					sqliteinth.testcase(jumpIfNull==0);
-					this.sqlite3ExprIfFalse(pExpr.pLeft,dest,jumpIfNull);
-					this.sqlite3ExprIfFalse(pExpr.pRight,dest,jumpIfNull);
-					break;
-				}
-				case TokenType.TK_OR: {
-					int d2=v.sqlite3VdbeMakeLabel();
-					sqliteinth.testcase(jumpIfNull==0);
-					this.sqlite3ExprCachePush();
-					this.sqlite3ExprIfTrue(pExpr.pLeft,d2,jumpIfNull^sqliteinth.SQLITE_JUMPIFNULL);
-					this.sqlite3ExprIfFalse(pExpr.pRight,dest,jumpIfNull);
-					v.sqlite3VdbeResolveLabel(d2);
-					this.sqlite3ExprCachePop(1);
-					break;
-				}
-				case TokenType.TK_NOT: {
-					sqliteinth.testcase(jumpIfNull==0);
-					this.sqlite3ExprIfTrue(pExpr.pLeft,dest,jumpIfNull);
-					break;
-				}
-				case TokenType.TK_LT:
-				case TokenType.TK_LE:
-				case TokenType.TK_GT:
-				case TokenType.TK_GE:
-				case TokenType.TK_NE:
-				case TokenType.TK_EQ: {
-					sqliteinth.testcase(op==TokenType.TK_LT);
-                    sqliteinth.testcase(op == TokenType.TK_LE);
-                    sqliteinth.testcase(op == TokenType.TK_GT);
-                    sqliteinth.testcase(op == TokenType.TK_GE);
-                    sqliteinth.testcase(op == TokenType.TK_EQ);
-                    sqliteinth.testcase(op == TokenType.TK_NE);
-					sqliteinth.testcase(jumpIfNull==0);
-					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
-					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
-					this.codeCompare(pExpr.pLeft,pExpr.pRight,(OpCode)op,r1,r2,dest,jumpIfNull);
-					sqliteinth.testcase(regFree1==0);
-					sqliteinth.testcase(regFree2==0);
-					break;
-				}
-				case TokenType.TK_IS:
-				case TokenType.TK_ISNOT: {
-					sqliteinth.testcase(pExpr.Operator==TokenType.TK_IS);
-					sqliteinth.testcase(pExpr.Operator == TokenType.TK_ISNOT);
-					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
-					r2=this.sqlite3ExprCodeTemp(pExpr.pRight,ref regFree2);
-					op=(pExpr.Operator == TokenType.TK_IS)?TokenType.TK_NE:TokenType.TK_EQ;
-					this.codeCompare(pExpr.pLeft,pExpr.pRight,(OpCode)op,r1,r2,dest,sqliteinth.SQLITE_NULLEQ);
-					sqliteinth.testcase(regFree1==0);
-					sqliteinth.testcase(regFree2==0);
-					break;
-				}
-				case TokenType.TK_ISNULL:
-				case TokenType.TK_NOTNULL: {
-					sqliteinth.testcase(op==TokenType.TK_ISNULL);
-					sqliteinth.testcase(op==TokenType.TK_NOTNULL);
-					r1=this.sqlite3ExprCodeTemp(pExpr.pLeft,ref regFree1);
-					v.sqlite3VdbeAddOp2(op,r1,dest);
-					sqliteinth.testcase(regFree1==0);
-					break;
-				}
-				case TokenType.TK_BETWEEN: {
-					sqliteinth.testcase(jumpIfNull==0);
-					this.exprCodeBetween(pExpr,dest,0,jumpIfNull);
-					break;
-				}
-				#if SQLITE_OMIT_SUBQUERY
-																																																																																																					        case TokenType.TK_IN:
-          {
-            if ( jumpIfNull != 0 )
-            {
-              exprc.sqlite3ExprCodeIN( pParse, pExpr, dest, dest );
-            }
-            else
-            {
-              int destIfNull = sqlite3VdbeMakeLabel( v );
-              exprc.sqlite3ExprCodeIN( pParse, pExpr, dest, destIfNull );
-              sqlite3VdbeResolveLabel( v, destIfNull );
-            }
-          break;
-          }
-#endif
-				default: {
-					r1=this.sqlite3ExprCodeTemp(pExpr,ref regFree1);
-					v.sqlite3VdbeAddOp3( OpCode.OP_IfNot,r1,dest,jumpIfNull!=0?1:0);
-					sqliteinth.testcase(regFree1==0);
-					sqliteinth.testcase(jumpIfNull==0);
-					break;
-				}
-				}
-				this.sqlite3ReleaseTempReg(regFree1);
-				this.sqlite3ReleaseTempReg(regFree2);
-			}
-			public int sqlite3GetTempReg() {
-				if(this.nTempReg==0) {
-					return ++this.nMem;
-				}
-				return this.aTempReg[--this.nTempReg];
-			}
-			public void sqlite3ReleaseTempReg(int iReg) {
-				if(iReg!=0&&this.nTempReg<Sqlite3.ArraySize(this.aTempReg)) {
-					int i;
-					sqliteinth.yColCache p;
-                    for (i = 0; i < sqliteinth.SQLITE_N_COLCACHE; i++)//p=pParse.aColCache... p++)
-					 {
-						p=this.aColCache[i];
-						if(p.iReg==iReg) {
-							p.tempReg=1;
-							return;
-						}
-					}
-					this.aTempReg[this.nTempReg++]=iReg;
-				}
-			}
-			public int sqlite3GetTempRange(int nReg) {
-				int i,n;
-				i=this.iRangeReg;
-				n=this.nRangeReg;
-				if(nReg<=n) {
-					//Debug.Assert( 1 == usedAsColumnCache( pParse, i, i + n - 1 ) );
-					this.iRangeReg+=nReg;
-					this.nRangeReg-=nReg;
-				}
-				else {
-					i=this.nMem+1;
-					this.nMem+=nReg;
-				}
-				return i;
-			}
-			public void sqlite3ReleaseTempRange(int iReg,int nReg) {
-				this.sqlite3ExprCacheRemove(iReg,nReg);
-				if(nReg>this.nRangeReg) {
-					this.nRangeReg=nReg;
-					this.iRangeReg=iReg;
-				}
-			}
 			
-			public void sqlite3ExprListSetSpan(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			ExprList pList,///
-			///<summary>
-			///List to which to add the span. 
-			///</summary>
-			ExprSpan pSpan///
-			///<summary>
-			///The span to be added 
-			///</summary>
+			
+			
+			
+			
+			
+			public void sqlite3ExprListSetSpan(
+			    ExprList pList,///
+			    ///List to which to add the span. 
+			    ExprSpan pSpan///
+			    ///The span to be added 
 			) {
 				Connection db=this.db;
 				Debug.Assert(pList!=null///
@@ -8468,16 +7508,12 @@ return;
 				return this.sqlite3ExprFunction(pList,null);
 			}
 			public Expr sqlite3ExprFunction(ExprList pList,Token pToken) {
-				Expr pNew;
 				Connection db=this.db;
 				Debug.Assert(pToken!=null);
-				pNew=exprc.CreateExpr(db,TokenType.TK_FUNCTION,pToken,true);
+				var pNew=exprc.CreateExpr(db,TokenType.TK_FUNCTION,pToken,true);
 				if(pNew==null) {
 					exprc.Delete(db,ref pList);
-					///
-					///<summary>
 					///Avoid memory leak when malloc fails 
-					///</summary>
 					return null;
 				}
 				pNew.x.pList=pList;
@@ -8485,20 +7521,20 @@ return;
 				this.sqlite3ExprSetHeight(pNew);
 				return pNew;
 			}
+            /// <summary>
+            /// expr ::= VARIABLE 
+            /// </summary>
+            /// <param name="pExpr"></param>
 			public void sqlite3ExprAssignVarNumber(Expr pExpr) {
 				Connection db=this.db;
-				string z;
 				if(pExpr==null)
 					return;
 				Debug.Assert(!pExpr.ExprHasAnyProperty(ExprFlags.EP_IntValue|ExprFlags.EP_Reduced|ExprFlags.EP_TokenOnly));
-				z=pExpr.u.zToken;
+				var z=pExpr.u.zToken;
 				Debug.Assert(z!=null);
 				Debug.Assert(z.Length!=0);
 				if(z.Length==1) {
-					///
-					///<summary>
 					///Wildcard of the form "?".  Assign the next variable number 
-					///</summary>
 					Debug.Assert(z[0]=='?');
 					pExpr.iColumn=(ynVar)(++this.nVar);
 				}
@@ -8506,11 +7542,8 @@ return;
 					ynVar x=0;
 					int n=StringExtensions.Strlen30(z);
 					if(z[0]=='?') {
-						///
-						///<summary>
 						///Wildcard of the form "?nnn".  Convert "nnn" to an integer and
 						///use it as the variable number 
-						///</summary>
 						i64 i=0;
 						bool bOk=0==Converter.sqlite3Atoi64(z.Substring(1),ref i,n-1,SqliteEncoding.UTF8);
 						pExpr.iColumn=x=(ynVar)i;
@@ -8527,15 +7560,10 @@ return;
 						}
 					}
 					else {
-						///
-						///<summary>
 						///Wildcards like ":aaa", "$aaa" or "@aaa".  Reuse the same variable
 						///number as the prior appearance of the same name, or if the name
-						///has never appeared before, reuse the same variable number
-						///
-						///</summary>
-						ynVar i;
-						for(i=0;i<this.nzVar;i++) {
+						///has never appeared before, reuse the same variable number						
+						for(var i=0;i<this.nzVar;i++) {
 							if(this.azVar[i]!=null&&z.CompareTo(this.azVar[i])==0)//memcmp(pParse.azVar[i],z,n+1)==0 )
 							 {
 								pExpr.iColumn=x=(ynVar)(i+1);
@@ -8546,15 +7574,7 @@ return;
 							x=pExpr.iColumn=(ynVar)(++this.nVar);
 					}
 					if(x>0) {
-						if(x>this.nzVar) {
-							//char **a;
-							//a = sqlite3DbRealloc(db, pParse.azVar, x*sizeof(a[0]));
-							//if( a==0 ) return;  /* Error reported through db.mallocFailed */
-							//pParse.azVar = a;
-							//memset(&a[pParse.nzVar], 0, (x-pParse.nzVar)*sizeof(a[0]));
-							Array.Resize(ref this.azVar,x);
-							this.nzVar=x;
-						}
+                        azVar.Count = x;						
 						if(z[0]!='?'||this.azVar[x-1]==null) {
 							//sqlite3DbFree(db, pParse.azVar[x-1]);
 							this.azVar[x-1]=z.Substring(0,n);
@@ -8723,10 +7743,10 @@ return;
 								///API. To workaround them, add a dummy  OpCode.OP_Variable here.
 								///
 								///</summary>
-								int r1=this.sqlite3GetTempReg();
+								int r1=this.allocTempReg();
 								this.sqlite3ExprCodeTarget(pRight,r1);
 								v.sqlite3VdbeChangeP3(v.sqlite3VdbeCurrentAddr()-1,0);
-								this.sqlite3ReleaseTempReg(r1);
+								this.deallocTempReg(r1);
 							}
 						}
 					}
@@ -9234,14 +8254,14 @@ return;
 				///Fill the automatic index with content 
 				///</summary>
 				addrTop=v.sqlite3VdbeAddOp1(OpCode.OP_Rewind,pLevel.iTabCur);
-				regRecord=this.sqlite3GetTempReg();
-				this.sqlite3GenerateIndexKey(pIdx,pLevel.iTabCur,regRecord,true);
+				regRecord=this.allocTempReg();
+				this.codegenGenerateIndexKey(pIdx,pLevel.iTabCur,regRecord,true);
 				v.sqlite3VdbeAddOp2( OpCode.OP_IdxInsert,pLevel.iIdxCur,regRecord);
 				v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_USESEEKRESULT);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Next, pLevel.iTabCur, addrTop + 1);
 				v.sqlite3VdbeChangeP5(SQLITE_STMTSTATUS_AUTOINDEX);
 				v.sqlite3VdbeJumpHere(addrTop);
-				this.sqlite3ReleaseTempReg(regRecord);
+				this.deallocTempReg(regRecord);
 				///
 				///<summary>
 				///Jump here when skipping the initialization 
@@ -10655,7 +9675,7 @@ range_est_fallback:
 					r1=this.codeEqualityTerm(pTerm,pLevel,regBase+j);
 					if(r1!=regBase+j) {
 						if(nReg==1) {
-							this.sqlite3ReleaseTempReg(regBase);
+							this.deallocTempReg(regBase);
 							regBase=r1;
 						}
 						else {
@@ -12070,8 +11090,8 @@ range_est_fallback:
 							///<summary>
 							///Loop through each expression in <exprlist>. 
 							///</summary>
-							r1=this.sqlite3GetTempReg();
-							r2=this.sqlite3GetTempReg();
+							r1=this.allocTempReg();
+							r2=this.allocTempReg();
                             v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, r2);
 							for(i=0;i<pList.Count;i++) {
 								//, pItem++){
@@ -12110,8 +11130,8 @@ range_est_fallback:
 									}
 								}
 							}
-							this.sqlite3ReleaseTempReg(r1);
-							this.sqlite3ReleaseTempReg(r2);
+							this.deallocTempReg(r1);
+							this.deallocTempReg(r2);
 						}
 					if(!isRowid) {
 						v.sqlite3VdbeChangeP4(addr,keyInfo, P4Usage.P4_KEYINFO);
@@ -12246,7 +11266,7 @@ range_est_fallback:
 				///
 				///</summary>
 				this.sqlite3ExprCachePush();
-				r1=this.sqlite3GetTempReg();
+				r1=this.allocTempReg();
 				this.sqlite3ExprCode(pExpr.pLeft,r1);
 				///
 				///<summary>
@@ -12356,49 +11376,11 @@ range_est_fallback:
 						v.sqlite3VdbeJumpHere(j1);
 					}
 				}
-				this.sqlite3ReleaseTempReg(r1);
+				this.deallocTempReg(r1);
 				this.sqlite3ExprCachePop(1);
 				v.VdbeComment("end IN expr");
 			}
-			public void codeInteger(Expr pExpr,bool negFlag,int iMem) {
-				Vdbe v=this.pVdbe;
-				if((pExpr.Flags&ExprFlags.EP_IntValue)!=0) {
-					int i=pExpr.u.iValue;
-					Debug.Assert(i>=0);
-					if(negFlag)
-						i=-i;
-					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,iMem);
-				}
-				else {
-					int c;
-					i64 value=0;
-					string z=pExpr.u.zToken;
-					Debug.Assert(!String.IsNullOrEmpty(z));
-					c=Converter.sqlite3Atoi64(z,ref value,StringExtensions.Strlen30(z),SqliteEncoding.UTF8);
-					if(c==0||(c==2&&negFlag)) {
-						//char* zV;
-						if(negFlag) {
-							value=c==2?IntegerExtensions.SMALLEST_INT64:-value;
-						}
-						v.sqlite3VdbeAddOp4(OpCode.OP_Int64,0,iMem,0,value, P4Usage.P4_INT64);
-					}
-					else {
-						#if SQLITE_OMIT_FLOATING_POINT
-																																																																																																																																														utilc.sqlite3ErrorMsg(pParse, "oversized integer: %s%s", negFlag ? "-" : "", z);
-#else
-						exprc.codeReal(v,z,negFlag,iMem);
-						#endif
-					}
-				}
-			}
-			public void cacheEntryClear(sqliteinth.yColCache p) {
-				if(p.tempReg!=0) {
-					if(this.nTempReg<Sqlite3.ArraySize(this.aTempReg)) {
-						this.aTempReg[this.nTempReg++]=p.iReg;
-					}
-					p.tempReg=0;
-				}
-			}
+			
 			public void sqlite3VtabBeginParse(///
 			///<summary>
 			///Parsing context 
@@ -12471,55 +11453,37 @@ range_est_fallback:
 			}
 			public void sqlite3VtabFinishParse(Token pEnd) {
 				Table pTab=this.pNewTable;
-				///
-				///<summary>
 				///The table being constructed 
-				///</summary>
 				Connection db=this.db;
-				///
-				///<summary>
 				///The database connection 
-				///</summary>
 				if(pTab==null)
 					return;
 				this.addArgumentToVtab();
 				this.sArg.zRestSql="";
 				if(pTab.nModuleArg<1)
 					return;
-				///
-				///<summary>
 				///If the CREATE VIRTUAL TABLE statement is being entered for the
 				///first time (in other words if the virtual table is actually being
 				///created now instead of just being read out of sqlite_master) then
 				///do additional initialization work and store the statement text
 				///in the sqlite_master table.
-				///
-				///</summary>
 				if(0==db.init.busy) {
 					string zStmt;
 					string zWhere;
 					int iDb;
 					Vdbe v;
-					///
-					///<summary>
 					///Compute the complete text of the CREATE VIRTUAL TABLE statement 
-					///</summary>
 					if(pEnd!=null) {
 						this.sNameToken.Length=this.sNameToken.zRestSql.Length;
 						//(int)( pEnd.z - pParse.sNameToken.z ) + pEnd.n;
 					}
 					zStmt=io.sqlite3MPrintf(db,"CREATE VIRTUAL TABLE %T",this.sNameToken.zRestSql.Substring(0,this.sNameToken.Length));
-					///
-					///<summary>
 					///A slot for the record has already been allocated in the 
 					///SQLITE_MASTER table.  We just need to update that slot with all
 					///the information we've collected.  
-					///
 					///The VM register number pParse.regRowid holds the rowid of an
 					///entry in the sqlite_master table tht was created for this vtab
 					///by build.sqlite3StartTable().
-					///
-					///</summary>
 					iDb=db.indexOf(pTab.pSchema);
                     build.sqlite3NestedParse(this, "UPDATE %Q.%s " + "SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName, pTab.zName, zStmt, this.regRowid);
 					db.DbFree(ref zStmt);
@@ -12527,7 +11491,7 @@ range_est_fallback:
 					build.sqlite3ChangeCookie(this,iDb);
 					v.sqlite3VdbeAddOp2( OpCode.OP_Expire,0,0);
 					zWhere=io.sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
-					v.sqlite3VdbeAddParseSchemaOp(iDb,zWhere);
+					v.codegenAddParseSchemaOp(iDb,zWhere);
                     v.sqlite3VdbeAddOp4(OpCode.OP_VCreate, iDb, 0, 0, pTab.zName, (P4Usage)(StringExtensions.Strlen30(pTab.zName) + 1));
 				}
 				///
@@ -12583,10 +11547,7 @@ range_est_fallback:
 				if((pTab.tabFlags&TableFlags.TF_Virtual)==0||VTableMethodsExtensions.sqlite3GetVTable(db,pTab)!=null) {
 					return SqlResult.SQLITE_OK;
 				}
-				///
-				///<summary>
 				///Locate the required virtual table module 
-				///</summary>
 				zMod=pTab.azModuleArg[0];
 				pMod=(Module)db.aModule.Find(zMod,StringExtensions.Strlen30(zMod),(Module)null);
 				if(null==pMod) {

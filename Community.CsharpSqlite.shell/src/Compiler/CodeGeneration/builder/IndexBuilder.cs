@@ -367,8 +367,8 @@ return;
             }
             pParse.sqlite3OpenTable(iTab, iDb, pTab, OpCode.OP_OpenRead);
             addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iTab, 0);
-            regRecord = pParse.sqlite3GetTempReg();
-            regIdxKey = pParse.sqlite3GenerateIndexKey(pIndex, iTab, regRecord, true);
+            regRecord = pParse.allocTempReg();
+            regIdxKey = pParse.codegenGenerateIndexKey(pIndex, iTab, regRecord, true);
             if (pIndex.onError != OnConstraintError.OE_None)
             {
                 int regRowid = regIdxKey + pIndex.nColumn;
@@ -389,7 +389,7 @@ return;
             }
             v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, iIdx, regRecord);
             v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_USESEEKRESULT);
-            pParse.sqlite3ReleaseTempReg(regRecord);
+            pParse.deallocTempReg(regRecord);
             v.sqlite3VdbeAddOp2(OpCode.OP_Next, iTab, addr1 + 1);
             v.sqlite3VdbeJumpHere(addr1);
             v.sqlite3VdbeAddOp1(OpCode.OP_Close, iTab);
@@ -813,12 +813,10 @@ goto exit_create_index;
                         continue;
                     for (k = 0; k < pIdx.nColumn; k++)
                     {
-                        string z1;
-                        string z2;
                         if (pIdx.aiColumn[k] != pIndex.aiColumn[k])
                             break;
-                        z1 = pIdx.azColl[k];
-                        z2 = pIndex.azColl[k];
+                        var z1 = pIdx.azColl[k];
+                        var z2 = pIndex.azColl[k];
                         if (z1 != z2 && !z1.Equals(z2, StringComparison.InvariantCultureIgnoreCase))
                             break;
                     }
@@ -916,7 +914,7 @@ goto exit_create_index;
                 {
                     pParse.sqlite3RefillIndex(pIndex, iMem);
                     build.sqlite3ChangeCookie(pParse, iDb);
-                    v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "name='%q' AND type='index'", pIndex.zName));
+                    v.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "name='%q' AND type='index'", pIndex.zName));
                     v.sqlite3VdbeAddOp1(OpCode.OP_Expire, 0);
                 }
             }

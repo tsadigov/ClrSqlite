@@ -111,7 +111,7 @@ namespace Community.CsharpSqlite
             }
             int tabcount = 0;
             string[] tab = new string[] { "\t", "\t\t", "\t\t\t", "\t\t\t\t", "\t\t\t\t\t" };
-            public bool PrintFrame(VdbeFrame frame)
+            public void PrintFrame(VdbeFrame frame)
             {
                 Console.WriteLine();
                 tabcount++;
@@ -126,7 +126,6 @@ namespace Community.CsharpSqlite
                         Console.BackgroundColor = bgclr;
                     }
                 );
-                return true;
             }
 
             #region hehehe
@@ -1296,7 +1295,7 @@ pOp.cnt = 0;
                 }
                 this.sqlite3VdbeChangeP4(-1, pTab.zColAff, P4Usage.P4_TRANSIENT);
             }
-            public void sqlite3ColumnDefault(Table pTab, int i, int iReg)
+            public void codegenColumnDefault(Table pTab, int i, int iReg)
             {
                 Debug.Assert(pTab != null);
                 if (null == pTab.pSelect)
@@ -1321,7 +1320,7 @@ pOp.cnt = 0;
 #endif
                 }
             }
-            public void sqlite3ExprCodeGetColumnOfTable(///
+            public void codegenExprCodeGetColumnOfTable(///
                                                         ///<summary>
                                                         ///The VDBE under construction 
                                                         ///</summary>
@@ -1354,7 +1353,7 @@ pOp.cnt = 0;
                 }
                 if (iCol >= 0)
                 {
-                    this.sqlite3ColumnDefault(pTab, iCol, regOut);
+                    this.codegenColumnDefault(pTab, iCol, regOut);
                 }
             }
             public bool vdbeSafety()
@@ -1400,13 +1399,13 @@ pOp.cnt = 0;
                 return (this.aOp != null ? SqlResult.SQLITE_OK : SqlResult.SQLITE_NOMEM);
                 //  return (pNew ? SqlResult.SQLITE_OK : SQLITE_NOMEM);
             }
-            public void sqlite3VdbeAddParseSchemaOp(int iDb, string zWhere)
+            public void codegenAddParseSchemaOp(int iDb, string zWhere)
             {
                 int j;
                 int addr = this.sqlite3VdbeAddOp3(OpCode.OP_ParseSchema, iDb, 0, 0);
                 this.sqlite3VdbeChangeP4(addr, zWhere, P4Usage.P4_DYNAMIC);
                 for (j = 0; j < this.db.BackendCount; j++)
-                    vdbeaux.sqlite3VdbeUsesBtree(this, j);
+                    vdbeaux.markUsed(this, j);
             }
             public void sqlite3VdbeLinkSubProgram(SubProgram p)
             {

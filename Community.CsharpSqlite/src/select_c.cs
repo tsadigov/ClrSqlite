@@ -425,14 +425,14 @@ namespace Community.CsharpSqlite.Ast {
                 Vdbe v = pParse.pVdbe;
                 int nExpr = pOrderBy.Count;
                 int regBase = pParse.sqlite3GetTempRange(nExpr + 2);
-                int regRecord = pParse.sqlite3GetTempReg();
+                int regRecord = pParse.allocTempReg();
                 pParse.sqlite3ExprCacheClear();
                 pParse.sqlite3ExprCodeExprList(pOrderBy, regBase, false);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Sequence, pOrderBy.iECursor, regBase + nExpr);
                 pParse.sqlite3ExprCodeMove(regData, regBase + nExpr + 1, 1);
                 v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, regBase, nExpr + 2, regRecord);
                 v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, pOrderBy.iECursor, regRecord);
-                pParse.sqlite3ReleaseTempReg(regRecord);
+                pParse.deallocTempReg(regRecord);
                 pParse.sqlite3ReleaseTempRange(regBase, nExpr + 2);
                 if (pSelect.iLimit != 0)
                 {
@@ -514,11 +514,11 @@ namespace Community.CsharpSqlite.Ast {
                 Vdbe v;
                 int r1;
                 v = pParse.pVdbe;
-                r1 = pParse.sqlite3GetTempReg();
+                r1 = pParse.allocTempReg();
                 v.sqlite3VdbeAddOp4Int(OpCode.OP_Found, iTab, addrRepeat, iMem, N);
                 v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, iMem, N, r1);
                 v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, iTab, r1);
-                pParse.sqlite3ReleaseTempReg(r1);
+                pParse.deallocTempReg(r1);
             }
 #if !SQLITE_OMIT_SUBQUERY
             ///<summary>
@@ -714,10 +714,10 @@ namespace Community.CsharpSqlite.Ast {
                     case SelectResultType.Union:
                         {
                             int r1;
-                            r1 = pParse.sqlite3GetTempReg();
+                            r1 = pParse.allocTempReg();
                             v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, regResult, nColumn, r1);
                             v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, iParm, r1);
-                            pParse.sqlite3ReleaseTempReg(r1);
+                            pParse.deallocTempReg(r1);
                             break;
                         }
                     ///
@@ -740,7 +740,7 @@ namespace Community.CsharpSqlite.Ast {
                     case SelectResultType.Table:
                     case SelectResultType.EphemTab:
                         {
-                            int r1 = pParse.sqlite3GetTempReg();
+                            int r1 = pParse.allocTempReg();
                             sqliteinth.testcase(eDest == SelectResultType.Table);
                             sqliteinth.testcase(eDest == SelectResultType.EphemTab);
                             v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, regResult, nColumn, r1);
@@ -750,13 +750,13 @@ namespace Community.CsharpSqlite.Ast {
                             }
                             else
                             {
-                                int r2 = pParse.sqlite3GetTempReg();
+                                int r2 = pParse.allocTempReg();
                                 v.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, iParm, r2);
                                 v.sqlite3VdbeAddOp3(OpCode.OP_Insert, iParm, r1, r2);
                                 v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
-                                pParse.sqlite3ReleaseTempReg(r2);
+                                pParse.deallocTempReg(r2);
                             }
-                            pParse.sqlite3ReleaseTempReg(r1);
+                            pParse.deallocTempReg(r1);
                             break;
                         }
 #if !SQLITE_OMIT_SUBQUERY
@@ -783,11 +783,11 @@ namespace Community.CsharpSqlite.Ast {
                             }
                             else
                             {
-                                int r1 = pParse.sqlite3GetTempReg();
+                                int r1 = pParse.allocTempReg();
                                 v.sqlite3VdbeAddOp4(OpCode.OP_MakeRecord, regResult, 1, r1, p.affinity, (P4Usage)1);
                                 pParse.sqlite3ExprCacheAffinityChange(regResult, 1);
                                 v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, iParm, r1);
-                                pParse.sqlite3ReleaseTempReg(r1);
+                                pParse.deallocTempReg(r1);
                             }
                             break;
                         }
@@ -843,10 +843,10 @@ namespace Community.CsharpSqlite.Ast {
                             sqliteinth.testcase(eDest == SelectResultType.Output);
                             if (pOrderBy != null)
                             {
-                                int r1 = pParse.sqlite3GetTempReg();
+                                int r1 = pParse.allocTempReg();
                                 v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, regResult, nColumn, r1);
                                 pushOntoSorter(pParse, pOrderBy, p, r1);
-                                pParse.sqlite3ReleaseTempReg(r1);
+                                pParse.deallocTempReg(r1);
                             }
                             else
                                 if (eDest == SelectResultType.Coroutine)
@@ -1091,7 +1091,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 int regRow;
                 int regRowid;
                 iTab = pOrderBy.iECursor;
-                regRow = pParse.sqlite3GetTempReg();
+                regRow = pParse.allocTempReg();
                 if (eDest == SelectResultType.Output || eDest == SelectResultType.Coroutine)
                 {
                     pseudoTab = pParse.nTab++;
@@ -1100,7 +1100,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 }
                 else
                 {
-                    regRowid = pParse.sqlite3GetTempReg();
+                    regRowid = pParse.allocTempReg();
                 }
                 addr = 1 + v.sqlite3VdbeAddOp2(OpCode.OP_Sort, iTab, addrBreak);
                 codeOffset(v, p, addrContinue);
@@ -1164,8 +1164,8 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             break;
                         }
                 }
-                pParse.sqlite3ReleaseTempReg(regRow);
-                pParse.sqlite3ReleaseTempReg(regRowid);
+                pParse.deallocTempReg(regRow);
+                pParse.deallocTempReg(regRowid);
                 ///The bottom of the loop
                 v.sqlite3VdbeResolveLabel(addrContinue);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Next, iTab, addr);
@@ -1688,16 +1688,16 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                     case SelectResultType.Table:
                     case SelectResultType.EphemTab:
                         {
-                            int r1 = pParse.sqlite3GetTempReg();
-                            int r2 = pParse.sqlite3GetTempReg();
+                            int r1 = pParse.allocTempReg();
+                            int r2 = pParse.allocTempReg();
                             sqliteinth.testcase(pDest.eDest == SelectResultType.Table);
                             sqliteinth.testcase(pDest.eDest == SelectResultType.EphemTab);
                             v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, pIn.iMem, pIn.nMem, r1);
                             v.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, pDest.iParm, r2);
                             v.sqlite3VdbeAddOp3(OpCode.OP_Insert, pDest.iParm, r1, r2);
                             v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
-                            pParse.sqlite3ReleaseTempReg(r2);
-                            pParse.sqlite3ReleaseTempReg(r1);
+                            pParse.deallocTempReg(r2);
+                            pParse.deallocTempReg(r1);
                             break;
                         }
 #if !SQLITE_OMIT_SUBQUERY
@@ -1712,11 +1712,11 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                             int r1;
                             Debug.Assert(pIn.nMem == 1);
                             p.affinity = p.ResultingFieldList[0].pExpr.sqlite3CompareAffinity(pDest.affinity);
-                            r1 = pParse.sqlite3GetTempReg();
+                            r1 = pParse.allocTempReg();
                             v.sqlite3VdbeAddOp4(OpCode.OP_MakeRecord, pIn.iMem, 1, r1, p.affinity, (P4Usage)1);
                             pParse.sqlite3ExprCacheAffinityChange(pIn.iMem, 1);
                             v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, pDest.iParm, r1);
-                            pParse.sqlite3ReleaseTempReg(r1);
+                            pParse.deallocTempReg(r1);
                             break;
                         }
 #if FALSE

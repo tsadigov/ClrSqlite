@@ -1,5 +1,6 @@
 #define SQLITE_MAX_EXPR_DEPTH
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Text;
 using Bitmask=System.UInt64;
@@ -24,232 +25,219 @@ namespace Community.CsharpSqlite.Ast
     using System.Collections.Generic;
     public class exprc
         {
-            ///<summary>
-            /// 2001 September 15
-            ///
-            /// The author disclaims copyright to this source code.  In place of
-            /// a legal notice, here is a blessing:
-            ///
-            ///    May you do good and not evil.
-            ///    May you find forgiveness for yourself and forgive others.
-            ///    May you share freely, never taking more than you give.
-            ///
-            ///
-            /// This file contains routines used for analyzing expressions and
-            /// for generating VDBE code that evaluates expressions in SQLite.
-            ///
-            ///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-            ///  C#-SQLite is an independent reimplementation of the SQLite software library
-            ///
-            ///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
-            ///
-            ///
-            ///
-            ///</summary>
-            //#include "sqliteInt.h"
-            ///<summary>
-            /// Return the 'affinity' of the expression pExpr if any.
-            ///
-            /// If pExpr is a column, a reference to a column via an 'AS' alias,
-            /// or a sub-select with a column as the return value, then the
-            /// affinity of that column is returned. Otherwise, 0x00 is returned,
-            /// indicating no affinity for the expression.
-            ///
-            /// i.e. the WHERE clause expresssions in the following statements all
-            /// have an affinity:
-            ///
-            /// CREATE TABLE t1(a);
-            /// SELECT * FROM t1 WHERE a;
-            /// SELECT a AS b FROM t1 WHERE b;
-            /// SELECT * FROM t1 WHERE (select a from t1);
-            ///
-            ///</summary>
-            ///<summary>
-            /// Set the explicit collating sequence for an expression to the
-            /// collating sequence supplied in the second argument.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Set the collating sequence for expression pExpr to be the collating
-            /// sequence named by pToken.   Return a pointer to the revised expression.
-            /// The collating sequence is marked as "explicit" using the ExprFlags.EP_ExpCollate
-            /// flag.  An explicit collating sequence will override implicit
-            /// collating sequences.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Return the default collation sequence for the expression pExpr. If
-            /// there is no default collation type, return 0.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Return the P5 value that should be used for a binary comparison
-            /// opcode ( OpCode.OP_Eq,  OpCode.OP_Ge etc.) used to compare pExpr1 and pExpr2.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Return a pointer to the collation sequence that should be used by
-            /// a binary comparison operator comparing pLeft and pRight.
-            ///
-            /// If the left hand expression has a collating sequence type, then it is
-            /// used. Otherwise the collation sequence for the right hand expression
-            /// is used, or the default (BINARY) if neither expression has a collating
-            /// type.
-            ///
-            /// Argument pRight (but not pLeft) may be a null pointer. In this case,
-            /// it is not considered.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Generate code for a comparison operator.
-            ///
-            ///</summary>
+        ///<summary>
+        /// 2001 September 15
+        ///
+        /// The author disclaims copyright to this source code.  In place of
+        /// a legal notice, here is a blessing:
+        ///
+        ///    May you do good and not evil.
+        ///    May you find forgiveness for yourself and forgive others.
+        ///    May you share freely, never taking more than you give.
+        ///
+        ///
+        /// This file contains routines used for analyzing expressions and
+        /// for generating VDBE code that evaluates expressions in SQLite.
+        ///
+        ///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+        ///  C#-SQLite is an independent reimplementation of the SQLite software library
+        ///
+        ///  SQLITE_SOURCE_ID: 2011-06-23 19:49:22 4374b7e83ea0a3fbc3691f9c0c936272862f32f2
+        ///
+        ///
+        ///
+        ///</summary>
+        //#include "sqliteInt.h"
+        ///<summary>
+        /// Return the 'affinity' of the expression pExpr if any.
+        ///
+        /// If pExpr is a column, a reference to a column via an 'AS' alias,
+        /// or a sub-select with a column as the return value, then the
+        /// affinity of that column is returned. Otherwise, 0x00 is returned,
+        /// indicating no affinity for the expression.
+        ///
+        /// i.e. the WHERE clause expresssions in the following statements all
+        /// have an affinity:
+        ///
+        /// CREATE TABLE t1(a);
+        /// SELECT * FROM t1 WHERE a;
+        /// SELECT a AS b FROM t1 WHERE b;
+        /// SELECT * FROM t1 WHERE (select a from t1);
+        ///
+        ///</summary>
+        ///<summary>
+        /// Set the explicit collating sequence for an expression to the
+        /// collating sequence supplied in the second argument.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Set the collating sequence for expression pExpr to be the collating
+        /// sequence named by pToken.   Return a pointer to the revised expression.
+        /// The collating sequence is marked as "explicit" using the ExprFlags.EP_ExpCollate
+        /// flag.  An explicit collating sequence will override implicit
+        /// collating sequences.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Return the default collation sequence for the expression pExpr. If
+        /// there is no default collation type, return 0.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Return the P5 value that should be used for a binary comparison
+        /// opcode ( OpCode.OP_Eq,  OpCode.OP_Ge etc.) used to compare pExpr1 and pExpr2.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Return a pointer to the collation sequence that should be used by
+        /// a binary comparison operator comparing pLeft and pRight.
+        ///
+        /// If the left hand expression has a collating sequence type, then it is
+        /// used. Otherwise the collation sequence for the right hand expression
+        /// is used, or the default (BINARY) if neither expression has a collating
+        /// type.
+        ///
+        /// Argument pRight (but not pLeft) may be a null pointer. In this case,
+        /// it is not considered.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Generate code for a comparison operator.
+        ///
+        ///</summary>
 #if SQLITE_MAX_EXPR_DEPTH
-            ///<summary>
-            /// Check that argument nHeight is less than or equal to the maximum
-            /// expression depth allowed. If it is not, leave an error message in
-            /// pParse.
-            ///</summary>
-            ///<summary>
-            /// Set the Expr.nHeight variable in the structure passed as an
-            /// argument. An expression with no children, Expr.x.pList or
-            /// Expr.x.pSelect member has a height of 1. Any other expression
-            /// has a height equal to the maximum height of any other
-            /// referenced Expr plus one.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Set the Expr.nHeight variable using the exprSetHeight() function. If
-            /// the height is greater than the maximum allowed expression depth,
-            /// leave an error in pParse.
-            ///
-            ///</summary>
-            ///<summary>
-            /// Return the maximum height of any expression tree referenced
-            /// by the select statement passed as an argument.
-            ///
-            ///</summary>
+        ///<summary>
+        /// Check that argument nHeight is less than or equal to the maximum
+        /// expression depth allowed. If it is not, leave an error message in
+        /// pParse.
+        ///</summary>
+        ///<summary>
+        /// Set the Expr.nHeight variable in the structure passed as an
+        /// argument. An expression with no children, Expr.x.pList or
+        /// Expr.x.pSelect member has a height of 1. Any other expression
+        /// has a height equal to the maximum height of any other
+        /// referenced Expr plus one.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Set the Expr.nHeight variable using the exprSetHeight() function. If
+        /// the height is greater than the maximum allowed expression depth,
+        /// leave an error in pParse.
+        ///
+        ///</summary>
+        ///<summary>
+        /// Return the maximum height of any expression tree referenced
+        /// by the select statement passed as an argument.
+        ///
+        ///</summary>
 #else
 																																																//define exprSetHeight(y)
 #endif
-            ///<summary>exprc.sqlite3ExprAlloc
-            /// This routine is the core allocator for Expr nodes.
-            ///
-            /// Construct a new expression node and return a pointer to it.  Memory
-            /// for this node and for the pToken argument is a single allocation
-            /// obtained from sqlite3DbMalloc().  The calling function
-            /// is responsible for making sure the node eventually gets freed.
-            ///
-            /// If dequote is true, then the token (if it exists) is dequoted.
-            /// If dequote is false, no dequoting is performance.  The deQuote
-            /// parameter is ignored if pToken is NULL or if the token does not
-            /// appear to be quoted.  If the quotes were of the form "..." (double-quotes)
-            /// then the ExprFlags.EP_DblQuoted flag is set on the expression node.
-            ///
-            /// Special case:  If op==TokenType.TK_INTEGER and pToken points to a string that
-            /// can be translated into a 32-bit integer, then the token is not
-            /// stored in u.zToken.  Instead, the integer values is written
-            /// into u.iValue and the ExprFlags.EP_IntValue flag is set.  No extra storage
-            /// is allocated to hold the integer text and the dequote flag is ignored.
-            ///</summary>
-            public static Expr CreateExpr(Connection db,///
-                ///<summary>
-                ///Handle for sqlite3DbMallocZero() (may be null) 
-                ///</summary>
-            TokenType op,///
-                ///<summary>
-                ///Expression opcode 
-                ///</summary>
-            Token pToken,///
-                ///<summary>
-                ///Token argument.  Might be NULL 
-                ///</summary>
-            bool dequote///
-                ///<summary>
-                ///True to dequote 
-                ///</summary>
+        ///<summary>exprc.sqlite3ExprAlloc
+        /// This routine is the core allocator for Expr nodes.
+        ///
+        /// Construct a new expression node and return a pointer to it.  Memory
+        /// for this node and for the pToken argument is a single allocation
+        /// obtained from sqlite3DbMalloc().  The calling function
+        /// is responsible for making sure the node eventually gets freed.
+        ///
+        /// If dequote is true, then the token (if it exists) is dequoted.
+        /// If dequote is false, no dequoting is performance.  The deQuote
+        /// parameter is ignored if pToken is NULL or if the token does not
+        /// appear to be quoted.  If the quotes were of the form "..." (double-quotes)
+        /// then the ExprFlags.EP_DblQuoted flag is set on the expression node.
+        ///
+        /// Special case:  If op==TokenType.TK_INTEGER and pToken points to a string that
+        /// can be translated into a 32-bit integer, then the token is not
+        /// stored in u.zToken.  Instead, the integer values is written
+        /// into u.iValue and the ExprFlags.EP_IntValue flag is set.  No extra storage
+        /// is allocated to hold the integer text and the dequote flag is ignored.
+        ///</summary>
+        public static Expr CreateExpr(
+            Connection db,///Handle for sqlite3DbMallocZero() (may be null)                                                     
+            TokenType op,///Expression opcode                          
+            Token pToken,///Token argument.  Might be NULL                          
+            bool dequote///True to dequote                         
             )
+        {
+            TokenType p_operator = (TokenType)op;
+            int nExtra = 0;
+            int iValue = 0;
+            if (pToken != null)
             {
-                TokenType p_operator = (TokenType)op;
-                Expr pNew;
-                int nExtra = 0;
-                int iValue = 0;
-                if (pToken != null)
+                if (p_operator != TokenType.TK_INTEGER || pToken.zRestSql == null || pToken.zRestSql.Length == 0 || Converter.sqlite3GetInt32(pToken.zRestSql.ToString(), ref iValue) == false)
                 {
-                    if (p_operator != TokenType.TK_INTEGER || pToken.zRestSql == null || pToken.zRestSql.Length == 0 || Converter.sqlite3GetInt32(pToken.zRestSql.ToString(), ref iValue) == false)
-                    {
-                        nExtra = pToken.Length + 1;
-                        Debug.Assert(iValue >= 0);
-                    }
+                    nExtra = pToken.Length + 1;
+                    Debug.Assert(iValue >= 0);
                 }
-                pNew = new Expr();
-                pNew.token = pToken;
-                //sqlite3DbMallocZero(db, sizeof(Expr)+nExtra);
-                if (pNew != null)
+            }
+
+            //sqlite3DbMallocZero(db, sizeof(Expr)+nExtra);
+            //if (pNew != null)
+
+            var pNew = new Expr()
+            {
+                token = pToken,
+                Operator = p_operator,
+                iAgg = -1
+#if SQLITE_MAX_EXPR_DEPTH
+                    ,
+                nHeight = 1
+#endif
+            };
+            if (pToken != null)
+            {
+                if (nExtra == 0)
                 {
-                    pNew.Operator = p_operator;
-                    pNew.iAgg = -1;
-                    if (pToken != null)
+                    pNew.Flags |= ExprFlags.EP_IntValue;
+                    pNew.u.iValue = iValue;
+                }
+                else
+                {
+                    //pNew.u.zToken = (char)&pNew[1];
+                    if (pToken.Length > 0)
+                        pNew.u.zToken = pToken.zRestSql.Substring(0, pToken.Length);
+                    //memcpy(pNew.u.zToken, pToken.z, pToken.n);
+                    else
+                        if (pToken.Length == 0 && pToken.zRestSql == "")
+                        pNew.u.zToken = "";
+                    //pNew.u.zToken[pToken.n] = 0;
+                    var c = (pToken.zRestSql??String.Empty).FirstOrDefault();
+                    if (dequote && nExtra >= 3 && c.In('\'', '"', '[', '`'))
                     {
-                        if (nExtra == 0)
-                        {
-                            pNew.Flags |= ExprFlags.EP_IntValue;
-                            pNew.u.iValue = iValue;
-                        }
-                        else
-                        {
-                            int c;
-                            //pNew.u.zToken = (char)&pNew[1];
-                            if (pToken.Length > 0)
-                                pNew.u.zToken = pToken.zRestSql.Substring(0, pToken.Length);
-                            //memcpy(pNew.u.zToken, pToken.z, pToken.n);
-                            else
-                                if (pToken.Length == 0 && pToken.zRestSql == "")
-                                    pNew.u.zToken = "";
-                            //pNew.u.zToken[pToken.n] = 0;
-                            if (dequote && nExtra >= 3 && ((c = pToken.zRestSql[0]) == '\'' || c == '"' || c == '[' || c == '`'))
-                            {
 #if DEBUG_CLASS_EXPR || DEBUG_CLASS_ALL
 																																																																																																																																																																								StringExtensions.sqlite3Dequote(ref pNew.u._zToken);
 #else
-                                StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
+                        StringExtensions.sqlite3Dequote(ref pNew.u.zToken);
 #endif
-                                if (c == '"')
-                                    pNew.Flags |= ExprFlags.EP_DblQuoted;
-                            }
-                        }
+                        if (c == '"')
+                            pNew.Flags |= ExprFlags.EP_DblQuoted;
                     }
-#if SQLITE_MAX_EXPR_DEPTH
-                    pNew.nHeight = 1;
-#endif
                 }
-                return pNew;
             }
+
+
+            return pNew;
+        }
             ///<summary>
             /// Allocate a new expression node from a zero-terminated token that has
             /// already been dequoted.
             ///
             ///</summary>
-            public static Expr sqlite3Expr(Connection db,///
-                ///<summary>
-                ///Handle for sqlite3DbMallocZero() (may be null) 
-                ///</summary>
-            TokenType op,///
-                ///<summary>
-                ///Expression opcode 
-                ///</summary>
-            string zToken///
-                ///<summary>
-                ///Token argument.  Might be NULL 
-                ///</summary>
+            public static Expr sqlite3Expr(
+                Connection db,///Handle for sqlite3DbMallocZero() (may be null)                 
+                TokenType op,///Expression opcode                 
+                string zToken///Token argument.  Might be NULL                 
             )
             {
-                Token x = new Token();
-                x.zRestSql = zToken;
-                x.Length = !String.IsNullOrEmpty(zToken) ? zToken.Strlen30() : 0;
+                Token x = new Token()
+                {
+                    zRestSql = zToken,
+                    Length = !String.IsNullOrEmpty(zToken) ? zToken.Strlen30() : 0
+                };
                 return CreateExpr(db, op, x, false);
             }
-            ///
+            
             ///<summary>
             ///Attach subtrees pLeft and pRight to the Expr node pRoot.
             ///
@@ -1157,44 +1145,7 @@ return null;
             ///<param name="is contained in the RHS then jump to destIfNull.  If the LHS is contained">is contained in the RHS then jump to destIfNull.  If the LHS is contained</param>
             ///<param name="within the RHS then fall through.">within the RHS then fall through.</param>
 #endif
-            ///<summary>
-            /// Duplicate an 8-byte value
-            ///</summary>
-            //static char *dup8bytes(Vdbe v, string in){
-            //  char *out = sqlite3DbMallocRaw(sqlite3VdbeDb(v), 8);
-            //  if( out ){
-            //    memcpy(out, in, 8);
-            //  }
-            //  return out;
-            //}
-#if !SQLITE_OMIT_FLOATING_POINT
-            ///<summary>
-            /// Generate an instruction that will put the floating point
-            /// value described by z[0..n-1] into register iMem.
-            ///
-            /// The z[] string will probably not be zero-terminated.  But the
-            /// z[n] character is guaranteed to be something that does not look
-            /// like the continuation of the number.
-            ///</summary>
-            public static void codeReal(Vdbe v, string z, bool negateFlag, int iMem)
-            {
-                if (Sqlite3.ALWAYS(!String.IsNullOrEmpty(z)))
-                {
-                    double value = 0;
-                    //string zV;
-                    Converter.sqlite3AtoF(z, ref value, StringExtensions.Strlen30(z), SqliteEncoding.UTF8);
-                    Debug.Assert(!MathExtensions.sqlite3IsNaN(value));
-                    ///
-                    ///<summary>
-                    ///The new AtoF never returns NaN 
-                    ///</summary>
-                    if (negateFlag)
-                        value = -value;
-                    //zV = dup8bytes(v,  value);
-                    v.sqlite3VdbeAddOp4(OpCode.OP_Real, 0, iMem, 0, value,  P4Usage.P4_REAL);
-                }
-            }
-#endif
+            
             ///<summary>
             /// Generate an instruction that will put the integer describe by
             /// text z[0..n-1] into register iMem.
@@ -1384,7 +1335,7 @@ return null;
                     int r2;
                     r2 = pParse.sqlite3ExprCodeTarget(pExpr, r1);
                     if (Sqlite3.NEVER(r1 != r2))
-                        pParse.sqlite3ReleaseTempReg(r1);
+                        pParse.deallocTempReg(r1);
                     pExpr.Operator2 = pExpr.Operator;
                     pExpr.Operator = TokenType.TK_REGISTER;
                     pExpr.iTable = r2;

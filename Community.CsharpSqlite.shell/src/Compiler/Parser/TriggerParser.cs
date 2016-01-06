@@ -437,7 +437,7 @@ goto trigger_cleanup;
                 build.sqlite3NestedParse(pParse, "INSERT INTO %Q.%s VALUES('trigger',%Q,%Q,0,'CREATE TRIGGER %q')", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), zName, pTrig.table, z);
                 db.DbFree(ref z);
                 build.sqlite3ChangeCookie(pParse, iDb);
-                v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "type='trigger' AND name='%q'", zName));
+                v.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "type='trigger' AND name='%q'", zName));
             }
             if (db.init.busy != 0)
             {

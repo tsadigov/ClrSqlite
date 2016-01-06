@@ -512,7 +512,7 @@ goto pragma_out;
 				int addr;
 				if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 					goto pragma_out;
-                Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                Engine.vdbeaux.markUsed(v, iDb);
 				if(null==zRight) {
 					v.sqlite3VdbeSetNumCols(1);
                     v.sqlite3VdbeSetColName(0, ColName.NAME, "cache_size", SQLITE_STATIC);
@@ -753,7 +753,7 @@ goto pragma_out;
 										}
 										for(ii=db.BackendCount-1;ii>=0;ii--) {
 											if(db.Backends[ii].BTree!=null&&(ii==iDb||pId2.Length==0)) {
-                                                Engine.vdbeaux.sqlite3VdbeUsesBtree(v, ii);
+                                                Engine.vdbeaux.markUsed(v, ii);
                                                 v.sqlite3VdbeAddOp3(OpCode.OP_JournalMode, ii, 1, (int)eMode);
 											}
 										}
@@ -868,7 +868,7 @@ goto pragma_out;
 															v.sqlite3VdbeChangeP2(iAddr+2,iAddr+4);
 															v.sqlite3VdbeChangeP1(iAddr+4,eAuto-1);
 															v.sqlite3VdbeChangeP1(iAddr+5,iDb);
-                                                            Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                                                            Engine.vdbeaux.markUsed(v, iDb);
 														}
 													}
 												}
@@ -1501,7 +1501,7 @@ else
 																														///</summary>
 																														new VdbeOpList(OpCode.OP_Halt,0,0,0),
 																													};
-																													r1=pParse.sqlite3GenerateIndexKey(pIdx,1,3,false);
+																													r1=pParse.codegenGenerateIndexKey(pIdx,1,3,false);
 																													jmp2=v.sqlite3VdbeAddOp4Int( OpCode.OP_Found,j+2,0,r1,pIdx.nColumn+1);
 																													addr=v.sqlite3VdbeAddOpList(Sqlite3.ArraySize(idxErr),idxErr);
 																													v.sqlite3VdbeChangeP4(addr+1,"rowid ",SQLITE_STATIC);
@@ -1672,7 +1672,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																											if(zLeft.Equals("schema_version",StringComparison.InvariantCultureIgnoreCase)||zLeft.Equals("user_version",StringComparison.InvariantCultureIgnoreCase)||zLeft.Equals("freelist_count",StringComparison.InvariantCultureIgnoreCase)) {
                                                                                                                 BTreeProp iCookie;
 																												///Cookie index. 1 for schema-cookie.
-                                                                                                                Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                                                                                                                Engine.vdbeaux.markUsed(v, iDb);
 																												switch(zLeft[0]) {
 																												case 'f':
 																												case 'F':

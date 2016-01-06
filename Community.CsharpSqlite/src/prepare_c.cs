@@ -297,7 +297,7 @@ db.xAuth = 0;
                 Enumerable.Range(0, db.BackendCount)                    
                     .Where(x => !((db.DbHasProperty(x, sqliteinth.DB_SchemaLoaded) || x == 1)))
                     .ForEach(
-                        idx => {
+                        (idx,i2) => {
                             rc = InitialiseSingleDatabase(db, idx, ref pzErrMsg);//  <<<<<<<<<<<<<<<<<<<<<<<<<
                             if (rc != 0)
                                 build.sqlite3ResetInternalSchema(db, idx);
@@ -812,20 +812,14 @@ db.xAuth = 0;
                                 ///<summary>
                                 ///OUT: A pointer to the prepared statement 
                                 ///</summary>
-        int dummy///
-                 ///<summary>
-                 ///( No string passed) 
-                 ///</summary>
-       )
+        int dummy///( No string passed) 
+                 )
         {
             string pzTail = null;
             SqlResult rc;
             rc = sqlite3LockAndPrepare(db, zSql, nBytes, 1, null, ref ppStmt, ref pzTail);
             Debug.Assert(rc == SqlResult.SQLITE_OK || ppStmt == null);
-            ///
-            ///<summary>
             ///VERIFY: F13021 
-            ///</summary>
             return rc;
         }
         public static SqlResult sqlite3_prepare_v2(Connection db,///
@@ -853,10 +847,7 @@ db.xAuth = 0;
             SqlResult rc;
             rc = sqlite3LockAndPrepare(db, zSql, nBytes, 1, null, ref ppStmt, ref pzTail);
             Debug.Assert(rc == SqlResult.SQLITE_OK || ppStmt == null);
-            ///
-            ///<summary>
             ///VERIFY: F13021 
-            ///</summary>
             return rc;
         }
 #if !SQLITE_OMIT_UTF16

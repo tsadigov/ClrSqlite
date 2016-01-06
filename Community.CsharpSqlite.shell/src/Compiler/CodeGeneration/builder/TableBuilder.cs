@@ -321,7 +321,7 @@ goto begin_table_error;
                     var reg2 = pParse.regRoot = ++pParse.nMem;
                     var reg3 = ++pParse.nMem;
                     vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, reg3,(int) BTreeProp.FILE_FORMAT);
-                    Engine.vdbeaux.sqlite3VdbeUsesBtree(vdbEngine, iDb);
+                    Engine.vdbeaux.markUsed(vdbEngine, iDb);
                     var j1 = vdbEngine.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
                     var fileFormat = (db.flags & SqliteFlags.SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
                     vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
@@ -952,10 +952,9 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     }
 #endif
                     ///Reparse everything to update our internal data structures 
-                    v.sqlite3VdbeAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "tbl_name='%q'", pNewTable.zName));
+                    v.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "tbl_name='%q'", pNewTable.zName));
                 }
-                ///Add the table to the in-memory representation of the database.</param>
-                ///<param name=""></param>
+                ///Add the table to the in-memory representation of the database.
                 if (db.init.busy != 0)
                 {
                     Table pOld;

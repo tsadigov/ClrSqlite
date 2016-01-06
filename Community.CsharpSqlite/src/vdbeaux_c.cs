@@ -819,15 +819,16 @@ namespace Community.CsharpSqlite.Engine
                 return zTemp.ToString();
             }
 #endif
-            ///<summary>
-            /// Declare to the Vdbe that the BTree object at db->aDb[i] is used.
-            ///
-            /// The prepared statements need to know in advance the complete set of
-            /// attached databases that they will be using.  A mask of these databases
-            /// is maintained in p->btreeMask and is used for locking and other purposes.
-            ///
-            ///</summary>
-            public static void sqlite3VdbeUsesBtree(this Vdbe p, int i)
+        ///<summary>
+        ///Name:sqlite3VdbeUsesBtree
+        /// Declare to the Vdbe that the BTree object at db->aDb[i] is used.
+        ///
+        /// The prepared statements need to know in advance the complete set of
+        /// attached databases that they will be using.  A mask of these databases
+        /// is maintained in p->btreeMask and is used for locking and other purposes.
+        ///
+        ///</summary>
+        public static void markUsed(this Vdbe p, int i)
             {
                 Debug.Assert(i >= 0 && i < p.db.BackendCount && i < (int)sizeof(yDbMask) * 8);
                 Debug.Assert(i < (int)sizeof(yDbMask) * 8);

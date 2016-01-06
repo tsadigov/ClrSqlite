@@ -224,7 +224,7 @@ p.zName,  P4Usage.P4_STATIC );
                         {
                             if ((mask & pParse.cookieMask) == 0)
                                 continue;
-                            Engine.vdbeaux.sqlite3VdbeUsesBtree(v, iDb);
+                            Engine.vdbeaux.markUsed(v, iDb);
                             v.sqlite3VdbeAddOp2( OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
                             if (!db.init.IsBusy)
                             {
@@ -1070,13 +1070,13 @@ p.zName,  P4Usage.P4_STATIC );
             ///</summary>
             public static void sqlite3ChangeCookie(Parse pParse, int iDb)
             {
-                int r1 = pParse.sqlite3GetTempReg();
+                int r1 = pParse.allocTempReg();
                 Connection db = pParse.db;
                 Vdbe v = pParse.pVdbe;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 v.sqlite3VdbeAddOp2(OpCode.OP_Integer, db.Backends[iDb].pSchema.schema_cookie + 1, r1);
                 v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, BTreeProp.SCHEMA_VERSION, r1);
-                pParse.sqlite3ReleaseTempReg(r1);
+                pParse.deallocTempReg(r1);
             }
             ///<summary>
             /// Measure the number of characters needed to output the given
@@ -1438,7 +1438,7 @@ db.xAuth = xAuth;
         static void destroyRootPage(Parse pParse, int iTable, int iDb)
             {
                 Vdbe v = pParse.sqlite3GetVdbe();
-                int r1 = pParse.sqlite3GetTempReg();
+                int r1 = pParse.allocTempReg();
                 v.sqlite3VdbeAddOp3( OpCode.OP_Destroy, iTable, r1, iDb);
                 build.sqlite3MayAbort(pParse);
 #if !SQLITE_OMIT_AUTOVACUUM
@@ -1453,7 +1453,7 @@ db.xAuth = xAuth;
                 ///<param name="token for additional information.">token for additional information.</param>
                 build.sqlite3NestedParse(pParse, "UPDATE %Q.%s SET rootpage=%d WHERE #%d AND rootpage=#%d", pParse.db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), iTable, r1, r1);
 #endif
-                pParse.sqlite3ReleaseTempReg(r1);
+                pParse.deallocTempReg(r1);
             }
            
             
@@ -2216,7 +2216,7 @@ goto exit_drop_index;
                     for (int i = 0; i < db.BackendCount; i++)
                     {
                         v.sqlite3VdbeAddOp2(OpCode.OP_Transaction, i, (type == (int)TokenType.TK_EXCLUSIVE) ? 2 : 1);
-                        Engine.vdbeaux.sqlite3VdbeUsesBtree(v, i);
+                        Engine.vdbeaux.markUsed(v, i);
                     }
                 }
                 v.sqlite3VdbeAddOp2(OpCode.OP_AutoCommit, 0, 0);

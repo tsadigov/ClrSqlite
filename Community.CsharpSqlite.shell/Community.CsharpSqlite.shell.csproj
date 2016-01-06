@@ -327,6 +327,7 @@
     <Compile Include="src\Compiler\Ast\Where.cs" />
     <Compile Include="src\Auth\AuthRelaed.cs" />
     <Compile Include="src\BackupExtensions.cs" />
+    <Compile Include="src\Compiler\Parser\VdbeFacade.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Text.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\TheRest.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Transaction.cs" />

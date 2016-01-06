@@ -552,7 +552,7 @@ namespace Community.CsharpSqlite.Ast {
 						///construct.
 						///
 						///</summary>
-						iReleaseReg=pParse.sqlite3GetTempReg();
+						iReleaseReg=pParse.allocTempReg();
 						pTerm=pWC.findTerm(iCur,-1,notReady,wherec.WO_EQ|wherec.WO_IN,null);
 						Debug.Assert(pTerm!=null);
 						Debug.Assert(pTerm.pExpr!=null);
@@ -644,7 +644,7 @@ namespace Community.CsharpSqlite.Ast {
 																																																																																																																																																																																																												            VdbeComment( v, "pk" );
 #endif
 								pParse.sqlite3ExprCacheAffinityChange(r1,1);
-								pParse.sqlite3ReleaseTempReg(rTemp);
+								pParse.deallocTempReg(rTemp);
 								pLevel.disableTerm(pStart);
 							}
 							else {
@@ -681,7 +681,7 @@ namespace Community.CsharpSqlite.Ast {
 								Debug.Assert(pLevel.p5==0);
 							}
 							if(testOp!=OpCode.OP_Noop) {
-								iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
+								iRowidReg=iReleaseReg=pParse.allocTempReg();
                                 v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iCur, iRowidReg);
 								pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 								v.sqlite3VdbeAddOp3(testOp,memEndValue,addrBrk,iRowidReg);
@@ -1041,14 +1041,14 @@ namespace Community.CsharpSqlite.Ast {
 								///If it is, jump to the next iteration of the loop.
 								///
 								///</summary>
-								r1=pParse.sqlite3GetTempReg();
+								r1=pParse.allocTempReg();
 								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_BTM_LIMIT);
 								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_TOP_LIMIT);
 								if((pLevel.plan.wsFlags&(wherec.WHERE_BTM_LIMIT|wherec.WHERE_TOP_LIMIT))!=0) {
 									v.sqlite3VdbeAddOp3( OpCode.OP_Column,iIdxCur,nEq,r1);
                                     v.sqlite3VdbeAddOp2(OpCode.OP_IsNull, r1, addrCont);
 								}
-								pParse.sqlite3ReleaseTempReg(r1);
+								pParse.deallocTempReg(r1);
 								///
 								///<summary>
 								///Seek the table cursor, if required 
@@ -1056,7 +1056,7 @@ namespace Community.CsharpSqlite.Ast {
 								pLevel.disableTerm(pRangeStart);
 								pLevel.disableTerm(pRangeEnd);
 								if(0==omitTable) {
-									iRowidReg=iReleaseReg=pParse.sqlite3GetTempReg();
+									iRowidReg=iReleaseReg=pParse.allocTempReg();
 									v.sqlite3VdbeAddOp2( OpCode.OP_IdxRowid,iIdxCur,iRowidReg);
 									pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
                                     v.sqlite3VdbeAddOp2(OpCode.OP_Seek, iCur, iRowidReg);
@@ -1377,7 +1377,7 @@ namespace Community.CsharpSqlite.Ast {
 						pTerm.wtFlags|=WhereTermFlags.TERM_CODED;
 					}
 				}
-				pParse.sqlite3ReleaseTempReg(iReleaseReg);
+				pParse.deallocTempReg(iReleaseReg);
 				return notReady;
 			}
 		}
