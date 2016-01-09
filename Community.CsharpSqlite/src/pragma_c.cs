@@ -203,7 +203,7 @@ namespace Community.CsharpSqlite {
 		///</summary>
 		static void returnSingleInt(Parse pParse,string zLabel,i64 value) {
 			var v=pParse.sqlite3GetVdbe();
-			int mem=++pParse.nMem;
+			int mem=++pParse.UsedCellCount;
 			//i64* pI64 = sqlite3DbMallocRaw( pParse->db, sizeof( value ) );
 			//if ( pI64 )
 			//{
@@ -439,7 +439,7 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			if(v==null)
 				return;
 			v.sqlite3VdbeRunOnlyOnce();
-			pParse.nMem=2;
+			pParse.UsedCellCount=2;
 			///Interpret the [database.] part of the pragma statement. iDb is the
 			///index of the database this pragma is being applied to in db.aDb[]. 
 			iDb=build.sqlite3TwoPartName(pParse,pId1,pId2,ref pId);
@@ -451,14 +451,14 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			if(iDb==1&&build.sqlite3OpenTempDatabase(pParse)!=0) {
 				return;
 			}
-			zLeft=build.sqlite3NameFromToken(db,pId);
+			zLeft=build.Token2Name(db,pId);
 			if(zLeft=="")
 				return;
 			if(minusFlag!=0) {
 				zRight=(pValue==null)?"":io.sqlite3MPrintf(db,"-%T",pValue);
 			}
 			else {
-				zRight=build.sqlite3NameFromToken(db,pValue);
+				zRight=build.Token2Name(db,pValue);
 			}
 			Debug.Assert(pId2!=null);
 			zDb=pId2.Length>0?pDb.Name:null;
@@ -516,7 +516,7 @@ goto pragma_out;
 				if(null==zRight) {
 					v.sqlite3VdbeSetNumCols(1);
                     v.sqlite3VdbeSetColName(0, ColName.NAME, "cache_size", SQLITE_STATIC);
-					pParse.nMem+=2;
+					pParse.UsedCellCount+=2;
 					addr=v.sqlite3VdbeAddOpList(getCacheSize.Length,getCacheSize);
 					v.sqlite3VdbeChangeP1(addr,iDb);
 					v.sqlite3VdbeChangeP1(addr+1,iDb);
@@ -612,7 +612,7 @@ goto pragma_out;
 							if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 								goto pragma_out;
 							build.sqlite3CodeVerifySchema(pParse,iDb);
-							iReg=++pParse.nMem;
+							iReg=++pParse.UsedCellCount;
 							if(zLeft[0]=='p') {
 								v.sqlite3VdbeAddOp2( OpCode.OP_Pagecount,iDb,iReg);
 							}
@@ -638,7 +638,7 @@ goto pragma_out;
 								if(_v==null||SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 									goto pragma_out;
 								build.sqlite3CodeVerifySchema(pParse,iDb);
-								iReg=++pParse.nMem;
+								iReg=++pParse.UsedCellCount;
 								_v.sqlite3VdbeAddOp2( OpCode.OP_Pagecount,iDb,iReg);
 								_v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,iReg,1);
 								_v.sqlite3VdbeSetNumCols(1);
@@ -1122,7 +1122,7 @@ else
 																				int nHidden=0;
 																				Column pCol;
 																				v.sqlite3VdbeSetNumCols(6);
-																				pParse.nMem=6;
+																				pParse.UsedCellCount=6;
                                                                                 v.sqlite3VdbeSetColName(0, ColName.NAME, "cid", SQLITE_STATIC);
                                                                                 v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
                                                                                 v.sqlite3VdbeSetColName(2, ColName.NAME, "type", SQLITE_STATIC);
@@ -1163,7 +1163,7 @@ else
 																					int i;
 																					pTab=pIdx.pTable;
 																					v.sqlite3VdbeSetNumCols(3);
-																					pParse.nMem=3;
+																					pParse.UsedCellCount=3;
                                                                                     v.sqlite3VdbeSetColName(0, ColName.NAME, "seqno", SQLITE_STATIC);
                                                                                     v.sqlite3VdbeSetColName(1, ColName.NAME, "cid", SQLITE_STATIC);
                                                                                     v.sqlite3VdbeSetColName(2, ColName.NAME, "name", SQLITE_STATIC);
@@ -1190,7 +1190,7 @@ else
 																						if(pIdx!=null) {
 																							int i=0;
 																							v.sqlite3VdbeSetNumCols(3);
-																							pParse.nMem=3;
+																							pParse.UsedCellCount=3;
                                                                                             v.sqlite3VdbeSetColName(0, ColName.NAME, "seq", SQLITE_STATIC);
                                                                                             v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
                                                                                             v.sqlite3VdbeSetColName(2, ColName.NAME, "unique", SQLITE_STATIC);
@@ -1211,7 +1211,7 @@ else
 																						if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																							goto pragma_out;
 																						v.sqlite3VdbeSetNumCols(3);
-																						pParse.nMem=3;
+																						pParse.UsedCellCount=3;
                                                                                         v.sqlite3VdbeSetColName(0, ColName.NAME, "seq", SQLITE_STATIC);
                                                                                         v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
                                                                                         v.sqlite3VdbeSetColName(2, ColName.NAME, "file", SQLITE_STATIC);
@@ -1230,10 +1230,10 @@ else
 																							int i=0;
 																							HashElem p;
 																							v.sqlite3VdbeSetNumCols(2);
-																							pParse.nMem=2;
+																							pParse.UsedCellCount=2;
                                                                                             v.sqlite3VdbeSetColName(0, ColName.NAME, "seq", SQLITE_STATIC);
                                                                                             v.sqlite3VdbeSetColName(1, ColName.NAME, "name", SQLITE_STATIC);
-																							for(p=db.aCollSeq.first;p!=null;p=p.next)//( p = sqliteHashFirst( db.aCollSeq ) ; p; p = sqliteHashNext( p ) )
+																							for(p=db.aCollSeq.first;p!=null;p=p.pNext)//( p = sqliteHashFirst( db.aCollSeq ) ; p; p = sqliteHashNext( p ) )
 																							 {
 																								CollSeq pColl=((CollSeq[])p.data)[0];
 																								// sqliteHashData( p );
@@ -1257,7 +1257,7 @@ else
 																									if(pFK!=null) {
 																										int i=0;
 																										v.sqlite3VdbeSetNumCols(8);
-																										pParse.nMem=8;
+																										pParse.UsedCellCount=8;
 																										v.sqlite3VdbeSetColName(0, ColName.NAME, "id",SQLITE_STATIC);
                                                                                                         v.sqlite3VdbeSetColName(1, ColName.NAME, "seq", SQLITE_STATIC);
                                                                                                         v.sqlite3VdbeSetColName(2, ColName.NAME, "table", SQLITE_STATIC);
@@ -1363,7 +1363,7 @@ else
 																										///</summary>
 																										if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																											goto pragma_out;
-																										pParse.nMem=6;
+																										pParse.UsedCellCount=6;
 																										v.sqlite3VdbeSetNumCols(1);
                                                                                                         v.sqlite3VdbeSetColName(0, ColName.NAME, "integrity_check", SQLITE_STATIC);
 																										///
@@ -1409,8 +1409,8 @@ else
 																											///<param name="for all tables and indices in the database.">for all tables and indices in the database.</param>
 																											///<param name=""></param>
 																											Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-																											pTbls=db.Backends[i].pSchema.tblHash;
-																											for(x=pTbls.first;x!=null;x=x.next) {
+																											pTbls=db.Backends[i].pSchema.Tables;
+																											for(x=pTbls.first;x!=null;x=x.pNext) {
 																												//          for(x=sqliteHashFirst(pTbls); x; x=sqliteHashNext(x)){
 																												Table pTab=(Table)x.data;
 																												// sqliteHashData( x );
@@ -1425,8 +1425,8 @@ else
 
 																											///Make sure sufficient number of registers have been allocated 
 																											
-																											if(pParse.nMem<cnt+4) {
-																												pParse.nMem=cnt+4;
+																											if(pParse.UsedCellCount<cnt+4) {
+																												pParse.UsedCellCount=cnt+4;
 																											}
 																											
 																											///Do the b-tree integrity checks 
@@ -1441,7 +1441,7 @@ else
 																											
                                                                                                             ///Make sure all the indices are constructed correctly.
 																											
-																											for(x=pTbls.first;x!=null&&!isQuick;x=x.next) {
+																											for(x=pTbls.first;x!=null&&!isQuick;x=x.pNext) {
 																												;
 																												//          for(x=sqliteHashFirst(pTbls); x && !isQuick; x=sqliteHashNext(x)){
 																												Table pTab=(Table)x.data;
@@ -1757,7 +1757,7 @@ utilc.sqlite3ErrorMsg( pParse, "unsupported encoding: %s", zRight );
 																															int i=0;
 																															string zOpt;
 																															v.sqlite3VdbeSetNumCols(1);
-																															pParse.nMem=1;
+																															pParse.UsedCellCount=1;
                                                                                                                             v.sqlite3VdbeSetColName(0, ColName.NAME, "compile_option", SQLITE_STATIC);
 																															while((zOpt=sqlite3_compileoption_get(i++))!=null) {
 																																v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,1,0,zOpt,0);

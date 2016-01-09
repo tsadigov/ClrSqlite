@@ -1331,7 +1331,7 @@ return null;
                 }
                 if (pExpr.isAppropriateForFactoring() != false)
                 {
-                    int r1 = ++pParse.nMem;
+                    int r1 = ++pParse.UsedCellCount;
                     int r2;
                     r2 = pParse.sqlite3ExprCodeTarget(pExpr, r1);
                     if (Sqlite3.NEVER(r1 != r2))
@@ -1589,7 +1589,7 @@ return null;
                                             pCol.pTab = pExpr.pTab;
                                             pCol.iTable = pExpr.iTable;
                                             pCol.iColumn = pExpr.iColumn;
-                                            pCol.iMem = ++pParse.nMem;
+                                            pCol.iMem = ++pParse.UsedCellCount;
                                             pCol.iSorterColumn = -1;
                                             pCol.pExpr = pExpr;
                                             if (pAggInfo.pGroupBy != null)
@@ -1683,7 +1683,7 @@ return null;
                                         Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
                                         pItem = pAggInfo.aFunc[i];
                                         pItem.pExpr = pExpr;
-                                        pItem.iMem = ++pParse.nMem;
+                                        pItem.iMem = ++pParse.UsedCellCount;
                                         Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
                                         pItem.pFunc = FuncDefTraverse.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.Count : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)

@@ -1011,7 +1011,7 @@ break;
 					}
 				}
 			}
-			for(i=db.aCollSeq.first;i!=null;i=i.next) {
+			for(i=db.aCollSeq.first;i!=null;i=i.pNext) {
 				//sqliteHashFirst(db.aCollSeq); i!=null; i=sqliteHashNext(i)){
 				CollSeq[] pColl=(CollSeq[])i.data;
 				// sqliteHashData(i);
@@ -2435,7 +2435,7 @@ return z;
 				;
 			connection.aCollSeq.sqlite3HashInit();
 			#if !SQLITE_OMIT_VIRTUALTABLE
-			connection.aModule=new Hash();
+			connection.aModule=new Hash<Module>();
 			connection.aModule.sqlite3HashInit();
 			#endif
 			///<param name="Add the default collation sequence BINARY. BINARY works for both UTF">8</param>
@@ -2480,13 +2480,13 @@ return z;
             ///database it is 'NONE'. This matches the pager layer defaults.
             {
                 var main = connection.Backends[0];
-                main.pSchema=SchemaExtensions.sqlite3SchemaGet(main.BTree, connection);
+                main.pSchema=SchemaExtensions.GetSchema(main.BTree, connection);
                 main.Name = "main";
                 main.safety_level = 3;
             }
             {
                 var temp = connection.Backends[1];
-                temp.pSchema = SchemaExtensions.sqlite3SchemaGet(null, connection);
+                temp.pSchema = SchemaExtensions.GetSchema(null, connection);
                 temp.Name = "temp";
                 temp.safety_level = 1;
             }

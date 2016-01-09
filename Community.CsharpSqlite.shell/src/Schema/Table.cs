@@ -209,12 +209,14 @@ namespace Community.CsharpSqlite.Metadata
             ///</summary>
             public Table pNextZombie;
 
-            ///
-            ///<summary>
-            ///Next on the Parse.pZombieTab list 
-            ///</summary>
+        public bool IsView { get { return null!=pSelect; } }
 
-            public Table Copy()
+        ///
+        ///<summary>
+        ///Next on the Parse.pZombieTab list 
+        ///</summary>
+
+        public Table Copy()
             {
                 if (this == null)
                     return null;

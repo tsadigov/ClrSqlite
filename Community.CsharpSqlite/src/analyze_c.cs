@@ -208,7 +208,7 @@ namespace Community.CsharpSqlite
 
 			Debug.Assert (sqlite3SchemaMutexHeld (db, iDb, null));
 			//for(i=sqliteHashFirst(&db.aDb[iDb].pSchema.idxHash);i;i=sqliteHashNext(i)){
-			for (i = db.Backends [iDb].pSchema.idxHash.first; i != null; i = i.next) {
+			for (i = db.Backends [iDb].pSchema.Indexes.first; i != null; i = i.pNext) {
 				Index pIdx = (Index)i.data;
 				// sqliteHashData( i );
 				build.sqlite3DefaultRowEst (pIdx);

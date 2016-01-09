@@ -489,7 +489,7 @@ namespace Community.CsharpSqlite.Ast {
 				///</summary>
                 if (pLevel.iFrom > 0 && (pTabItem.jointype & JoinType.JT_LEFT) != 0)// Check value of pTabItem[0].jointype
 				 {
-					pLevel.iLeftJoin=++pParse.nMem;
+					pLevel.iLeftJoin=++pParse.UsedCellCount;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,pLevel.iLeftJoin);
 					#if SQLITE_DEBUG
 																																																																																																																								        VdbeComment( v, "init LEFT JOIN no-match flag" );
@@ -660,7 +660,7 @@ namespace Community.CsharpSqlite.Ast {
 								///<summary>
 								///</summary>
 								///<param name="EV: R">11662 </param>
-								memEndValue=++pParse.nMem;
+								memEndValue=++pParse.UsedCellCount;
 								pParse.sqlite3ExprCode(pX.pRight,memEndValue);
 								if(pX.Operator==TokenType.TK_LT||pX.Operator==TokenType.TK_GT) {
 									testOp=bRev!=0?OpCode.OP_Le:OpCode.OP_Ge;
@@ -1138,7 +1138,7 @@ namespace Community.CsharpSqlite.Ast {
 									///<summary>
 									///</summary>
 									///<param name="Shortened table list or OR">clause generation </param>
-									int regReturn=++pParse.nMem;
+									int regReturn=++pParse.UsedCellCount;
 									///
 									///<summary>
 									///Register used with OpCode.OP_Gosub 
@@ -1228,8 +1228,8 @@ namespace Community.CsharpSqlite.Ast {
 									///<param name="called on an uninitialized cursor.">called on an uninitialized cursor.</param>
 									///<param name=""></param>
 									if((wctrlFlags&wherec.WHERE_DUPLICATES_OK)==0) {
-										regRowset=++pParse.nMem;
-										regRowid=++pParse.nMem;
+										regRowset=++pParse.UsedCellCount;
+										regRowid=++pParse.UsedCellCount;
 										v.sqlite3VdbeAddOp2(OpCode.OP_Null,0,regRowset);
 									}
 									iRetInit=v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regReturn);

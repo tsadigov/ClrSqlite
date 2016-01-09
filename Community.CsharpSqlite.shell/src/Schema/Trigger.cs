@@ -14,6 +14,7 @@ using u64 = System.UInt64;
 using unsigned = System.UInt64;
 using Pgno = System.UInt32;
 using Community.CsharpSqlite.Utils;
+using Community.CsharpSqlite.Engine.Op;
 
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
@@ -24,8 +25,10 @@ using Community.CsharpSqlite.Engine;
 using ynVar = System.Int32; 
 #endif
 
-namespace Community.CsharpSqlite.Metadata
+namespace Community.CsharpSqlite.Ast
 {
+    using Utils;
+    using Metadata;
         ///<summary>
         /// At least one instance of the following structure is created for each
         /// trigger that may be fired while parsing an INSERT, UPDATE or DELETE

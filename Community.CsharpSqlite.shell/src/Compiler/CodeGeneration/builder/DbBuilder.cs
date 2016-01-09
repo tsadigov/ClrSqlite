@@ -46,20 +46,10 @@ namespace Community.CsharpSqlite.builder
         /// does not exist.
         ///
         ///</summary>
-        public static int sqlite3FindDb(this Connection db, Token pName)
-        {
-            int i;
-            ///
-            ///<summary>
-            ///Database number 
-            ///</summary>
-            string zName;
-            ///
-            ///<summary>
-            ///Name we are searching for 
-            ///</summary>
-            zName = build.sqlite3NameFromToken(db, pName);
-            i = db.sqlite3FindDbName(zName);
+        public static int FindDbIdxByToken(this Connection db, Token pName)
+        {            
+            var zName = build.Token2Name(db, pName);
+            var i = db.sqlite3FindDbName(zName);
             db.DbFree(ref zName);
             return i;
         }

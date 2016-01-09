@@ -19,7 +19,7 @@ namespace Community.CsharpSqlite.Utils {
 			pH.ht=null;
 			pH.htsize=0;
 			while(elem!=null) {
-				HashElem next_elem=elem.next;
+				HashElem next_elem=elem.pNext;
 				////malloc_cs.sqlite3_free(ref  elem );
 				elem=next_elem;
 			}
@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite.Utils {
 		}
 
 		
-		
+		//delee this use the method below
 		public static T sqlite3HashInsert<T>(ref Hash pH,string pKey,int nKey,T data) where T : class {
 			
 			///New element added to the pH 
@@ -49,8 +49,19 @@ namespace Community.CsharpSqlite.Utils {
 			Debug.Assert(pKey!=null);
 			Debug.Assert(nKey>=0);
 
-            T result = pH.HashInsert(pKey.sub(nKey),data);
+            T result = pH.Insert(pKey.sub(nKey),data);
             return result;
 		}
-	}
+        public static T Insert<T>(this Hash pH, string pKey, int nKey, T data) where T : class
+        {
+
+            ///New element added to the pH 
+            Debug.Assert(pH != null);
+            Debug.Assert(pKey != null);
+            Debug.Assert(nKey >= 0);
+
+            T result = pH.Insert(pKey.sub(nKey), data);
+            return result;
+        }
+    }
 }

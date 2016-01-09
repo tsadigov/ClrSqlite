@@ -441,7 +441,7 @@ public object pAuthArg;               /* 1st argument to the access auth functio
 
 #endif
 #if !SQLITE_OMIT_VIRTUALTABLE
-            public Hash aModule;
+            public Hash<Module> aModule;
 
             ///
             ///<summary>
@@ -489,7 +489,7 @@ public object pAuthArg;               /* 1st argument to the access auth functio
         ///<summary>
         ///All collating sequences 
         ///</summary>
-        public Hash aCollSeq = new Hash();
+        public Hash<CollSeq[]> aCollSeq = new Hash<CollSeq[]>();
 
         ///
         

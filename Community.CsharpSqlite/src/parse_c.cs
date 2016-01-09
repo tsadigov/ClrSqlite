@@ -9745,7 +9745,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 376 "parse.y"
 			{
-				TableBuilder.sqlite3DropTable(pParse,yymsp[0].minor.yy259_SrcList,0,yymsp[-1].minor.yy4_Int);
+				TableBuilder.sqlite3DropTable(pParse,yymsp[0].minor.yy259_SrcList,false,yymsp[-1].minor.yy4_Int);
 			}
 			//#line 2489 "parse.c"
 			break;
@@ -9767,7 +9767,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 389 "parse.y"
 			{
-				TableBuilder.sqlite3DropTable(pParse,yymsp[0].minor.yy259_SrcList,1,yymsp[-1].minor.yy4_Int);
+				TableBuilder.sqlite3DropTable(pParse,yymsp[0].minor.yy259_SrcList,true,yymsp[-1].minor.yy4_Int);
 			}
 			//#line 2503 "parse.c"
 			break;

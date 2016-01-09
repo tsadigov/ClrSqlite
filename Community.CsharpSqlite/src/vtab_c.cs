@@ -84,7 +84,7 @@ namespace Community.CsharpSqlite
                     pMod.pModule = pModule;
                     pMod.pAux = pAux;
                     pMod.xDestroy = xDestroy;
-                    pDel = (Module)HashExtensions.sqlite3HashInsert(ref db.aModule, zCopy, nName, pMod);
+                    pDel = (Module)HashExtensions.Insert(db.aModule, zCopy, nName, pMod);
                     if (pDel != null && pDel.xDestroy != null)
                     {
                         build.sqlite3ResetInternalSchema(db, -1);

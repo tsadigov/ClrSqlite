@@ -40,25 +40,11 @@ namespace Community.CsharpSqlite.builder
         ///</summary>
         public static Index sqlite3FindIndex(Connection db, string zName, string zDb)
         {
-            Index p = null;
-            int nName = StringExtensions.Strlen30(zName);
-            ///All mutexes are required for schema access.  Make sure we hold them. 
-            Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-            for (int i = sqliteinth.OMIT_TEMPDB; i < db.BackendCount; i++)
-            {
-                int j = (i < 2) ? i ^ 1 : i;
-                ///Search TEMP before MAIN 
-                Schema pSchema = db.Backends[j].pSchema;
-                Debug.Assert(pSchema != null);
-                if (zDb != null && !zDb.Equals(db.Backends[j].Name, StringComparison.InvariantCultureIgnoreCase))
-                    continue;
-                Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
-                p = pSchema.idxHash.Find(zName, nName, (Index)null);
-                if (p != null)
-                    break;
-            }
-            return p;
+            return db.FindInBackendsSchemas(zName,zDb,schema=>schema.Indexes);
         }
+
+        
+
         ///<summary>
         /// Reclaim the memory used by an index
         ///
@@ -81,8 +67,8 @@ namespace Community.CsharpSqlite.builder
         public static void sqlite3UnlinkAndDeleteIndex(Connection db, int iDb, string zIdxName)//OPCODE:OP_DropIndex
         {
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-            var pHash = db.Backends[iDb].pSchema.idxHash;
-            var pIndex = HashExtensions.sqlite3HashInsert(ref pHash, zIdxName, zIdxName.Strlen30(), (Index)null);
+            var pHash = db.Backends[iDb].pSchema.Indexes;
+            var pIndex = HashExtensions.Insert( pHash, zIdxName, zIdxName.Strlen30(), (Index)null);
 
             sqlite3UnlinkAndDeleteIndex(db, pIndex);
         }
@@ -222,7 +208,7 @@ namespace Community.CsharpSqlite.builder
                 {
                     string zColl;
                     Debug.Assert(pName1.zRestSql != null);
-                    zColl = build.sqlite3NameFromToken(pParse.db, pName1);
+                    zColl = build.Token2Name(pParse.db, pName1);
                     if (zColl == null)
                         return;
                     pColl = db.sqlite3FindCollSeq(sqliteinth.ENC(db), zColl, 0);
@@ -237,7 +223,7 @@ namespace Community.CsharpSqlite.builder
             iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pObjName);
             if (iDb < 0)
                 return;
-            z = build.sqlite3NameFromToken(db, pObjName);
+            z = build.Token2Name(db, pObjName);
             if (z == null)
                 return;
             zDb = db.Backends[iDb].Name;
@@ -272,7 +258,7 @@ namespace Community.CsharpSqlite.builder
             {
                 if (zColl == null || collationMatch(zColl, pIndex))
                 {
-                    int iDb = pParse.db.indexOf( pTab.pSchema);
+                    int iDb = pParse.db.indexOfBackendWithSchema( pTab.pSchema);
                     Community.CsharpSqlite.build.sqlite3BeginWriteOperation(pParse, 0, iDb);
                     pParse.sqlite3RefillIndex(pIndex, -1);
                 }
@@ -295,8 +281,8 @@ namespace Community.CsharpSqlite.builder
             {
                 Debug.Assert(pDb != null);
                 //HashElem k;///For looping over tables in pDb 
-                pDb.pSchema.tblHash.first
-                    .path(h => h.next)
+                pDb.pSchema.Tables.first
+                    .path(h => h.pNext)
                     .ForEach(k=> reindexTable(pParse, (Table)k.data, zColl));
                 //for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
             }
@@ -338,7 +324,7 @@ namespace Community.CsharpSqlite.builder
             ///Register holding assemblied index record 
             Connection db = pParse.db;
             ///The database connection 
-            int iDb = db.indexOf( pIndex.pSchema);
+            int iDb = db.indexOfBackendWithSchema( pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
 db.aDb[iDb].zName ) ){
@@ -520,7 +506,7 @@ return;
                     ///sqlite3FixSrcList can never fail. 
                     Debugger.Break();
                 }
-                pTab = TableBuilder.sqlite3LocateTable(pParse, 0, pTblName.a[0].zName, pTblName.a[0].zDatabase);
+                pTab = TableBuilder.sqlite3LocateTable(pParse, pTblName.a[0].zName, pTblName.a[0].zDatabase);
                 if (pTab == null///
                     ///<summary>
                     ///|| db.mallocFailed != 0 
@@ -535,7 +521,7 @@ return;
                 pTab = pParse.pNewTable;
                 if (pTab == null)
                     goto exit_create_index;
-                iDb = db.indexOf( pTab.pSchema);
+                iDb = db.indexOfBackendWithSchema( pTab.pSchema);
             }
             pDb = db.Backends[iDb];
             Debug.Assert(pTab != null);
@@ -574,7 +560,7 @@ return;
             ///</summary>
             if (pName != null)
             {
-                zName = build.sqlite3NameFromToken(db, pName);
+                zName = build.Token2Name(db, pName);
                 if (zName == null)
                     goto exit_create_index;
                 if (SqlResult.SQLITE_OK != build.sqlite3CheckObjectName(pParse, zName))
@@ -851,7 +837,7 @@ goto exit_create_index;
             {
                 Index p;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, pIndex.pSchema));
-                p = HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, pIndex.zName, StringExtensions.Strlen30(pIndex.zName), pIndex);
+                p = HashExtensions.Insert( pIndex.pSchema.Indexes, pIndex.zName, StringExtensions.Strlen30(pIndex.zName), pIndex);
                 if (p != null)
                 {
                     Debug.Assert(p == pIndex);
@@ -881,10 +867,10 @@ goto exit_create_index;
             ///step can be skipped.
             else//if ( 0 == db.init.busy )
             {
-                Vdbe v;
                 string zStmt;
-                int iMem = ++pParse.nMem;
-                v = pParse.sqlite3GetVdbe();
+                int iMem = ++pParse.UsedCellCount;
+                var v = pParse.sqlite3GetVdbe();
+                var facade = new VdbeFacade(v);
                 if (v == null)
                     goto exit_create_index;
                 ///Create the rootpage for the index
@@ -913,8 +899,8 @@ goto exit_create_index;
                 if (pTblName != null)
                 {
                     pParse.sqlite3RefillIndex(pIndex, iMem);
-                    build.sqlite3ChangeCookie(pParse, iDb);
-                    v.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "name='%q' AND type='index'", pIndex.zName));
+                    build.codegenChangeCookie(pParse, iDb);
+                    facade.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "name='%q' AND type='index'", pIndex.zName));
                     v.sqlite3VdbeAddOp1(OpCode.OP_Expire, 0);
                 }
             }

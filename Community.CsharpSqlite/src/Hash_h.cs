@@ -82,6 +82,16 @@ namespace Community.CsharpSqlite.Utils {
 		///</summary>
 		};
 
+    public class Hash<T> : Hash where T : class
+    {
+        public T Find(string pKey, int nKey, T nullType = null) 
+        {
+            Debug.Assert(this != null);
+            Debug.Assert(pKey != null);
+            Debug.Assert(nKey >= 0);
+            return sqlite3HashFind(pKey.sub(nKey), nullType);
+        }
+    }
 		public class Hash {
 			public u32 htsize=31;
 			///
@@ -106,12 +116,7 @@ namespace Community.CsharpSqlite.Utils {
 					return cp;
 				}
 			}
-            public T Find<T>(string pKey, int nKey, T nullType) where T : class {
-                Debug.Assert(this != null);
-                Debug.Assert(pKey != null);
-                Debug.Assert(nKey >= 0);
-                return sqlite3HashFind(pKey.sub(nKey), nullType);
-            }
+            
 			public T sqlite3HashFind<T>(Str key,T nullType) where T : class {
 				///The element that matches key 
 				u32 h;
@@ -153,7 +158,7 @@ namespace Community.CsharpSqlite.Utils {
 					if(elem.key==key ) {
 						return elem;
 					}
-					elem=elem.next;
+					elem=elem.pNext;
 				}
 				return null;
 			}
@@ -185,22 +190,22 @@ namespace Community.CsharpSqlite.Utils {
                 _ht pEntry;
                 if (elem.prev != null)
                 {
-                    elem.prev.next = elem.next;
+                    elem.prev.pNext = elem.pNext;
                 }
                 else
                 {
-                    pH.first = elem.next;
+                    pH.first = elem.pNext;
                 }
-                if (elem.next != null)
+                if (elem.pNext != null)
                 {
-                    elem.next.prev = elem.prev;
+                    elem.pNext.prev = elem.prev;
                 }
                 if (pH.ht != null && pH.ht[h] != null)
                 {
                     pEntry = pH.ht[h];
                     if (pEntry.chain == elem)
                     {
-                        pEntry.chain = elem.next;
+                        pEntry.chain = elem.pNext;
                     }
                     pEntry.count--;
                     Debug.Assert(pEntry.count >= 0);
@@ -215,7 +220,7 @@ namespace Community.CsharpSqlite.Utils {
                 }
             }
 
-            public T HashInsert<T>(Str str, T data) where T:class
+            public T Insert<T>(Str str, T data) where T:class
             {
                 var pH = this;
                 u32 h;
@@ -315,7 +320,7 @@ if( new_size==pH->htsize ) return false;
                 var oldstart=pH.first;
                 pH.first =null;
                 //for (var elem = pH.first, pH.first = null; elem != null; elem = next_elem)
-                foreach (var elem in oldstart.path(x => x.next))
+                foreach (var elem in oldstart.path(x => x.pNext))
                 {
                     u32 h = elem.key.Hash % new_size;
                     insertElement( new_ht[h], elem);
@@ -349,11 +354,11 @@ if( new_size==pH->htsize ) return false;
                 }
                 if (pHead != null)
                 {
-                    pNew.next = pHead;
+                    pNew.pNext = pHead;
                     pNew.prev = pHead.prev;
                     if (pHead.prev != null)
                     {
-                        pHead.prev.next = pNew;
+                        pHead.prev.pNext = pNew;
                     }
                     else
                     {
@@ -363,7 +368,7 @@ if( new_size==pH->htsize ) return false;
                 }
                 else
                 {
-                    pNew.next = pH.first;
+                    pNew.pNext = pH.first;
                     if (pH.first != null)
                     {
                         pH.first.prev = pNew;
@@ -385,9 +390,10 @@ if( new_size==pH->htsize ) return false;
 		///<param name="Again, this structure is intended to be opaque, but it can't really">Again, this structure is intended to be opaque, but it can't really</param>
 		///<param name="be opaque because it is used by macros.">be opaque because it is used by macros.</param>
 		///<param name=""></param>
-		public class HashElem {
-			public HashElem next;
-			public HashElem prev;
+		public class HashElem:ILinkedListNode<HashElem>
+    {
+			public HashElem pNext { get; set; }
+			public HashElem prev { get; set; }
 			///
 			///<summary>
 			///Next and previous elements in the table 
@@ -459,7 +465,7 @@ if( new_size==pH->htsize ) return false;
 		}
 		//#define sqliteHashNext(E)   ((E).next)
 		public static HashElem sqliteHashNext(this HashElem E) {
-			return E.next;
+			return E.pNext;
 		}
 		//#define sqliteHashData(E)   ((E).data)
 		public static object sqliteHashData(this HashElem E) {

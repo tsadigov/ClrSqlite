@@ -755,7 +755,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			pItem = pSelect.pSrc.a [0];
-			pSrc = TableBuilder.sqlite3LocateTable (pParse, 0, pItem.zName, pItem.zDatabase);
+			pSrc = TableBuilder.sqlite3LocateTable(pParse, pItem.zName, pItem.zDatabase);
 			if (pSrc == null) {
 				return 0;
 				///
@@ -893,7 +893,7 @@ namespace Community.CsharpSqlite
 																																																															      sqlite3_xferopt_count.iValue++;
 #endif
 																																																															#endif
-			iDbSrc = pParse.db.indexOf( pSrc.pSchema);
+			iDbSrc = pParse.db.indexOfBackendWithSchema( pSrc.pSchema);
 			v = pParse.sqlite3GetVdbe ();
 			build.sqlite3CodeVerifySchema (pParse, iDbSrc);
 			iSrc = pParse.nTab++;

@@ -654,14 +654,15 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
             public Schema sqlite3BtreeSchema(int nBytes, dxFreeSchema xFree)
             {
                 BtShared pBt = this.pBt;
-                this.Enter();
-                if (null == pBt.pSchema && nBytes != 0)
+                using (this.scope())
                 {
-                    pBt.pSchema = new Schema();
-                    //sqlite3DbMallocZero(0, nBytes);
-                    pBt.xFreeSchema = xFree;
+                    if (null == pBt.pSchema && nBytes != 0)
+                    {
+                        pBt.pSchema = new Schema();
+                        //sqlite3DbMallocZero(0, nBytes);
+                        pBt.xFreeSchema = xFree;
+                    }
                 }
-                this.Exit();
                 return pBt.pSchema;
             }
             public SqlResult sqlite3BtreeSchemaLocked()

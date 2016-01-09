@@ -53,6 +53,7 @@ using yDbMask = System.Int64;
     using Compiler;
     using Compiler.CodeGeneration;
     using Compiler.Parser;
+    using Compiler.CodeGen;
 #endif
     public partial class Sqlite3 {
         public class Parse : VdbeFacade {
@@ -266,232 +267,229 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
             ///</summary>
             public int nzVar {
                 get { return azVar.Count; }
-            }			
-			///<summary>
-			///Number of available slots in azVar[] 
-			///</summary>
-			public MyCollection<string> azVar=new MyCollection<string>();
-			///
-			///<summary>
-			///Pointers to names of parameters 
-			///</summary>
-            
-            
+            }
+            ///<summary>
+            ///Number of available slots in azVar[] 
+            ///</summary>
+            public MyCollection<string> azVar = new MyCollection<string>();
+            ///
+            ///<summary>
+            ///Pointers to names of parameters 
+            ///</summary>
+
+
             ///<summary>
             ///VM being reprepared (sqlite3Reprepare()) 
             ///</summary>
             public Vdbe pReprepare;
-			///<summary>
+            ///<summary>
             ///Number of aliased result set columns 
             ///</summary>
             public int nAlias;
-			///<summary>
+            ///<summary>
             ///Number of allocated slots for aAlias[] 
             ///</summary>
             public int nAliasAlloc;
-			///<summary>
+            ///<summary>
             ///Register used to hold aliased result 
             ///</summary>
             public int[] aAlias;
-			///<summary>
+            ///<summary>
             ///True if the EXPLAIN flag is found on the query 
             ///</summary>
             public u8 explain;
-			Token _sNameToken;
+            Token _sNameToken;
             ///<summary>
             ///Token with unqualified schema object name 
             ///</summary>
             public Token sNameToken
             {
-				get {
-					return _sNameToken;
-				}
-				set {
-					_sNameToken=value;
-					if(null!=_sNameToken)
-						Log.WriteHeader("Parse name : "+_sNameToken.Text);
-				}
-			}
-			///<summary>
+                get {
+                    return _sNameToken;
+                }
+                set {
+                    _sNameToken = value;
+                    if (null != _sNameToken)
+                        Log.WriteHeader("Parse name : " + _sNameToken.Text);
+                }
+            }
+            ///<summary>
             ///The last token parsed 
             ///</summary>
             public Token sLastToken;
-			///<summary>
+            ///<summary>
             ///All SQL text past the last semicolon parsed 
             ///</summary>
-            StringBuilder m_zTail=new StringBuilder();
+            StringBuilder m_zTail = new StringBuilder();
             public StringBuilder zTail
             {
                 get { return m_zTail; }
                 set { m_zTail = value; }
-			}
+            }
 
-            
+
 
             ///
             ///<summary>
             ///A table being constructed by CREATE TABLE 
             ///</summary>
             public Table pNewTable;
-			
-			public Trigger pNewTrigger;
-			///
-			///<summary>
-			///Trigger under construct by a CREATE TRIGGER 
-			///</summary>
-			public string zAuthContext;
-			///
-			///<summary>
-			///The 6th parameter to db.xAuth callbacks 
-			///</summary>
-			#if !SQLITE_OMIT_VIRTUALTABLE
-			public Token sArg;
-			///
-			///<summary>
-			///Complete text of a module argument 
-			///</summary>
-			public u8 declareVtab;
-			///
-			///<summary>
-			///True if inside sqlite3_declare_vtab() 
-			///</summary>
-			public int nVtabLock;
-			///
-			///<summary>
-			///Number of virtual tables to lock 
-			///</summary>
-			public Table[] apVtabLock;
-			///
-			///<summary>
-			///Pointer to virtual tables needing locking 
-			///</summary>
-			#endif
-			public int nHeight;
-			///
-			///<summary>
-			///</summary>
-			///<param name="Expression tree height of current sub">select </param>
-			public Table pZombieTab;
-			///
-			///<summary>
-			///List of Table objects to delete after code gen 
-			///</summary>
-			public TriggerPrg pTriggerPrg;
-			///<summary>
-			///Linked list of coded triggers
-			///</summary>
-			#if !SQLITE_OMIT_EXPLAIN
-			public int iSelectId;
-			public int iNextSelectId;
-			#endif
-			// We need to create instances of the col cache
-			public Parse() {
-				aTempReg=new int[8];
-				///
-				///<summary>
-				///Holding area for temporary registers 
-				///</summary>
-				aColCache=new sqliteinth.yColCache[sqliteinth.SQLITE_N_COLCACHE];
-				///
-				///<summary>
-				///One for each valid column cache entry 
-				///</summary>
-				for(int i=0;i<this.aColCache.Length;i++) {
-					this.aColCache[i]=new sqliteinth.yColCache();
-				}
-				cookieValue=new int[Limits.SQLITE_MAX_ATTACHED+2];
-				///
-				///<summary>
-				///Values of cookies to verify 
-				///</summary>
-				sLastToken=new Token();
-				///
-				///<summary>
-				///The last token parsed 
-				///</summary>
-				#if !SQLITE_OMIT_VIRTUALTABLE
-				sArg=new Token();
-				#endif
-			}
-			public void ResetMembers()// Need to clear all the following variables during each recursion
-			 {
-				nVar=0;				
-				azVar=new MyCollection<string>();
-				nAlias=0;
-				nAliasAlloc=0;
-				aAlias=null;
-				explain=0;
-				sNameToken=new Token();
-				sLastToken=new Token();
-				zTail.Length=0;
-				pNewTable=null;
-				pNewTrigger=null;
-				zAuthContext=null;
-				#if !SQLITE_OMIT_VIRTUALTABLE
-				sArg=new Token();
-				declareVtab=0;
-				nVtabLock=0;
-				apVtabLock=null;
-				#endif
-				nHeight=0;
-				pZombieTab=null;
-				pTriggerPrg=null;
-			}
-			private Parse[] SaveBuf=new Parse[10];
-			//For Recursion Storage
-			public void RestoreMembers()// Need to clear all the following variables during each recursion
-			 {
-				if(SaveBuf[nested]!=null) {
-					nVar=SaveBuf[nested].nVar;					
-					azVar=SaveBuf[nested].azVar;
-					nAlias=SaveBuf[nested].nAlias;
-					nAliasAlloc=SaveBuf[nested].nAliasAlloc;
-					aAlias=SaveBuf[nested].aAlias;
-					explain=SaveBuf[nested].explain;
-					sNameToken=SaveBuf[nested].sNameToken;
-					sLastToken=SaveBuf[nested].sLastToken;
-					zTail=SaveBuf[nested].zTail;
-					pNewTable=SaveBuf[nested].pNewTable;
-					pNewTrigger=SaveBuf[nested].pNewTrigger;
-					zAuthContext=SaveBuf[nested].zAuthContext;
-					#if !SQLITE_OMIT_VIRTUALTABLE
-					sArg=SaveBuf[nested].sArg;
-					declareVtab=SaveBuf[nested].declareVtab;
-					nVtabLock=SaveBuf[nested].nVtabLock;
-					apVtabLock=SaveBuf[nested].apVtabLock;
-					#endif
-					nHeight=SaveBuf[nested].nHeight;
-					pZombieTab=SaveBuf[nested].pZombieTab;
-					pTriggerPrg=SaveBuf[nested].pTriggerPrg;
-					SaveBuf[nested]=null;
-				}
-			}
-			public void SaveMembers()// Need to clear all the following variables during each recursion
-			 {
-				SaveBuf[nested]=new Parse();
-				SaveBuf[nested].nVar=nVar;				
-				SaveBuf[nested].azVar=azVar;
-				SaveBuf[nested].nAlias=nAlias;
-				SaveBuf[nested].nAliasAlloc=nAliasAlloc;
-				SaveBuf[nested].aAlias=aAlias;
-				SaveBuf[nested].explain=explain;
-				SaveBuf[nested].sNameToken=sNameToken;
-				SaveBuf[nested].sLastToken=sLastToken;
-				SaveBuf[nested].zTail=zTail;
-				SaveBuf[nested].pNewTable=pNewTable;
-				SaveBuf[nested].pNewTrigger=pNewTrigger;
-				SaveBuf[nested].zAuthContext=zAuthContext;
-				#if !SQLITE_OMIT_VIRTUALTABLE
-				SaveBuf[nested].sArg=sArg;
-				SaveBuf[nested].declareVtab=declareVtab;
-				SaveBuf[nested].nVtabLock=nVtabLock;
-				SaveBuf[nested].apVtabLock=apVtabLock;
-				#endif
-				SaveBuf[nested].nHeight=nHeight;
-				SaveBuf[nested].pZombieTab=pZombieTab;
-				SaveBuf[nested].pTriggerPrg=pTriggerPrg;
-			}
-			/**
+
+
+            ///<summary>
+            ///Trigger under construct by a CREATE TRIGGER 
+            ///</summary>
+            public Trigger pNewTrigger;
+
+            ///<summary>
+            ///The 6th parameter to db.xAuth callbacks 
+            ///</summary>
+            public string zAuthContext;
+
+#if !SQLITE_OMIT_VIRTUALTABLE
+            ///
+            ///<summary>
+            ///Complete text of a module argument 
+            ///</summary>
+            public Token sArg;
+
+
+
+            ///<summary>
+            ///True if inside sqlite3_declare_vtab() 
+            ///</summary>
+            public u8 declareVtab;
+            
+
+            ///<summary>
+            ///Number of virtual tables to lock 
+            ///</summary>
+            public int nVtabLock;
+            
+
+
+            ///<summary>
+            ///Pointer to virtual tables needing locking 
+            ///</summary>
+            public Table[] apVtabLock;
+            
+#endif
+
+            ///<param name="Expression tree height of current sub">select </param>
+            public int nHeight;
+            
+            ///<summary>
+            ///List of Table objects to delete after code gen 
+            ///</summary>
+            public Table pZombieTab;
+            
+
+
+            ///<summary>
+            ///Linked list of coded triggers
+            ///</summary>
+            public TriggerPrg pTriggerPrg;
+            
+#if !SQLITE_OMIT_EXPLAIN
+            public int iSelectId;
+            public int iNextSelectId;
+#endif
+            // We need to create instances of the col cache
+            public Parse() {
+                aTempReg = new int[8];
+                ///Holding area for temporary registers 
+                aColCache = new sqliteinth.yColCache[sqliteinth.SQLITE_N_COLCACHE];
+                ///One for each valid column cache entry 
+                for (int i = 0; i < this.aColCache.Length; i++) {
+                    this.aColCache[i] = new sqliteinth.yColCache();
+                }
+                cookieValue = new int[Limits.SQLITE_MAX_ATTACHED + 2];
+                ///Values of cookies to verify 
+                sLastToken = new Token();
+                ///The last token parsed 
+#if !SQLITE_OMIT_VIRTUALTABLE
+                sArg = new Token();
+#endif
+            }
+            public void ResetMembers()// Need to clear all the following variables during each recursion
+            {
+                nVar = 0;
+                azVar = new MyCollection<string>();
+                nAlias = 0;
+                nAliasAlloc = 0;
+                aAlias = null;
+                explain = 0;
+                sNameToken = new Token();
+                sLastToken = new Token();
+                zTail.Length = 0;
+                pNewTable = null;
+                pNewTrigger = null;
+                zAuthContext = null;
+#if !SQLITE_OMIT_VIRTUALTABLE
+                sArg = new Token();
+                declareVtab = 0;
+                nVtabLock = 0;
+                apVtabLock = null;
+#endif
+                nHeight = 0;
+                pZombieTab = null;
+                pTriggerPrg = null;
+            }
+            private Parse[] SaveBuf = new Parse[10];
+            //For Recursion Storage
+            public void RestoreMembers()// Need to clear all the following variables during each recursion
+            {
+                if (SaveBuf[nested] != null) {
+                    nVar = SaveBuf[nested].nVar;
+                    azVar = SaveBuf[nested].azVar;
+                    nAlias = SaveBuf[nested].nAlias;
+                    nAliasAlloc = SaveBuf[nested].nAliasAlloc;
+                    aAlias = SaveBuf[nested].aAlias;
+                    explain = SaveBuf[nested].explain;
+                    sNameToken = SaveBuf[nested].sNameToken;
+                    sLastToken = SaveBuf[nested].sLastToken;
+                    zTail = SaveBuf[nested].zTail;
+                    pNewTable = SaveBuf[nested].pNewTable;
+                    pNewTrigger = SaveBuf[nested].pNewTrigger;
+                    zAuthContext = SaveBuf[nested].zAuthContext;
+#if !SQLITE_OMIT_VIRTUALTABLE
+                    sArg = SaveBuf[nested].sArg;
+                    declareVtab = SaveBuf[nested].declareVtab;
+                    nVtabLock = SaveBuf[nested].nVtabLock;
+                    apVtabLock = SaveBuf[nested].apVtabLock;
+#endif
+                    nHeight = SaveBuf[nested].nHeight;
+                    pZombieTab = SaveBuf[nested].pZombieTab;
+                    pTriggerPrg = SaveBuf[nested].pTriggerPrg;
+                    SaveBuf[nested] = null;
+                }
+            }
+            public void SaveMembers()// Need to clear all the following variables during each recursion
+            {
+                SaveBuf[nested] = new Parse();
+                SaveBuf[nested].nVar = nVar;
+                SaveBuf[nested].azVar = azVar;
+                SaveBuf[nested].nAlias = nAlias;
+                SaveBuf[nested].nAliasAlloc = nAliasAlloc;
+                SaveBuf[nested].aAlias = aAlias;
+                SaveBuf[nested].explain = explain;
+                SaveBuf[nested].sNameToken = sNameToken;
+                SaveBuf[nested].sLastToken = sLastToken;
+                SaveBuf[nested].zTail = zTail;
+                SaveBuf[nested].pNewTable = pNewTable;
+                SaveBuf[nested].pNewTrigger = pNewTrigger;
+                SaveBuf[nested].zAuthContext = zAuthContext;
+#if !SQLITE_OMIT_VIRTUALTABLE
+                SaveBuf[nested].sArg = sArg;
+                SaveBuf[nested].declareVtab = declareVtab;
+                SaveBuf[nested].nVtabLock = nVtabLock;
+                SaveBuf[nested].apVtabLock = apVtabLock;
+#endif
+                SaveBuf[nested].nHeight = nHeight;
+                SaveBuf[nested].pZombieTab = pZombieTab;
+                SaveBuf[nested].pTriggerPrg = pTriggerPrg;
+            }
+            /**
 ///<summary>
 ///</summary>
 ///<param name="This function is called by the parser after the table">name in</param>
@@ -507,485 +505,352 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 ///<param name=""></param>
 ///<param name="Routine sqlite3AlterFinishAddColumn() will be called to complete">Routine sqlite3AlterFinishAddColumn() will be called to complete</param>
 ///<param name="coding the "ALTER TABLE ... ADD" statement.">coding the "ALTER TABLE ... ADD" statement.</param>
-*/public void sqlite3AlterBeginAddColumn(SrcList pSrc) {
-				Table pNew;
-				Table pTab;
-				Vdbe v;
-				int iDb;
-				int i;
-				int nAlloc;
-				Connection db=this.db;
-				///
-				///<summary>
-				///Look up the table being altered. 
-				///</summary>
-				Debug.Assert(this.pNewTable==null);
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-				//      if ( db.mallocFailed != 0 ) goto exit_begin_add_column;
-				pTab=TableBuilder.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
-				if(pTab==null)
-					goto exit_begin_add_column;
-				if(pTab.IsVirtual()) {
-					utilc.sqlite3ErrorMsg(this,"virtual tables may not be altered");
-					goto exit_begin_add_column;
-				}
-				///
-				///<summary>
-				///Make sure this is not an attempt to ALTER a view. 
-				///</summary>
-				if(pTab.pSelect!=null) {
-					utilc.sqlite3ErrorMsg(this,"Cannot add a column to a view");
-					goto exit_begin_add_column;
-				}
-				if(SqlResult.SQLITE_OK!=this.isSystemTable(pTab.zName)) {
-					goto exit_begin_add_column;
-				}
-				Debug.Assert(pTab.addColOffset>0);
-				iDb=db.indexOf(pTab.pSchema);
-				///
-				///<summary>
-				///Put a copy of the Table struct in Parse.pNewTable for the
-				///build.sqlite3AddColumn() function and friends to modify.  But modify
-				///the name by adding an "sqlite_altertab_" prefix.  By adding this
-				///prefix, we insure that the name will not collide with an existing
-				///table because user table are not allowed to have the "sqlite_"
-				///prefix on their name.
-				///
-				///</summary>
-				pNew=new Table();
-				// (Table*)sqlite3DbMallocZero( db, sizeof(Table))
-				if(pNew==null)
-					goto exit_begin_add_column;
-				this.pNewTable=pNew;
-				pNew.nRef=1;
-				pNew.nCol=pTab.nCol;
-				Debug.Assert(pNew.nCol>0);
-				nAlloc=(((pNew.nCol-1)/8)*8)+8;
-				Debug.Assert(nAlloc>=pNew.nCol&&nAlloc%8==0&&nAlloc-pNew.nCol<8);
-				pNew.aCol=new Column[nAlloc];
-				// (Column*)sqlite3DbMallocZero( db, sizeof(Column) * nAlloc );
-				pNew.zName=io.sqlite3MPrintf(db,"sqlite_altertab_%s",pTab.zName);
-				if(pNew.aCol==null||pNew.zName==null) {
-					//        db.mallocFailed = 1;
-					goto exit_begin_add_column;
-				}
-				// memcpy( pNew.aCol, pTab.aCol, sizeof(Column) * pNew.nCol );
-				for(i=0;i<pNew.nCol;i++) {
-					Column pCol=pTab.aCol[i].Copy();
-					// sqlite3DbStrDup( db, pCol.zName );
-					pCol.zColl=null;
-					pCol.zType=null;
-					pCol.pDflt=null;
-					pCol.zDflt=null;
-					pNew.aCol[i]=pCol;
-				}
-				pNew.pSchema=db.Backends[iDb].pSchema;
-				pNew.addColOffset=pTab.addColOffset;
-				pNew.nRef=1;
-				///
-				///<summary>
-				///Begin a transaction and increment the schema cookie.  
-				///</summary>
-				build.sqlite3BeginWriteOperation(this,0,iDb);
-				v=this.sqlite3GetVdbe();
-				if(v==null)
-					goto exit_begin_add_column;
-				build.sqlite3ChangeCookie(this,iDb);
-				exit_begin_add_column:
-				build.sqlite3SrcListDelete(db,ref pSrc);
-				return;
-			}
-			public///<summary>
-			/// This function is called after an "ALTER TABLE ... ADD" statement
-			/// has been parsed. Argument pColDef contains the text of the new
-			/// column definition.
-			///
-			/// The Table structure pParse.pNewTable was extended to include
-			/// the new column during parsing.
-			///</summary>
-			void sqlite3AlterFinishAddColumn(Token pColDef) {
-				Table pNew;
-				///Copy of pParse.pNewTable 
-				Table pTab;
-				///Table being altered 
-				int iDb;
-				///Database number 
-				string zDb;
-				///Database name 
-				string zTab;
-				///Table name 
-				string zCol;
-				///Null-terminated column definitior
-				Column pCol;
-				///The new column 
-				Expr pDflt;
-				///Default value for the new column 
-				Connection db;
-				///The database connection; 
-				db=this.db;
-				if(this.nErr!=0///
-				///|| db.mallocFailed != 0 
-				)
-					return;
-				pNew=this.pNewTable;
-				Debug.Assert(pNew!=null);
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-				iDb=db.indexOf(pNew.pSchema);
-				zDb=db.Backends[iDb].Name;
-				zTab=pNew.zName.Substring(16);
-				// zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
-				pCol=pNew.aCol[pNew.nCol-1];
-				pDflt=pCol.pDflt;
-				pTab=TableBuilder.sqlite3FindTable(db, zDb, zTab);
-				Debug.Assert(pTab!=null);
-				#if !SQLITE_OMIT_AUTHORIZATION
+*/
+            public void sqlite3AlterBeginAddColumn(SrcList pSrc) {
+                Connection db = this.db;
+                ///Look up the table being altered. 
+                Debug.Assert(this.pNewTable == null);
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
+                //      if ( db.mallocFailed != 0 ) goto exit_begin_add_column;
+                var pTab = TableBuilder.sqlite3LocateTable(this, pSrc.a[0].zName, pSrc.a[0].zDatabase);
+                if (pTab == null)
+                    goto exit_begin_add_column;
+                if (pTab.IsVirtual()) {
+                    utilc.sqlite3ErrorMsg(this, "virtual tables may not be altered");
+                    goto exit_begin_add_column;
+                }
+                ///Make sure this is not an attempt to ALTER a view. 
+                if (pTab.IsView) {
+                    utilc.sqlite3ErrorMsg(this, "Cannot add a column to a view");
+                    goto exit_begin_add_column;
+                }
+                if (SqlResult.SQLITE_OK != this.isSystemTable(pTab.zName)) {
+                    goto exit_begin_add_column;
+                }
+                Debug.Assert(pTab.addColOffset > 0);
+                var iDb = db.indexOfBackendWithSchema(pTab.pSchema);
+                ///Put a copy of the Table struct in Parse.pNewTable for the
+                ///build.sqlite3AddColumn() function and friends to modify.  But modify
+                ///the name by adding an "sqlite_altertab_" prefix.  By adding this
+                ///prefix, we insure that the name will not collide with an existing
+                ///table because user table are not allowed to have the "sqlite_"
+                ///prefix on their name.
+                var nAlloc = (((pTab.nCol - 1) / 8) * 8) + 8;
+                Debug.Assert(nAlloc >= pTab.nCol && nAlloc % 8 == 0 && nAlloc - pTab.nCol < 8);
+
+                var pNew = this.pNewTable = new Table()
+                {
+                    nRef = 1,
+                    nCol = pTab.nCol,
+                    zName = io.sqlite3MPrintf(db, "sqlite_altertab_%s", pTab.zName),
+                    addColOffset = pTab.addColOffset,
+                    pSchema = db.Backends[iDb].pSchema,
+                    aCol = pTab.aCol.Select(x => {
+                        var pCol = x.Copy();
+                        pCol.zColl = null;
+                        pCol.zType = null;
+                        pCol.pDflt = null;
+                        pCol.zDflt = null;
+                        return pCol;
+                    }).ToArray()
+                };
+                // (Table*)sqlite3DbMallocZero( db, sizeof(Table))
+                //if(pNew==null)
+                //	goto exit_begin_add_column;
+                Debug.Assert(pNew.nCol > 0);
+                // (Column*)sqlite3DbMallocZero( db, sizeof(Column) * nAlloc );
+                if (pNew.aCol == null || pNew.zName == null) {
+                    //        db.mallocFailed = 1;
+                    goto exit_begin_add_column;
+                }
+                // memcpy( pNew.aCol, pTab.aCol, sizeof(Column) * pNew.nCol );
+                ///Begin a transaction and increment the schema cookie.  
+                build.sqlite3BeginWriteOperation(this, 0, iDb);
+
+                if (null == this.sqlite3GetVdbe())
+                    goto exit_begin_add_column;
+                build.codegenChangeCookie(this, iDb);
+
+                exit_begin_add_column://<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                build.sqlite3SrcListDelete(db, ref pSrc);
+                return;
+            }
+            public///<summary>
+                  /// This function is called after an "ALTER TABLE ... ADD" statement
+                  /// has been parsed. Argument pColDef contains the text of the new
+                  /// column definition.
+                  ///
+                  /// The Table structure pParse.pNewTable was extended to include
+                  /// the new column during parsing.
+                  ///</summary>
+          void sqlite3AlterFinishAddColumn(Token pColDef) {
+                ///Null-terminated column definitior
+                ///The new column 
+                ///Default value for the new column 				
+                var db = this.db;///The database connection; 
+				if (this.nErr != 0///
+                                  ///|| db.mallocFailed != 0 
+              )
+                    return;
+                var pNew = this.pNewTable;///Copy of pParse.pNewTable 
+				Debug.Assert(pNew != null);
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
+                var iDb = db.indexOfBackendWithSchema(pNew.pSchema);///Database number 
+				var zDb = db.Backends[iDb].Name;///Database name 
+				var zTab = pNew.zName.Substring(16);///Table name 
+                // zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
+                var pCol = pNew.aCol[pNew.nCol - 1];
+                var pDflt = pCol.pDflt;
+                var pTab = TableBuilder.sqlite3FindTable(db, zDb, zTab);///Table being altered 
+				Debug.Assert(pTab != null);
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																																/* Invoke the authorization callback. */
 if( sqlite3AuthCheck(pParse, SQLITE_ALTER_TABLE, zDb, pTab.zName, 0) ){
 return;
 }
 #endif
-				///If the default value for the new column was specified with a
-				///literal NULL, then set pDflt to 0. This simplifies checking
-				///for an SQL NULL default below.
-				if(pDflt!=null&&pDflt.Operator==TokenType.TK_NULL) {
-					pDflt=null;
-				}
-				///Check that the new column is not specified as PRIMARY KEY or UNIQUE.
-				///If there is a NOT NULL constraint, then the default value for the
-				///column must not be NULL.
-				if(pCol.isPrimKey!=0) {
-					utilc.sqlite3ErrorMsg(this,"Cannot add a PRIMARY KEY column");
-					return;
-				}
-				if(pNew.pIndex!=null) {
-					utilc.sqlite3ErrorMsg(this,"Cannot add a UNIQUE column");
-					return;
-				}
+                ///If the default value for the new column was specified with a
+                ///literal NULL, then set pDflt to 0. This simplifies checking
+                ///for an SQL NULL default below.
+                if (pDflt != null && pDflt.Operator == TokenType.TK_NULL) {
+                    pDflt = null;
+                }
+                ///Check that the new column is not specified as PRIMARY KEY or UNIQUE.
+                ///If there is a NOT NULL constraint, then the default value for the
+                ///column must not be NULL.
+                if (pCol.isPrimKey != 0) {
+                    utilc.sqlite3ErrorMsg(this, "Cannot add a PRIMARY KEY column");
+                    return;
+                }
+                if (pNew.pIndex != null) {
+                    utilc.sqlite3ErrorMsg(this, "Cannot add a UNIQUE column");
+                    return;
+                }
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0 && pNew.pFKey != null && pDflt != null)
                 {
-					utilc.sqlite3ErrorMsg(this,"Cannot add a REFERENCES column with non-NULL default value");
-					return;
-				}
-				if(pCol.notNull!=0&&pDflt==null) {
-					utilc.sqlite3ErrorMsg(this,"Cannot add a NOT NULL column with default value NULL");
-					return;
-				}
-				///Ensure the default expression is something that sqlite3ValueFromExpr()
-				///can handle (i.e. not CURRENT_TIME etc.)
-				if(pDflt!=null) {
-					sqlite3_value pVal=null;
+                    utilc.sqlite3ErrorMsg(this, "Cannot add a REFERENCES column with non-NULL default value");
+                    return;
+                }
+                if (pCol.notNull != 0 && pDflt == null) {
+                    utilc.sqlite3ErrorMsg(this, "Cannot add a NOT NULL column with default value NULL");
+                    return;
+                }
+                ///Ensure the default expression is something that sqlite3ValueFromExpr()
+                ///can handle (i.e. not CURRENT_TIME etc.)
+                if (pDflt != null) {
+                    sqlite3_value pVal = null;
                     if (vdbemem_cs.sqlite3ValueFromExpr(db, pDflt, SqliteEncoding.UTF8, sqliteinth.SQLITE_AFF_NONE, ref pVal) != 0)
                     {
-						//        db.mallocFailed = 1;
-						return;
-					}
-					if(pVal==null) {
-						utilc.sqlite3ErrorMsg(this,"Cannot add a column with non-constant default");
-						return;
-					}
+                        //        db.mallocFailed = 1;
+                        return;
+                    }
+                    if (pVal == null) {
+                        utilc.sqlite3ErrorMsg(this, "Cannot add a column with non-constant default");
+                        return;
+                    }
                     vdbemem_cs.sqlite3ValueFree(ref pVal);
-				}
-				///Modify the CREATE TABLE statement. 
-				zCol=pColDef.zRestSql.Substring(0,pColDef.Length).Replace(";"," ").Trim();
-				//sqlite3DbStrNDup(db, (char*)pColDef.z, pColDef.n);
-				if(zCol!=null) {
-					//  char zEnd = zCol[pColDef.n-1];
+                }
+                ///Modify the CREATE TABLE statement. 
+                var zCol = pColDef.zRestSql.Substring(0, pColDef.Length).Replace(";", " ").Trim();
+                //sqlite3DbStrNDup(db, (char*)pColDef.z, pColDef.n);
+                if (zCol != null) {
+                    //  char zEnd = zCol[pColDef.n-1];
                     SqliteFlags savedDbFlags = db.flags;
-					//      while( zEnd>zCol && (*zEnd==';' || CharExtensions.sqlite3Isspace(*zEnd)) ){
-					//    zEnd-- = '\0';
-					//  }
+                    //      while( zEnd>zCol && (*zEnd==';' || CharExtensions.sqlite3Isspace(*zEnd)) ){
+                    //    zEnd-- = '\0';
+                    //  }
                     db.flags |= SqliteFlags.SQLITE_PreferBuiltin;
-					build.sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = substr(sql,1,%d) || ', ' || %Q || substr(sql,%d) "+"WHERE type = 'table' AND name = %Q",zDb,sqliteinth.SCHEMA_TABLE(iDb),pNew.addColOffset,zCol,pNew.addColOffset+1,zTab);
-					db.DbFree(ref zCol);
-					db.flags=savedDbFlags;
-				}
-				///If the default value of the new column is NULL, then set the file
-				///format to 2. If the default value of the new column is not NULL,
-				///the file format becomes 3.
-				this.codegenMinimumFileFormat(iDb,pDflt!=null?3:2);
-				///Reload the schema of the modified table. 
-				this.reloadTableSchema(pTab,pTab.zName);
-			}
+                    build.sqlite3NestedParse(this, "UPDATE \"%w\".%s SET " + "sql = substr(sql,1,%d) || ', ' || %Q || substr(sql,%d) " + "WHERE type = 'table' AND name = %Q", zDb, sqliteinth.SCHEMA_TABLE(iDb), pNew.addColOffset, zCol, pNew.addColOffset + 1, zTab);
+                    db.DbFree(ref zCol);
+                    db.flags = savedDbFlags;
+                }
+                ///If the default value of the new column is NULL, then set the file
+                ///format to 2. If the default value of the new column is not NULL,
+                ///the file format becomes 3.
+                this.codegenMinimumFileFormat(iDb, pDflt != null ? 3 : 2);
+                ///Reload the schema of the modified table. 
+                this.reloadTableSchema(pTab, pTab.zName);
+            }
+
+
 
             ///<summary>
-			/// Generate code to make sure the file format number is at least minFormat.
-			/// The generated code will increase the file format number if necessary.
-			///</summary>
-			public void codegenMinimumFileFormat(int iDb,int minFormat) {
-				var v=this.sqlite3GetVdbe();
-				///The VDBE should have been allocated before this routine is called.
-				///If that allocation failed, we would have quit before reaching this
-				///point 
-				if(Sqlite3.ALWAYS(v)) {
-					int r1=this.allocTempReg(), r2=this.allocTempReg();
-				
-                    v.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, r1, BTreeProp.FILE_FORMAT);      //r1=cookie[FILE_FORMAT]
-                    vdbeaux.markUsed(v, iDb);
-					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,minFormat,r2);                            //r2=minFormat
-					var j1=v.sqlite3VdbeAddOp3(OpCode.OP_Ge,r2,0,r1);                               //if(r2>r1)
-                    v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, r2);  //  cookie[FileFormat]=r2
-					v.sqlite3VdbeJumpHere(j1);
+            /// Parameter zName is the name of a table that is about to be altered
+            /// (either with ALTER TABLE ... RENAME TO or ALTER TABLE ... ADD COLUMN).
+            /// If the table is a system table, this function leaves an error message
+            /// in pParse->zErr (system tables may not be altered) and returns non-zero.
+            ///
+            /// Or, if zName is not a system table, zero is returned.
+            ///</summary>
+            public SqlResult isSystemTable(string zName) {
+                if (zName.StartsWith("sqlite_", System.StringComparison.InvariantCultureIgnoreCase)) {
+                    utilc.sqlite3ErrorMsg(this, "table %s may not be altered", zName);
+                    return (SqlResult)1;
+                }
+                return 0;
+            }
 
-					this.deallocTempReg(r1,r2);
-				}
-			}
 
             ///<summary>
-			/// Parameter zName is the name of a table that is about to be altered
-			/// (either with ALTER TABLE ... RENAME TO or ALTER TABLE ... ADD COLUMN).
-			/// If the table is a system table, this function leaves an error message
-			/// in pParse->zErr (system tables may not be altered) and returns non-zero.
-			///
-			/// Or, if zName is not a system table, zero is returned.
-			///</summary>
-			public SqlResult isSystemTable(string zName) {
-				if(zName.StartsWith("sqlite_",System.StringComparison.InvariantCultureIgnoreCase)) {
-					utilc.sqlite3ErrorMsg(this,"table %s may not be altered",zName);
-					return (SqlResult)1;
-				}
-				return 0;
-			}
-			public///<summary>
-			/// Generate code to implement the "ALTER TABLE xxx RENAME TO yyy"
-			/// command.
-			///</summary>
-			void sqlite3AlterRenameTable(///
-			///<summary>
-			///Parser context. 
-			///</summary>
-			SrcList pSrc,///
-			///<summary>
-			///The table to rename. 
-			///</summary>
-			Token pName///
-			///<summary>
-			///The new table name. 
-			///</summary>
+            /// Generate code to implement the "ALTER TABLE xxx RENAME TO yyy"
+            /// command.
+            ///</summary>
+            public void sqlite3AlterRenameTable(
+                SrcList pSrc,///The table to rename. 
+			    Token tknName///The new table name. 
 			) {
-				int iDb;
-				///
-				///<summary>
-				///Database that contains the table 
-				///</summary>
-				string zDb;
-				///
-				///<summary>
-				///Name of database iDb 
-				///</summary>
-				Table pTab;
-				///
-				///<summary>
-				///Table being renamed 
-				///</summary>
-				string zName=null;
-				///
-				///<summary>
-				///</summary>
-				///<param name="NULL">terminated version of pName </param>
-				Connection db=this.db;
-				///
-				///<summary>
-				///Database connection 
-				///</summary>
-				int nTabName;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Number of UTF">8 characters in zTabName </param>
-				string zTabName;
-				///
-				///<summary>
-				///Original name of the table 
-				///</summary>
-				Vdbe v;
-				#if !SQLITE_OMIT_TRIGGER
-				string zWhere="";
-				///
-				///<summary>
-				///Where clause to locate temp triggers 
-				///</summary>
-				#endif
-				VTable pVTab=null;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Non">tab with an xRename() </param>
-                SqliteFlags savedDbFlags;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Saved value of db">>flags </param>
-				savedDbFlags=db.flags;
-				//if ( NEVER( db.mallocFailed != 0 ) ) goto exit_rename_table;
-				Debug.Assert(pSrc.Count==1);
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				pTab=TableBuilder.sqlite3LocateTable(this,0,pSrc.a[0].zName,pSrc.a[0].zDatabase);
-				if(pTab==null)
-					goto exit_rename_table;
-				iDb= this.db.indexOf(pTab.pSchema);
-				zDb=db.Backends[iDb].Name;
+                Connection db = this.db;///Database connection 
+                String NewNameOfTheTable = String.Empty;
+#if !SQLITE_OMIT_TRIGGER
+                string zWhere = "";///Where clause to locate temp triggers 
+#endif
+                VTable pVTab = null;
+                ///Non-tab with an xRename()                 
+                var savedDbFlags = db.flags;///Saved value of db>flags
+                //if ( NEVER( db.mallocFailed != 0 ) ) goto exit_rename_table;
+                Debug.Assert(pSrc.Count == 1);
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
+                var pTab = TableBuilder.sqlite3LocateTable(this, pSrc.a[0].zName, pSrc.a[0].zDatabase);///Table being renamed 
+				if (pTab == null)
+                    goto exit_rename_table;
+                var iDb = this.db.indexOfBackendWithSchema(pTab.pSchema);///Database that contains the table 
+				var zDb = db.Backends[iDb].Name;///Name of database iDb 
                 db.flags |= SqliteFlags.SQLITE_PreferBuiltin;
-				///
-				///<summary>
-				///Get a NULL terminated version of the new table name. 
-				///</summary>
-				zName=build.sqlite3NameFromToken(db,pName);
-				if(zName==null)
-					goto exit_rename_table;
-				///
-				///<summary>
-				///Check that a table or index named 'zName' does not already exist
-				///in database iDb. If so, this is an error.
-				///
-				///</summary>
-				if(TableBuilder.sqlite3FindTable(db, zDb, zName) != null||IndexBuilder.sqlite3FindIndex(db,zName,zDb)!=null) {
-					utilc.sqlite3ErrorMsg(this,"there is already another table or index with this name: %s",zName);
-					goto exit_rename_table;
-				}
-				///
-				///<summary>
-				///Make sure it is not a system table being altered, or a reserved name
-				///that the table is being renamed to.
-				///
-				///</summary>
-				if(SqlResult.SQLITE_OK!=this.isSystemTable(pTab.zName)) {
-					goto exit_rename_table;
-				}
-				if(SqlResult.SQLITE_OK!=build.sqlite3CheckObjectName(this,zName)) {
-					goto exit_rename_table;
-				}
-				#if !SQLITE_OMIT_VIEW
-				if(pTab.pSelect!=null) {
-					utilc.sqlite3ErrorMsg(this,"view %s may not be altered",pTab.zName);
-					goto exit_rename_table;
-				}
-				#endif
-				#if !SQLITE_OMIT_AUTHORIZATION
+                ///Get a NULL terminated version of the new table name. 
+                //RULE
+                
+                NewNameOfTheTable = build.Token2Name(db, tknName);///<param name="NULL">terminated version of pName </param>
+
+                if (NewNameOfTheTable == null)
+                    goto exit_rename_table;
+                ///Check that a table or index named 'zName' does not already exist
+                ///in database iDb. If so, this is an error.
+                //RULE
+                if (TableBuilder.sqlite3FindTable(db, zDb, NewNameOfTheTable) != null || IndexBuilder.sqlite3FindIndex(db, NewNameOfTheTable, zDb) != null) {
+                    utilc.sqlite3ErrorMsg(this, "there is already another table or index with this name: %s", NewNameOfTheTable);
+                    goto exit_rename_table;
+                }
+                ///Make sure it is not a system table being altered, or a reserved name
+                ///that the table is being renamed to.
+                //RULE
+                if (SqlResult.SQLITE_OK != this.isSystemTable(pTab.zName)) {
+                    goto exit_rename_table;
+                }
+                //RULE
+                if (SqlResult.SQLITE_OK != build.sqlite3CheckObjectName(this, NewNameOfTheTable)) {
+                    goto exit_rename_table;
+                }
+                //RULE
+#if !SQLITE_OMIT_VIEW
+                if (pTab.pSelect != null) {
+                    utilc.sqlite3ErrorMsg(this, "view %s may not be altered", pTab.zName);
+                    goto exit_rename_table;
+                }
+#endif
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																																/* Invoke the authorization callback. */
 if( sqlite3AuthCheck(pParse, SQLITE_ALTER_TABLE, zDb, pTab.zName, 0) ){
 goto exit_rename_table;
 }
 #endif
-				if(build.sqlite3ViewGetColumnNames(this,pTab)!=0) {
-					goto exit_rename_table;
-				}
-				#if !SQLITE_OMIT_VIRTUALTABLE
-				if(pTab.IsVirtual()) {
+                //RULE
+                if (build.sqlite3ViewGetColumnNames(this, pTab) != 0) {
+                    goto exit_rename_table;
+                }
+#if !SQLITE_OMIT_VIRTUALTABLE
+                if (pTab.IsVirtual()) {
                     pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
-					if(pVTab.pVtab.pModule.xRename==null) {
-						pVTab=null;
-					}
-				}
-				#endif
-				///
-				///<summary>
-				///Begin a transaction and code the VerifyCookie for database iDb.
-				///Then modify the schema cookie (since the ALTER TABLE modifies the
-				///schema). Open a statement transaction if the table is a virtual
-				///table.
-				///</summary>
-				v=this.sqlite3GetVdbe();
-				if(v==null) {
-					goto exit_rename_table;
-				}
-				build.sqlite3BeginWriteOperation(this,pVTab!=null?1:0,iDb);
-				build.sqlite3ChangeCookie(this,iDb);
-				///
-				///<summary>
-				///If this is a virtual table, invoke the xRename() function if
-				///one is defined. The xRename() callback will modify the names
-				///</summary>
-				///<param name="of any resources used by the v">table implementation (including other</param>
-				///<param name="SQLite tables) that are identified by the name of the virtual table.">SQLite tables) that are identified by the name of the virtual table.</param>
-				///<param name=""></param>
-				#if !SQLITE_OMIT_VIRTUALTABLE
-				if(pVTab!=null) {
-					int i=++this.nMem;
-					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,i,0,zName,0);
-                    v.sqlite3VdbeAddOp4(OpCode.OP_VRename, i, 0, 0, pVTab,  P4Usage.P4_VTAB);
-					build.sqlite3MayAbort(this);
-				}
-				#endif
-				///
-				///<summary>
-				///</summary>
-				///<param name="figure out how many UTF">8 characters are in zName </param>
-				zTabName=pTab.zName;
-				nTabName=sqlite3Utf8CharLen(zTabName,-1);
-				#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
+                    if (pVTab.pVtab.pModule.xRename == null) {
+                        pVTab = null;
+                    }
+                }
+#endif
+                ///Begin a transaction and code the VerifyCookie for database iDb.
+                ///Then modify the schema cookie (since the ALTER TABLE modifies the
+                ///schema). Open a statement transaction if the table is a virtual
+                ///table.
+                //RULE
+                var v = this.sqlite3GetVdbe();
+                if (v == null) {
+                    goto exit_rename_table;
+                }
+                build.sqlite3BeginWriteOperation(this, pVTab != null ? 1 : 0, iDb);
+                build.codegenChangeCookie(this, iDb);
+                ///If this is a virtual table, invoke the xRename() function if
+                ///one is defined. The xRename() callback will modify the names
+                ///<param name="of any resources used by the v">table implementation (including other</param>
+                ///<param name="SQLite tables) that are identified by the name of the virtual table.">SQLite tables) that are identified by the name of the virtual table.</param>
+                ///<param name=""></param>
+#if !SQLITE_OMIT_VIRTUALTABLE
+                if (pVTab != null) {
+                    var cellRef = ++this.UsedCellCount;
+                    v.sqlite3VdbeAddOp4(OpCode.OP_String8, 0, cellRef, 0, NewNameOfTheTable, 0);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_VRename, cellRef, 0, 0, pVTab, P4Usage.P4_VTAB);
+                    build.sqlite3MayAbort(this);
+                }
+#endif
+                ///<param name="figure out how many UTF">8 characters are in zName </param>
+                var zTabName = pTab.zName;///Original name of the table zTabName=pTab.zName;
+                var nTabName = sqlite3Utf8CharLen(zTabName, -1);///<param name="Number of UTF">8 characters in zTabName </param>
+#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
                 {
-					///
-					///<summary>
-					///</summary>
-					///<param name="If foreign">key support is enabled, rewrite the CREATE TABLE </param>
-					///<param name="statements corresponding to all child tables of foreign key constraints">statements corresponding to all child tables of foreign key constraints</param>
-					///<param name="for which the renamed table is the parent table.  ">for which the renamed table is the parent table.  </param>
-					if((zWhere=this.whereForeignKeys(pTab))!=null) {
-						build.sqlite3NestedParse(this,"UPDATE \"%w\".%s SET "+"sql = sqlite_rename_parent(sql, %Q, %Q) "+"WHERE %s;",zDb,sqliteinth.SCHEMA_TABLE(iDb),zTabName,zName,zWhere);
-						db.DbFree(ref zWhere);
-					}
-				}
-				#endif
-				///
-				///<summary>
-				///Modify the sqlite_master table to use the new table name. 
-				///</summary>
-				build.sqlite3NestedParse(this,"UPDATE %Q.%s SET "+
-				#if SQLITE_OMIT_TRIGGER
+                    ///<param name="If foreign">key support is enabled, rewrite the CREATE TABLE </param>
+                    ///<param name="statements corresponding to all child tables of foreign key constraints">statements corresponding to all child tables of foreign key constraints</param>
+                    ///<param name="for which the renamed table is the parent table.  ">for which the renamed table is the parent table.  </param>
+                    if ((zWhere = this.whereForeignKeys(pTab)) != null) {
+                        build.sqlite3NestedParse(this, "UPDATE \"%w\".%s SET " + "sql = sqlite_rename_parent(sql, %Q, %Q) " + "WHERE %s;", zDb, sqliteinth.SCHEMA_TABLE(iDb), zTabName, NewNameOfTheTable, zWhere);
+                        db.DbFree(ref zWhere);
+                    }
+                }
+#endif
+                ///Modify the sqlite_master table to use the new table name. 
+                build.sqlite3NestedParse(this, "UPDATE %Q.%s SET " +
+#if SQLITE_OMIT_TRIGGER
 																																																																																																																																 "sql = sqlite_rename_table(sql, %Q), " +
 #else
-				"sql = CASE "+"WHEN type = 'trigger' THEN sqlite_rename_trigger(sql, %Q)"+"ELSE sqlite_rename_table(sql, %Q) END, "+
-				#endif
- "tbl_name = %Q, " + "name = CASE " + "WHEN type='table' THEN %Q " + "WHEN name LIKE 'sqlite_autoindex%%' AND type='index' THEN " + "'sqlite_autoindex_' || %Q || substr(name,%d+18) " + "ELSE name END " + "WHERE tbl_name=%Q AND " + "(type='table' OR type='index' OR type='trigger');", zDb, sqliteinth.SCHEMA_TABLE(iDb), zName, zName, zName,
-				#if !SQLITE_OMIT_TRIGGER
-				zName,
-				#endif
-				zName,nTabName,zTabName);
-				#if !SQLITE_OMIT_AUTOINCREMENT
-				///
-				///<summary>
-				///If the sqlite_sequence table exists in this database, then update
-				///it with the new table name.
-				///</summary>
-				if(TableBuilder.sqlite3FindTable(db, zDb, "sqlite_sequence") != null) {
-					build.sqlite3NestedParse(this,"UPDATE \"%w\".sqlite_sequence set name = %Q WHERE name = %Q",zDb,zName,pTab.zName);
-				}
-				#endif
-				#if !SQLITE_OMIT_TRIGGER
-				///
-				///<summary>
-				///If there are TEMP triggers on this table, modify the sqlite_temp_master
-				///table. Don't do this if the table being ALTERed is itself located in
-				///the temp database.
-				///</summary>
-				if((zWhere=this.whereTempTriggers(pTab))!="") {
-					build.sqlite3NestedParse(this,"UPDATE sqlite_temp_master SET "+"sql = sqlite_rename_trigger(sql, %Q), "+"tbl_name = %Q "+"WHERE %s;",zName,zName,zWhere);
-					db.DbFree(ref zWhere);
-				}
-				#endif
-				#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
+                "sql = CASE " + "WHEN type = 'trigger' THEN sqlite_rename_trigger(sql, %Q)" + "ELSE sqlite_rename_table(sql, %Q) END, " +
+#endif
+ "tbl_name = %Q, " + "name = CASE " + "WHEN type='table' THEN %Q " + "WHEN name LIKE 'sqlite_autoindex%%' AND type='index' THEN " + "'sqlite_autoindex_' || %Q || substr(name,%d+18) " + "ELSE name END " + "WHERE tbl_name=%Q AND " + "(type='table' OR type='index' OR type='trigger');", zDb, sqliteinth.SCHEMA_TABLE(iDb), NewNameOfTheTable, NewNameOfTheTable, NewNameOfTheTable,
+#if !SQLITE_OMIT_TRIGGER
+                NewNameOfTheTable,
+#endif
+                NewNameOfTheTable, nTabName, zTabName);
+#if !SQLITE_OMIT_AUTOINCREMENT
+                ///If the sqlite_sequence table exists in this database, then update
+                ///it with the new table name.
+                if (TableBuilder.sqlite3FindTable(db, zDb, "sqlite_sequence") != null) {
+                    build.sqlite3NestedParse(this, "UPDATE \"%w\".sqlite_sequence set name = %Q WHERE name = %Q", zDb, NewNameOfTheTable, pTab.zName);
+                }
+#endif
+#if !SQLITE_OMIT_TRIGGER
+                ///If there are TEMP triggers on this table, modify the sqlite_temp_master
+                ///table. Don't do this if the table being ALTERed is itself located in
+                ///the temp database.
+                if ((zWhere = this.whereTempTriggers(pTab)) != "") {
+                    build.sqlite3NestedParse(this, "UPDATE sqlite_temp_master SET " + "sql = sqlite_rename_trigger(sql, %Q), " + "tbl_name = %Q " + "WHERE %s;", NewNameOfTheTable, NewNameOfTheTable, zWhere);
+                    db.DbFree(ref zWhere);
+                }
+#endif
+#if !(SQLITE_OMIT_FOREIGN_KEY) && !(SQLITE_OMIT_TRIGGER)
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
                 {
-					FKey p;
-					for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
-						Table pFrom=p.pFrom;
-						if(pFrom!=pTab) {
-							this.reloadTableSchema(p.pFrom,pFrom.zName);
-						}
-					}
-				}
-				#endif
-				///
-				///<summary>
-				///Drop and reload the internal table schema. 
-				///</summary>
-				this.reloadTableSchema(pTab,zName);
-				exit_rename_table:
-				build.sqlite3SrcListDelete(db,ref pSrc);
-				db.DbFree(ref zName);
-				db.flags=savedDbFlags;
-			}
+                    FKey p;
+                    for (p = fkeyc.sqlite3FkReferences(pTab); p != null; p = p.pNextTo) {
+                        Table pFrom = p.pFrom;
+                        if (pFrom != pTab) {
+                            this.reloadTableSchema(p.pFrom, pFrom.zName);
+                        }
+                    }
+                }
+#endif
+                ///Drop and reload the internal table schema. 
+                this.reloadTableSchema(pTab, NewNameOfTheTable);
+                exit_rename_table:
+                build.sqlite3SrcListDelete(db, ref pSrc);
+                db.DbFree(ref NewNameOfTheTable);
+                db.flags = savedDbFlags;
+            }
 
             ///<summary>
 			/// Generate code to drop and reload the internal representation of table
@@ -995,282 +860,279 @@ goto exit_rename_table;
 			/// pTab.zName if this function is being called to code part of an
 			/// "ALTER TABLE RENAME TO" statement.
 			///</summary>
-            public void reloadTableSchema(Table pTab,string zName) {
-				///Index of database containing pTab 
-				#if !SQLITE_OMIT_TRIGGER
-				Trigger pTrig;
-				#endif
-				var v=this.sqlite3GetVdbe();
-				if(NEVER(v==null))
-					return;
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				var iDb= this.db.indexOf(pTab.pSchema);
-				Debug.Assert(iDb>=0);
-				#if !SQLITE_OMIT_TRIGGER
-				///Drop any table triggers from the internal schema. 
+            public void reloadTableSchema(Table pTab, string zName)
+            {
+                ///Index of database containing pTab 
+#if !SQLITE_OMIT_TRIGGER
+                Trigger pTrig;
+#endif
+                var v = this.sqlite3GetVdbe();
+                if (NEVER(v == null))
+                    return;
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
+                var iDb = this.db.indexOfBackendWithSchema(pTab.pSchema);
+                Debug.Assert(iDb >= 0);
+#if !SQLITE_OMIT_TRIGGER
+                ///Drop any table triggers from the internal schema. 
                 pTab.sqlite3TriggerList(this).linkedList().ForEach(
-                    trg => {
-                        int iTrigDb = this.db.indexOf( trg.pSchema);
-                        Debug.Assert(iTrigDb == iDb || iTrigDb == 1);
-                        v.sqlite3VdbeAddOp4(OpCode.OP_DropTrigger, iTrigDb, 0, 0, trg.zName, 0);
+                    trg =>
+                    {
+                        Drop_Trigger(trg, v, iDb);
                     }
-                );            
-				#endif
-				///Drop the table and index from the internal schema. 
-				v.sqlite3VdbeAddOp4( OpCode.OP_DropTable,iDb,0,0,pTab.zName,0);
-				///Reload the table, index and permanent trigger schemas. 
-				var zWhere=io.sqlite3MPrintf(this.db,"tbl_name=%Q",zName);
-				if(zWhere==null)
-					return;
-				v.codegenAddParseSchemaOp(iDb,zWhere);
-				#if !SQLITE_OMIT_TRIGGER
-				///Now, if the table is not stored in the temp database, reload any temp
-				///triggers. Don't use IN(...) in case SQLITE_OMIT_SUBQUERY is defined.
-				if((zWhere=this.whereTempTriggers(pTab))!="") {
-					v.codegenAddParseSchemaOp(1,zWhere);
-				}
-				#endif
-			}
-			public///<summary>
-			/// Generate the text of a WHERE expression which can be used to select all
-			/// temporary triggers on table pTab from the sqlite_temp_master table. If
-			/// table pTab has no temporary triggers, or is itself stored in the
-			/// temporary database, NULL is returned.
-			///</summary>
-			string whereTempTriggers(Table pTab) {
-				Trigger pTrig;
-				string zWhere="";
-				Schema pTempSchema=this.db.Backends[1].pSchema;
-				///
-				///<summary>
-				///Temp db schema 
-				///</summary>
-				///
-				///<summary>
-				///If the table is not located in the temp.db (in which case NULL is
-				///returned, loop through the tables list of triggers. For each trigger
-				///that is not part of the temp.db schema, add a clause to the WHERE
-				///expression being built up in zWhere.
-				///</summary>
-				if(pTab.pSchema!=pTempSchema) {
-					Connection db=this.db;
-					for(pTrig= pTab.sqlite3TriggerList(this);pTrig!=null;pTrig=pTrig.pNext) {
-						if(pTrig.pSchema==pTempSchema) {
-							zWhere=alter.whereOrName(db,zWhere,pTrig.zName);
-						}
-					}
-				}
-				if(!String.IsNullOrEmpty(zWhere)) {
-					zWhere=io.sqlite3MPrintf(this.db,"type='trigger' AND (%s)",zWhere);
-					//sqlite3DbFree( pParse.db, ref zWhere );
-					//zWhere = zNew;
-				}
-				return zWhere;
-			}
-			public///<summary>
-			/// Generate the text of a WHERE expression which can be used to select all
-			/// tables that have foreign key constraints that refer to table pTab (i.e.
-			/// constraints for which pTab is the parent table) from the sqlite_master
-			/// table.
-			///</summary>
-			string whereForeignKeys(Table pTab) {
-				FKey p;
-				string zWhere="";
-				for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
-					zWhere=alter.whereOrName(this.db,zWhere,p.pFrom.zName);
-				}
-				return zWhere;
-			}
-			public void openStatTable(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			int iDb,///
-			///<summary>
-			///The database we are looking in 
-			///</summary>
-			int iStatCur,///
-			///<summary>
-			///Open the sqlite_stat1 table on this cursor 
-			///</summary>
-			string zWhere,///
-			///<summary>
-			///Delete entries for this table or index 
-			///</summary>
-			string zWhereType///
-			///<summary>
-			///Either "tbl" or "idx" 
-			///</summary>
-			) {
-				int[] aRoot=new int[] {
-					0,
-					0
-				};
-				u8[] aCreateTbl=new u8[] {
-					0,
-					0
-				};
-				int i;
-				Connection db=this.db;
-				DbBackend pDb;
-				Vdbe v=this.sqlite3GetVdbe();
-				if(v==null)
-					return;
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-				Debug.Assert(v.sqlite3VdbeDb()==db);
-				pDb=db.Backends[iDb];
-				for(i=0;i<Sqlite3.ArraySize(aTable);i++) {
-					string zTab=aTable[i].zName;
-					Table pStat;
-					if((pStat=TableBuilder.sqlite3FindTable(db, pDb.Name, zTab)) ==null) {
-						///
-						///<summary>
-						///The sqlite_stat[12] table does not exist. Create it. Note that a 
-						///</summary>
-						///<param name="side">effect of the CREATE TABLE statement is to leave the rootpage </param>
-						///<param name="of the new table in register pParse.regRoot. This is important ">of the new table in register pParse.regRoot. This is important </param>
-						///<param name="because the OpenWrite opcode below will be needing it. ">because the OpenWrite opcode below will be needing it. </param>
-						build.sqlite3NestedParse(this,"CREATE TABLE %Q.%s(%s)",pDb.Name,zTab,aTable[i].zCols);
-						aRoot[i]=this.regRoot;
-						aCreateTbl[i]=1;
-					}
-					else {
-						///
-						///<summary>
-						///The table already exists. If zWhere is not NULL, delete all entries 
-						///associated with the table zWhere. If zWhere is NULL, delete the
-						///entire contents of the table. 
-						///</summary>
-						aRoot[i]=pStat.tnum;
-						sqliteinth.sqlite3TableLock(this,iDb,aRoot[i],1,zTab);
-						if(!String.IsNullOrEmpty(zWhere)) {
-							build.sqlite3NestedParse(this,"DELETE FROM %Q.%s WHERE %s=%Q",pDb.Name,zTab,zWhereType,zWhere);
-						}
-						else {
-							///
-							///<summary>
-							///The sqlite_stat[12] table already exists.  Delete all rows. 
-							///</summary>
+                );
+#endif
+                Drop_Table(pTab, v, iDb);
+                ///Reload the table, index and permanent trigger schemas. 
+                var zWhere = io.sqlite3MPrintf(this.db, "tbl_name=%Q", zName);
+                if (zWhere == null)
+                    return;
+
+                v.codegenAddParseSchemaOp(iDb, zWhere);
+#if !SQLITE_OMIT_TRIGGER
+                ///Now, if the table is not stored in the temp database, reload any temp
+                ///triggers. Don't use IN(...) in case SQLITE_OMIT_SUBQUERY is defined.
+                if ((zWhere = this.whereTempTriggers(pTab)) != "")
+                {
+                    this.codegenAddParseSchemaOp(1, zWhere);
+                }
+#endif
+            }
+
+            
+
+
+
+            ///<summary>
+            /// Generate the text of a WHERE expression which can be used to select all
+            /// temporary triggers on table pTab from the sqlite_temp_master table. If
+            /// table pTab has no temporary triggers, or is itself stored in the
+            /// temporary database, NULL is returned.
+            ///</summary>
+            public string whereTempTriggers(Table pTab) {
+                string zWhere = "";
+                Schema pTempSchema = this.db.Backends[1].pSchema;
+                ///Temp db schema 
+                ///
+                ///If the table is not located in the temp.db (in which case NULL is
+                ///returned, loop through the tables list of triggers. For each trigger
+                ///that is not part of the temp.db schema, add a clause to the WHERE
+                ///expression being built up in zWhere.
+                if (pTab.pSchema != pTempSchema)
+                    pTab.sqlite3TriggerList(this).linkedList()
+                        .Where(pTrig => pTrig.pSchema == pTempSchema)
+                        .ForEach(pTrig => zWhere = alter.whereOrName(db, zWhere, pTrig.zName));
+
+                if (!String.IsNullOrEmpty(zWhere)) {
+                    zWhere = io.sqlite3MPrintf(this.db, "type='trigger' AND (%s)", zWhere);
+                    //sqlite3DbFree( pParse.db, ref zWhere );
+                    //zWhere = zNew;
+                }
+                return zWhere;
+            }
+
+            ///<summary>
+            /// Generate the text of a WHERE expression which can be used to select all
+            /// tables that have foreign key constraints that refer to table pTab (i.e.
+            /// constraints for which pTab is the parent table) from the sqlite_master
+            /// table.
+            ///</summary>
+            public string whereForeignKeys(Table pTab) {
+                string zWhere = "";
+                fkeyc.sqlite3FkReferences(pTab).path(p => p.pNextTo)
+                    .ForEach(p => zWhere = alter.whereOrName(this.db, zWhere, p.pFrom.zName));
+
+                return zWhere;
+            }
+            public void openStatTable(///
+                                      ///<summary>
+                                      ///Parsing context 
+                                      ///</summary>
+          int iDb,///
+                    ///<summary>
+                    ///The database we are looking in 
+                    ///</summary>
+            int iStatCur,///
+                         ///<summary>
+                         ///Open the sqlite_stat1 table on this cursor 
+                         ///</summary>
+           string zWhere,///
+                          ///<summary>
+                          ///Delete entries for this table or index 
+                          ///</summary>
+          string zWhereType///
+                             ///<summary>
+                             ///Either "tbl" or "idx" 
+                             ///</summary>
+           ) {
+                int[] aRoot = new int[] {
+                    0,
+                    0
+                };
+                u8[] aCreateTbl = new u8[] {
+                    0,
+                    0
+                };
+                int i;
+                Connection db = this.db;
+                DbBackend pDb;
+                Vdbe v = this.sqlite3GetVdbe();
+                if (v == null)
+                    return;
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
+                Debug.Assert(v.sqlite3VdbeDb() == db);
+                pDb = db.Backends[iDb];
+                for (i = 0; i < Sqlite3.ArraySize(aTable); i++) {
+                    string zTab = aTable[i].zName;
+                    Table pStat;
+                    if ((pStat = TableBuilder.sqlite3FindTable(db, pDb.Name, zTab)) == null) {
+                        ///
+                        ///<summary>
+                        ///The sqlite_stat[12] table does not exist. Create it. Note that a 
+                        ///</summary>
+                        ///<param name="side">effect of the CREATE TABLE statement is to leave the rootpage </param>
+                        ///<param name="of the new table in register pParse.regRoot. This is important ">of the new table in register pParse.regRoot. This is important </param>
+                        ///<param name="because the OpenWrite opcode below will be needing it. ">because the OpenWrite opcode below will be needing it. </param>
+                        build.sqlite3NestedParse(this, "CREATE TABLE %Q.%s(%s)", pDb.Name, zTab, aTable[i].zCols);
+                        aRoot[i] = this.regRoot;
+                        aCreateTbl[i] = 1;
+                    }
+                    else {
+                        ///
+                        ///<summary>
+                        ///The table already exists. If zWhere is not NULL, delete all entries 
+                        ///associated with the table zWhere. If zWhere is NULL, delete the
+                        ///entire contents of the table. 
+                        ///</summary>
+                        aRoot[i] = pStat.tnum;
+                        sqliteinth.sqlite3TableLock(this, iDb, aRoot[i], 1, zTab);
+                        if (!String.IsNullOrEmpty(zWhere)) {
+                            build.sqlite3NestedParse(this, "DELETE FROM %Q.%s WHERE %s=%Q", pDb.Name, zTab, zWhereType, zWhere);
+                        }
+                        else {
+                            ///
+                            ///<summary>
+                            ///The sqlite_stat[12] table already exists.  Delete all rows. 
+                            ///</summary>
                             v.sqlite3VdbeAddOp2(OpCode.OP_Clear, aRoot[i], iDb);
-						}
-					}
-				}
-				///
-				///<summary>
-				///Open the sqlite_stat[12] tables for writing. 
-				///</summary>
-				for(i=0;i<Sqlite3.ArraySize(aTable);i++) {
+                        }
+                    }
+                }
+                ///
+                ///<summary>
+                ///Open the sqlite_stat[12] tables for writing. 
+                ///</summary>
+                for (i = 0; i < Sqlite3.ArraySize(aTable); i++) {
                     v.sqlite3VdbeAddOp3(OpCode.OP_OpenWrite, iStatCur + i, aRoot[i], iDb);
-					v.sqlite3VdbeChangeP4(-1,3, P4Usage.P4_INT32);
-					v.sqlite3VdbeChangeP5(aCreateTbl[i]);
-				}
-			}
-			public///<summary>
-			/// Generate code to do an analysis of all indices associated with
-			/// a single table.
-			///</summary>
-			void analyzeOneTable(///
-			///<summary>
-			///Parser context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Table whose indices are to be analyzed 
-			///</summary>
-			Index pOnlyIdx,///
-			///<summary>
-			///If not NULL, only analyze this one index 
-			///</summary>
-			int iStatCur,///
-			///<summary>
-			///Index of VdbeCursor that writes the sqlite_stat1 table 
-			///</summary>
-			int iMem///
-			///<summary>
-			///Available memory locations begin here 
-			///</summary>
-			) {
-				Connection db=this.db;
-				///
-				///<summary>
-				///Database handle 
-				///</summary>
-				Index pIdx;
-				///
-				///<summary>
-				///An index to being analyzed 
-				///</summary>
-				int iIdxCur;
-				///
-				///<summary>
-				///Cursor open on index being analyzed 
-				///</summary>
-				Vdbe v;
-				///
-				///<summary>
-				///The virtual machine being built up 
-				///</summary>
-				int i;
-				///
-				///<summary>
-				///Loop counter 
-				///</summary>
-				int topOfLoop;
-				///
-				///<summary>
-				///The top of the loop 
-				///</summary>
-				int endOfLoop;
-				///
-				///<summary>
-				///The end of the loop 
-				///</summary>
-				int jZeroRows=-1;
-				///
-				///<summary>
-				///Jump from here if number of rows is zero 
-				///</summary>
-				int iDb;
-				///
-				///<summary>
-				///Index of database containing pTab 
-				///</summary>
-				int regTabname=iMem++;
-				///
-				///<summary>
-				///Register containing table name 
-				///</summary>
-				int regIdxname=iMem++;
-				///
-				///<summary>
-				///Register containing index name 
-				///</summary>
-				int regSampleno=iMem++;
-				///
-				///<summary>
-				///Register containing next sample number 
-				///</summary>
-				int regCol=iMem++;
-				///
-				///<summary>
-				///Content of a column analyzed table 
-				///</summary>
-				int regRec=iMem++;
-				///
-				///<summary>
-				///Register holding completed record 
-				///</summary>
-				int regTemp=iMem++;
-				///
-				///<summary>
-				///Temporary use register 
-				///</summary>
-				int regRowid=iMem++;
-				///
-				///<summary>
-				///Rowid for the inserted record 
-				///</summary>
-				#if SQLITE_ENABLE_STAT2
+                    v.sqlite3VdbeChangeP4(-1, 3, P4Usage.P4_INT32);
+                    v.sqlite3VdbeChangeP5(aCreateTbl[i]);
+                }
+            }
+            public///<summary>
+                  /// Generate code to do an analysis of all indices associated with
+                  /// a single table.
+                  ///</summary>
+          void analyzeOneTable(///
+                                 ///<summary>
+                                 ///Parser context 
+                                 ///</summary>
+           Table pTab,///
+                       ///<summary>
+                       ///Table whose indices are to be analyzed 
+                       ///</summary>
+         Index pOnlyIdx,///
+                           ///<summary>
+                           ///If not NULL, only analyze this one index 
+                           ///</summary>
+         int iStatCur,///
+                         ///<summary>
+                         ///Index of VdbeCursor that writes the sqlite_stat1 table 
+                         ///</summary>
+           int iMem///
+                    ///<summary>
+                    ///Available memory locations begin here 
+                    ///</summary>
+            ) {
+                Connection db = this.db;
+                ///
+                ///<summary>
+                ///Database handle 
+                ///</summary>
+                Index pIdx;
+                ///
+                ///<summary>
+                ///An index to being analyzed 
+                ///</summary>
+                int iIdxCur;
+                ///
+                ///<summary>
+                ///Cursor open on index being analyzed 
+                ///</summary>
+                Vdbe v;
+                ///
+                ///<summary>
+                ///The virtual machine being built up 
+                ///</summary>
+                int i;
+                ///
+                ///<summary>
+                ///Loop counter 
+                ///</summary>
+                int topOfLoop;
+                ///
+                ///<summary>
+                ///The top of the loop 
+                ///</summary>
+                int endOfLoop;
+                ///
+                ///<summary>
+                ///The end of the loop 
+                ///</summary>
+                int jZeroRows = -1;
+                ///
+                ///<summary>
+                ///Jump from here if number of rows is zero 
+                ///</summary>
+                int iDb;
+                ///
+                ///<summary>
+                ///Index of database containing pTab 
+                ///</summary>
+                int regTabname = iMem++;
+                ///
+                ///<summary>
+                ///Register containing table name 
+                ///</summary>
+                int regIdxname = iMem++;
+                ///
+                ///<summary>
+                ///Register containing index name 
+                ///</summary>
+                int regSampleno = iMem++;
+                ///
+                ///<summary>
+                ///Register containing next sample number 
+                ///</summary>
+                int regCol = iMem++;
+                ///
+                ///<summary>
+                ///Content of a column analyzed table 
+                ///</summary>
+                int regRec = iMem++;
+                ///
+                ///<summary>
+                ///Register holding completed record 
+                ///</summary>
+                int regTemp = iMem++;
+                ///
+                ///<summary>
+                ///Temporary use register 
+                ///</summary>
+                int regRowid = iMem++;
+                ///
+                ///<summary>
+                ///Rowid for the inserted record 
+                ///</summary>
+#if SQLITE_ENABLE_STAT2
 																																																																																																																															  int addr = 0;                /* Instruction address */
   int regTemp2 = iMem++;       /* Temporary use register */
   int regSamplerecno = iMem++; /* Index of next sample to record */
@@ -1278,64 +1140,64 @@ goto exit_rename_table;
   int regLast = iMem++;        /* Index of last sample to record */
   int regFirst = iMem++;       /* Index of first sample to record */
 #endif
-				v=this.sqlite3GetVdbe();
-				if(v==null||NEVER(pTab==null)) {
-					return;
-				}
-				if(pTab.tnum==0) {
-					///
-					///<summary>
-					///Do not gather statistics on views or virtual tables 
-					///</summary>
-					return;
-				}
-				if(pTab.zName.StartsWith("sqlite_",StringComparison.InvariantCultureIgnoreCase)) {
-					///
-					///<summary>
-					///Do not gather statistics on system tables 
-					///</summary>
-					return;
-				}
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
-				iDb= db.indexOf(pTab.pSchema);
-				Debug.Assert(iDb>=0);
-				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				#if !SQLITE_OMIT_AUTHORIZATION
+                v = this.sqlite3GetVdbe();
+                if (v == null || NEVER(pTab == null)) {
+                    return;
+                }
+                if (pTab.tnum == 0) {
+                    ///
+                    ///<summary>
+                    ///Do not gather statistics on views or virtual tables 
+                    ///</summary>
+                    return;
+                }
+                if (pTab.zName.StartsWith("sqlite_", StringComparison.InvariantCultureIgnoreCase)) {
+                    ///
+                    ///<summary>
+                    ///Do not gather statistics on system tables 
+                    ///</summary>
+                    return;
+                }
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(db));
+                iDb = db.indexOfBackendWithSchema(pTab.pSchema);
+                Debug.Assert(iDb >= 0);
+                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																															if( sqlite3AuthCheck(pParse, SQLITE_ANALYZE, pTab.zName, 0,
 db.aDb[iDb].zName ) ){
 return;
 }
 #endif
-				///
-				///<summary>
-				///</summary>
-				///<param name="Establish a read">cache level. </param>
-				sqliteinth.sqlite3TableLock(this,iDb,pTab.tnum,0,pTab.zName);
-				iIdxCur=this.nTab++;
-				v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regTabname,0,pTab.zName,0);
-				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-					int nCol;
-					KeyInfo pKey;
-					if(pOnlyIdx!=null&&pOnlyIdx!=pIdx)
-						continue;
-					nCol=pIdx.nColumn;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Establish a read">cache level. </param>
+                sqliteinth.sqlite3TableLock(this, iDb, pTab.tnum, 0, pTab.zName);
+                iIdxCur = this.nTab++;
+                v.sqlite3VdbeAddOp4(OpCode.OP_String8, 0, regTabname, 0, pTab.zName, 0);
+                for (pIdx = pTab.pIndex; pIdx != null; pIdx = pIdx.pNext) {
+                    int nCol;
+                    KeyInfo pKey;
+                    if (pOnlyIdx != null && pOnlyIdx != pIdx)
+                        continue;
+                    nCol = pIdx.nColumn;
                     pKey = pIdx.sqlite3IndexKeyinfo(this);
-					if(iMem+1+(nCol*2)>this.nMem) {
-						this.nMem=iMem+1+(nCol*2);
-					}
-					///
-					///<summary>
-					///Open a cursor to the index to be analyzed. 
-					///</summary>
-					Debug.Assert(iDb==db.indexOf(pIdx.pSchema));
-					v.sqlite3VdbeAddOp4( OpCode.OP_OpenRead,iIdxCur,pIdx.tnum,iDb,pKey, P4Usage.P4_KEYINFO_HANDOFF);
-					v.VdbeComment("%s",pIdx.zName);
-					///
-					///<summary>
-					///Populate the registers containing the index names. 
-					///</summary>
-					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regIdxname,0,pIdx.zName,0);
-					#if SQLITE_ENABLE_STAT2
+                    if (iMem + 1 + (nCol * 2) > this.UsedCellCount) {
+                        this.UsedCellCount = iMem + 1 + (nCol * 2);
+                    }
+                    ///
+                    ///<summary>
+                    ///Open a cursor to the index to be analyzed. 
+                    ///</summary>
+                    Debug.Assert(iDb == db.indexOfBackendWithSchema(pIdx.pSchema));
+                    v.sqlite3VdbeAddOp4(OpCode.OP_OpenRead, iIdxCur, pIdx.tnum, iDb, pKey, P4Usage.P4_KEYINFO_HANDOFF);
+                    v.VdbeComment("%s", pIdx.zName);
+                    ///
+                    ///<summary>
+                    ///Populate the registers containing the index names. 
+                    ///</summary>
+                    v.sqlite3VdbeAddOp4(OpCode.OP_String8, 0, regIdxname, 0, pIdx.zName, 0);
+#if SQLITE_ENABLE_STAT2
 																																																																																																																																																															
     /* If this iteration of the loop is generating code to analyze the
 ** first index in the pTab.pIndex list, then register regLast has
@@ -1361,44 +1223,44 @@ return;
     sqlite3VdbeAddOp2( v, OpCode.OP_Integer, 0, regRecno );
     sqlite3VdbeAddOp2( v,  OpCode.OP_Copy, regFirst, regSamplerecno );
 #endif
-					///
-					///<summary>
-					///The block of memory cells initialized here is used as follows.
-					///
-					///iMem:                
-					///The total number of rows in the table.
-					///
-					///iMem+1 .. iMem+nCol: 
-					///Number of distinct entries in index considering the 
-					///</summary>
-					///<param name="left">most N columns only, where N is between 1 and nCol, </param>
-					///<param name="inclusive.">inclusive.</param>
-					///<param name=""></param>
-					///<param name="iMem+nCol+1 .. Mem+2*nCol:  ">iMem+nCol+1 .. Mem+2*nCol:  </param>
-					///<param name="Previous value of indexed columns, from left to right.">Previous value of indexed columns, from left to right.</param>
-					///<param name=""></param>
-					///<param name="Cells iMem through iMem+nCol are initialized to 0. The others are ">Cells iMem through iMem+nCol are initialized to 0. The others are </param>
-					///<param name="initialized to contain an SQL NULL.">initialized to contain an SQL NULL.</param>
-					for(i=0;i<=nCol;i++) {
-						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,iMem+i);
-					}
-					for(i=0;i<nCol;i++) {
+                    ///
+                    ///<summary>
+                    ///The block of memory cells initialized here is used as follows.
+                    ///
+                    ///iMem:                
+                    ///The total number of rows in the table.
+                    ///
+                    ///iMem+1 .. iMem+nCol: 
+                    ///Number of distinct entries in index considering the 
+                    ///</summary>
+                    ///<param name="left">most N columns only, where N is between 1 and nCol, </param>
+                    ///<param name="inclusive.">inclusive.</param>
+                    ///<param name=""></param>
+                    ///<param name="iMem+nCol+1 .. Mem+2*nCol:  ">iMem+nCol+1 .. Mem+2*nCol:  </param>
+                    ///<param name="Previous value of indexed columns, from left to right.">Previous value of indexed columns, from left to right.</param>
+                    ///<param name=""></param>
+                    ///<param name="Cells iMem through iMem+nCol are initialized to 0. The others are ">Cells iMem through iMem+nCol are initialized to 0. The others are </param>
+                    ///<param name="initialized to contain an SQL NULL.">initialized to contain an SQL NULL.</param>
+                    for (i = 0; i <= nCol; i++) {
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, iMem + i);
+                    }
+                    for (i = 0; i < nCol; i++) {
                         v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, iMem + nCol + i + 1);
-					}
-					///
-					///<summary>
-					///Start the analysis loop. This loop runs through all the entries in
-					///</summary>
-					///<param name="the index b">tree.  </param>
-					endOfLoop=v.sqlite3VdbeMakeLabel();
+                    }
+                    ///
+                    ///<summary>
+                    ///Start the analysis loop. This loop runs through all the entries in
+                    ///</summary>
+                    ///<param name="the index b">tree.  </param>
+                    endOfLoop = v.sqlite3VdbeMakeLabel();
                     v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iIdxCur, endOfLoop);
-					topOfLoop=v.sqlite3VdbeCurrentAddr();
-					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,iMem,1);
-					for(i=0;i<nCol;i++) {
-						v.sqlite3VdbeAddOp3( OpCode.OP_Column,iIdxCur,i,regCol);
-						CollSeq pColl;
-						if(i==0) {
-							#if SQLITE_ENABLE_STAT2
+                    topOfLoop = v.sqlite3VdbeCurrentAddr();
+                    v.sqlite3VdbeAddOp2(OpCode.OP_AddImm, iMem, 1);
+                    for (i = 0; i < nCol; i++) {
+                        v.sqlite3VdbeAddOp3(OpCode.OP_Column, iIdxCur, i, regCol);
+                        CollSeq pColl;
+                        if (i == 0) {
+#if SQLITE_ENABLE_STAT2
 																																																																																																																																																																																																																															        /* Check if the record that cursor iIdxCur points to contains a
 ** value that should be stored in the sqlite_stat2 table. If so,
 ** store it.  */
@@ -1428,320 +1290,304 @@ return;
         sqlite3VdbeJumpHere( v, ne );
         sqlite3VdbeAddOp2( v,  OpCode.OP_AddImm, regRecno, 1 );
 #endif
-							///
-							///<summary>
-							///Always record the very first row 
-							///</summary>
-							v.sqlite3VdbeAddOp1(OpCode.OP_IfNot,iMem+1);
-						}
-						Debug.Assert(pIdx.azColl!=null);
-						Debug.Assert(pIdx.azColl[i]!=null);
-						pColl=build.sqlite3LocateCollSeq(this,pIdx.azColl[i]);
-						v.sqlite3VdbeAddOp4( OpCode.OP_Ne,regCol,0,iMem+nCol+i+1,pColl, P4Usage.P4_COLLSEQ);
-						v.sqlite3VdbeChangeP5(sqliteinth.SQLITE_NULLEQ);
-					}
-					//if( db.mallocFailed ){
-					//  /* If a malloc failure has occurred, then the result of the expression 
-					//  ** passed as the second argument to the call to sqlite3VdbeJumpHere() 
-					//  ** below may be negative. Which causes an Debug.Assert() to fail (or an
-					//  ** out-of-bounds write if SQLITE_DEBUG is not defined).  */
-					//  return;
-					//}
-					v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,endOfLoop);
-					for(i=0;i<nCol;i++) {
-						int addr2=v.sqlite3VdbeCurrentAddr()-(nCol*2);
-						if(i==0) {
-							v.sqlite3VdbeJumpHere(addr2-1);
-							///
-							///<summary>
-							///Set jump dest for the  OpCode.OP_IfNot 
-							///</summary>
-						}
-						v.sqlite3VdbeJumpHere(addr2);
-						///
-						///<summary>
-						///Set jump dest for the  OpCode.OP_Ne 
-						///</summary>
-						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,iMem+i+1,1);
-						v.sqlite3VdbeAddOp3( OpCode.OP_Column,iIdxCur,i,iMem+nCol+i+1);
-					}
-					///
-					///<summary>
-					///End of the analysis loop. 
-					///</summary>
-					v.sqlite3VdbeResolveLabel(endOfLoop);
-					v.sqlite3VdbeAddOp2( OpCode.OP_Next,iIdxCur,topOfLoop);
-					v.sqlite3VdbeAddOp1(OpCode.OP_Close,iIdxCur);
-					///
-					///<summary>
-					///Store the results in sqlite_stat1.
-					///
-					///The result is a single row of the sqlite_stat1 table.  The first
-					///two columns are the names of the table and index.  The third column
-					///is a string composed of a list of integer statistics about the
-					///index.  The first integer in the list is the total number of entries
-					///in the index.  There is one additional integer in the list for each
-					///column of the table.  This additional integer is a guess of how many
-					///rows of the table the index will select.  If D is the count of distinct
-					///values and K is the total number of rows, then the integer is computed
-					///as:
-					///
-					///</summary>
-					///<param name="I = (K+D">1)/D</param>
-					///<param name=""></param>
-					///<param name="If K==0 then no entry is made into the sqlite_stat1 table.  ">If K==0 then no entry is made into the sqlite_stat1 table.  </param>
-					///<param name="If K>0 then it is always the case the D>0 so division by zero">If K>0 then it is always the case the D>0 so division by zero</param>
-					///<param name="is never possible.">is never possible.</param>
-					///<param name=""></param>
+                            ///
+                            ///<summary>
+                            ///Always record the very first row 
+                            ///</summary>
+                            v.sqlite3VdbeAddOp1(OpCode.OP_IfNot, iMem + 1);
+                        }
+                        Debug.Assert(pIdx.azColl != null);
+                        Debug.Assert(pIdx.azColl[i] != null);
+                        pColl = build.sqlite3LocateCollSeq(this, pIdx.azColl[i]);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_Ne, regCol, 0, iMem + nCol + i + 1, pColl, P4Usage.P4_COLLSEQ);
+                        v.sqlite3VdbeChangeP5(sqliteinth.SQLITE_NULLEQ);
+                    }
+                    //if( db.mallocFailed ){
+                    //  /* If a malloc failure has occurred, then the result of the expression 
+                    //  ** passed as the second argument to the call to sqlite3VdbeJumpHere() 
+                    //  ** below may be negative. Which causes an Debug.Assert() to fail (or an
+                    //  ** out-of-bounds write if SQLITE_DEBUG is not defined).  */
+                    //  return;
+                    //}
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, endOfLoop);
+                    for (i = 0; i < nCol; i++) {
+                        int addr2 = v.sqlite3VdbeCurrentAddr() - (nCol * 2);
+                        if (i == 0) {
+                            v.sqlite3VdbeJumpHere(addr2 - 1);
+                            ///
+                            ///<summary>
+                            ///Set jump dest for the  OpCode.OP_IfNot 
+                            ///</summary>
+                        }
+                        v.sqlite3VdbeJumpHere(addr2);
+                        ///
+                        ///<summary>
+                        ///Set jump dest for the  OpCode.OP_Ne 
+                        ///</summary>
+                        v.sqlite3VdbeAddOp2(OpCode.OP_AddImm, iMem + i + 1, 1);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_Column, iIdxCur, i, iMem + nCol + i + 1);
+                    }
+                    ///
+                    ///<summary>
+                    ///End of the analysis loop. 
+                    ///</summary>
+                    v.sqlite3VdbeResolveLabel(endOfLoop);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Next, iIdxCur, topOfLoop);
+                    v.sqlite3VdbeAddOp1(OpCode.OP_Close, iIdxCur);
+                    ///
+                    ///<summary>
+                    ///Store the results in sqlite_stat1.
+                    ///
+                    ///The result is a single row of the sqlite_stat1 table.  The first
+                    ///two columns are the names of the table and index.  The third column
+                    ///is a string composed of a list of integer statistics about the
+                    ///index.  The first integer in the list is the total number of entries
+                    ///in the index.  There is one additional integer in the list for each
+                    ///column of the table.  This additional integer is a guess of how many
+                    ///rows of the table the index will select.  If D is the count of distinct
+                    ///values and K is the total number of rows, then the integer is computed
+                    ///as:
+                    ///
+                    ///</summary>
+                    ///<param name="I = (K+D">1)/D</param>
+                    ///<param name=""></param>
+                    ///<param name="If K==0 then no entry is made into the sqlite_stat1 table.  ">If K==0 then no entry is made into the sqlite_stat1 table.  </param>
+                    ///<param name="If K>0 then it is always the case the D>0 so division by zero">If K>0 then it is always the case the D>0 so division by zero</param>
+                    ///<param name="is never possible.">is never possible.</param>
+                    ///<param name=""></param>
                     v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, iMem, regSampleno);
-					if(jZeroRows<0) {
-						jZeroRows=v.sqlite3VdbeAddOp1(OpCode.OP_IfNot,iMem);
-					}
-					for(i=0;i<nCol;i++) {
-						v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,regTemp,0," ",0);
-						v.sqlite3VdbeAddOp3(OpCode.OP_Concat,regTemp,regSampleno,regSampleno);
-						v.sqlite3VdbeAddOp3(OpCode.OP_Add,iMem,iMem+i+1,regTemp);
-						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regTemp,-1);
-						v.sqlite3VdbeAddOp3(OpCode.OP_Divide,iMem+i+1,regTemp,regTemp);
-						v.sqlite3VdbeAddOp1(OpCode.OP_ToInt,regTemp);
-						v.sqlite3VdbeAddOp3(OpCode.OP_Concat,regTemp,regSampleno,regSampleno);
-					}
-					v.sqlite3VdbeAddOp4( OpCode.OP_MakeRecord,regTabname,3,regRec,"aaa",0);
-					v.sqlite3VdbeAddOp2( OpCode.OP_NewRowid,iStatCur,regRowid);
-					v.sqlite3VdbeAddOp3( OpCode.OP_Insert,iStatCur,regRec,regRowid);
+                    if (jZeroRows < 0) {
+                        jZeroRows = v.sqlite3VdbeAddOp1(OpCode.OP_IfNot, iMem);
+                    }
+                    for (i = 0; i < nCol; i++) {
+                        v.sqlite3VdbeAddOp4(OpCode.OP_String8, 0, regTemp, 0, " ", 0);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_Concat, regTemp, regSampleno, regSampleno);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_Add, iMem, iMem + i + 1, regTemp);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_AddImm, regTemp, -1);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_Divide, iMem + i + 1, regTemp, regTemp);
+                        v.sqlite3VdbeAddOp1(OpCode.OP_ToInt, regTemp);
+                        v.sqlite3VdbeAddOp3(OpCode.OP_Concat, regTemp, regSampleno, regSampleno);
+                    }
+                    v.sqlite3VdbeAddOp4(OpCode.OP_MakeRecord, regTabname, 3, regRec, "aaa", 0);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, iStatCur, regRowid);
+                    v.sqlite3VdbeAddOp3(OpCode.OP_Insert, iStatCur, regRec, regRowid);
                     v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
-				}
-				///
-				///<summary>
-				///If the table has no indices, create a single sqlite_stat1 entry
-				///containing NULL as the index name and the row count as the content.
-				///
-				///</summary>
-				if(pTab.pIndex==null) {
-					v.sqlite3VdbeAddOp3( OpCode.OP_OpenRead,iIdxCur,pTab.tnum,iDb);
-					v.VdbeComment("%s",pTab.zName);
-					v.sqlite3VdbeAddOp2( OpCode.OP_Count,iIdxCur,regSampleno);
-					v.sqlite3VdbeAddOp1(OpCode.OP_Close,iIdxCur);
-					jZeroRows=v.sqlite3VdbeAddOp1(OpCode.OP_IfNot,regSampleno);
-				}
-				else {
-					v.sqlite3VdbeJumpHere(jZeroRows);
-					jZeroRows=v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
-				}
+                }
+                ///
+                ///<summary>
+                ///If the table has no indices, create a single sqlite_stat1 entry
+                ///containing NULL as the index name and the row count as the content.
+                ///
+                ///</summary>
+                if (pTab.pIndex == null) {
+                    v.sqlite3VdbeAddOp3(OpCode.OP_OpenRead, iIdxCur, pTab.tnum, iDb);
+                    v.VdbeComment("%s", pTab.zName);
+                    v.sqlite3VdbeAddOp2(OpCode.OP_Count, iIdxCur, regSampleno);
+                    v.sqlite3VdbeAddOp1(OpCode.OP_Close, iIdxCur);
+                    jZeroRows = v.sqlite3VdbeAddOp1(OpCode.OP_IfNot, regSampleno);
+                }
+                else {
+                    v.sqlite3VdbeJumpHere(jZeroRows);
+                    jZeroRows = v.sqlite3VdbeAddOp0(OpCode.OP_Goto);
+                }
                 v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regIdxname);
-				v.sqlite3VdbeAddOp4( OpCode.OP_MakeRecord,regTabname,3,regRec,"aaa",0);
-				v.sqlite3VdbeAddOp2( OpCode.OP_NewRowid,iStatCur,regRowid);
-				v.sqlite3VdbeAddOp3( OpCode.OP_Insert,iStatCur,regRec,regRowid);
+                v.sqlite3VdbeAddOp4(OpCode.OP_MakeRecord, regTabname, 3, regRec, "aaa", 0);
+                v.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, iStatCur, regRowid);
+                v.sqlite3VdbeAddOp3(OpCode.OP_Insert, iStatCur, regRec, regRowid);
                 v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
-				if(this.nMem<regRec)
-					this.nMem=regRec;
-				v.sqlite3VdbeJumpHere(jZeroRows);
-			}
-			public///<summary>
-			/// Generate code that will cause the most recent index analysis to
-			/// be loaded into internal hash tables where is can be used.
-			///</summary>
-			void loadAnalysis(int iDb) {
-				Vdbe v=this.sqlite3GetVdbe();
-				if(v!=null) {
-					v.sqlite3VdbeAddOp1(OpCode.OP_LoadAnalysis,iDb);
-				}
-			}
-			public///<summary>
-			/// Generate code that will do an analysis of an entire database
-			///</summary>
-			void analyzeDatabase(int iDb) {
-				Connection db=this.db;
-				Schema pSchema=db.Backends[iDb].pSchema;
-				///
-				///<summary>
-				///Schema of database iDb 
-				///</summary>
-				HashElem k;
-				int iStatCur;
-				int iMem;
-				build.sqlite3BeginWriteOperation(this,0,iDb);
-				iStatCur=this.nTab;
-				this.nTab+=2;
-				this.openStatTable(iDb,iStatCur,null,null);
-				iMem=this.nMem+1;
-				Debug.Assert(sqlite3SchemaMutexHeld(db,iDb,null));
-				//for(k=sqliteHashFirst(pSchema.tblHash); k; k=sqliteHashNext(k)){
-				for(k=pSchema.tblHash.first;k!=null;k=k.next) {
-					Table pTab=(Table)k.data;
-					// sqliteHashData( k );
-					this.analyzeOneTable(pTab,null,iStatCur,iMem);
-				}
-				this.loadAnalysis(iDb);
-			}
-			/**
+                if (this.UsedCellCount < regRec)
+                    this.UsedCellCount = regRec;
+                v.sqlite3VdbeJumpHere(jZeroRows);
+            }
+            public///<summary>
+                  /// Generate code that will cause the most recent index analysis to
+                  /// be loaded into internal hash tables where is can be used.
+                  ///</summary>
+          void loadAnalysis(int iDb) {
+                Vdbe v = this.sqlite3GetVdbe();
+                if (v != null) {
+                    v.sqlite3VdbeAddOp1(OpCode.OP_LoadAnalysis, iDb);
+                }
+            }
+            public///<summary>
+                  /// Generate code that will do an analysis of an entire database
+                  ///</summary>
+          void analyzeDatabase(int iDb) {
+                Connection db = this.db;
+                Schema pSchema = db.Backends[iDb].pSchema;
+                ///
+                ///<summary>
+                ///Schema of database iDb 
+                ///</summary>
+                HashElem k;
+                int iStatCur;
+                int iMem;
+                build.sqlite3BeginWriteOperation(this, 0, iDb);
+                iStatCur = this.nTab;
+                this.nTab += 2;
+                this.openStatTable(iDb, iStatCur, null, null);
+                iMem = this.UsedCellCount + 1;
+                Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
+                //for(k=sqliteHashFirst(pSchema.tblHash); k; k=sqliteHashNext(k)){
+                for (k = pSchema.Tables.first; k != null; k = k.pNext) {
+                    Table pTab = (Table)k.data;
+                    // sqliteHashData( k );
+                    this.analyzeOneTable(pTab, null, iStatCur, iMem);
+                }
+                this.loadAnalysis(iDb);
+            }
+            /**
 ///<summary>
 ///Generate code that will do an analysis of a single table in
 ///a database.  If pOnlyIdx is not NULL then it is a single index
 ///in pTab that should be analyzed.
 ///</summary>
-*/public void analyzeTable(Table pTab,Index pOnlyIdx) {
-				int iDb;
-				int iStatCur;
-				Debug.Assert(pTab!=null);
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				iDb= this.db.indexOf(pTab.pSchema);
-				build.sqlite3BeginWriteOperation(this,0,iDb);
-				iStatCur=this.nTab;
-				this.nTab+=2;
-				if(pOnlyIdx!=null) {
-					this.openStatTable(iDb,iStatCur,pOnlyIdx.zName,"idx");
-				}
-				else {
-					this.openStatTable(iDb,iStatCur,pTab.zName,"tbl");
-				}
-				this.analyzeOneTable(pTab,pOnlyIdx,iStatCur,this.nMem+1);
-				this.loadAnalysis(iDb);
-			}
-			public///<summary>
-			/// Generate code for the ANALYZE command.  The parser calls this routine
-			/// when it recognizes an ANALYZE command.
-			///
-			///        ANALYZE                            -- 1
-			///        ANALYZE  <database>                -- 2
-			///        ANALYZE  ?<database>.?<tablename>  -- 3
-			///
-			/// Form 1 causes all indices in all attached databases to be analyzed.
-			/// Form 2 analyzes all indices the single database named.
-			/// Form 3 analyzes all indices associated with the named table.
-			///</summary>
-			// OVERLOADS, so I don't need to rewrite parse.c
-			void sqlite3Analyze(int null_2,int null_3) {
-				this.sqlite3Analyze(null,null);
-			}
-			public void sqlite3Analyze(Token pName1,Token pName2) {
-				Connection db=this.db;
-				int iDb;
-				int i;
-				string z,zDb;
-				Table pTab;
-				Index pIdx;
-				Token pTableName=null;
-				///
-				///<summary>
-				///Read the database schema. If an error occurs, leave an error message
-				///and code in pParse and return NULL. 
-				///</summary>
-				Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
-				if(SqlResult.SQLITE_OK!=prepare.sqlite3ReadSchema(this)) {
-					return;
-				}
-				Debug.Assert(pName2!=null||pName1==null);
-				if(pName1==null) {
-					///
-					///<summary>
-					///Form 1:  Analyze everything 
-					///</summary>
-					for(i=0;i<db.BackendCount;i++) {
-						if(i==1)
-							continue;
-						///
-						///<summary>
-						///Do not analyze the TEMP database 
-						///</summary>
-						this.analyzeDatabase(i);
-					}
-				}
-				else
-					if(pName2.Length==0) {
-						///
-						///<summary>
-						///Form 2:  Analyze the database or table named 
-						///</summary>
-						iDb=db.sqlite3FindDb(pName1);
-						if(iDb>=0) {
-							this.analyzeDatabase(iDb);
-						}
-						else {
-							z=build.sqlite3NameFromToken(db,pName1);
-							if(z!=null) {
-								if((pIdx=IndexBuilder.sqlite3FindIndex(db,z,null))!=null) {
-									this.analyzeTable(pIdx.pTable,pIdx);
-								}
-								else
-									if((pTab=TableBuilder.sqlite3LocateTable(this,0,z,null))!=null) {
-										this.analyzeTable(pTab,null);
-									}
-								z=null;
-								//sqlite3DbFree( db, z );
-							}
-						}
-					}
-					else {
-						///
-						///<summary>
-						///Form 3: Analyze the fully qualified table name 
-						///</summary>
-						iDb=build.sqlite3TwoPartName(this,pName1,pName2,ref pTableName);
-						if(iDb>=0) {
-							zDb=db.Backends[iDb].Name;
-							z=build.sqlite3NameFromToken(db,pTableName);
-							if(z!=null) {
-								if((pIdx=IndexBuilder.sqlite3FindIndex(db,z,zDb))!=null) {
-									this.analyzeTable(pIdx.pTable,pIdx);
-								}
-								else
-									if((pTab=TableBuilder.sqlite3LocateTable(this,0,z,zDb))!=null) {
-										this.analyzeTable(pTab,null);
-									}
-								z=null;
-								//sqlite3DbFree( db, z );
-							}
-						}
-					}
-			}
-			/**
+*/
+            public void analyzeTable(Table pTab, Index pOnlyIdx) {
+                int iDb;
+                int iStatCur;
+                Debug.Assert(pTab != null);
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
+                iDb = this.db.indexOfBackendWithSchema(pTab.pSchema);
+                build.sqlite3BeginWriteOperation(this, 0, iDb);
+                iStatCur = this.nTab;
+                this.nTab += 2;
+                if (pOnlyIdx != null) {
+                    this.openStatTable(iDb, iStatCur, pOnlyIdx.zName, "idx");
+                }
+                else {
+                    this.openStatTable(iDb, iStatCur, pTab.zName, "tbl");
+                }
+                this.analyzeOneTable(pTab, pOnlyIdx, iStatCur, this.UsedCellCount + 1);
+                this.loadAnalysis(iDb);
+            }
+            public///<summary>
+                  /// Generate code for the ANALYZE command.  The parser calls this routine
+                  /// when it recognizes an ANALYZE command.
+                  ///
+                  ///        ANALYZE                            -- 1
+                  ///        ANALYZE  <database>                -- 2
+                  ///        ANALYZE  ?<database>.?<tablename>  -- 3
+                  ///
+                  /// Form 1 causes all indices in all attached databases to be analyzed.
+                  /// Form 2 analyzes all indices the single database named.
+                  /// Form 3 analyzes all indices associated with the named table.
+                  ///</summary>
+            // OVERLOADS, so I don't need to rewrite parse.c
+            void sqlite3Analyze(int null_2, int null_3) {
+                this.sqlite3Analyze(null, null);
+            }
+            public void sqlite3Analyze(Token pName1, Token pName2) {
+                Connection db = this.db;
+                Table pTab;
+                Index pIdx;
+                Token pTableName = null;
+                ///Read the database schema. If an error occurs, leave an error message
+                ///and code in pParse and return NULL. 
+                Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
+                if (SqlResult.SQLITE_OK != prepare.sqlite3ReadSchema(this)) {
+                    return;
+                }
+                Debug.Assert(pName2 != null || pName1 == null);
+                if (pName1 == null) {
+                    ///Form 1:  Analyze everything 
+                    for (var i = 0; i < db.BackendCount; i++) {
+                        if (i == 1)
+                            continue;
+                        ///Do not analyze the TEMP database 
+                        this.analyzeDatabase(i);
+                    }
+                }
+                else
+                    if (pName2.Length == 0) {
+                    ///Form 2:  Analyze the database or table named 
+                    var iDb = db.FindDbIdxByToken(pName1);
+                    if (iDb >= 0) {
+                        this.analyzeDatabase(iDb);
+                    }
+                    else {
+                        var name = build.Token2Name(db, pName1);
+                        if (name != null) {
+                            if ((pIdx = IndexBuilder.sqlite3FindIndex(db, name, null)) != null) {
+                                this.analyzeTable(pIdx.pTable, pIdx);
+                            }
+                            else
+                                if ((pTab = TableBuilder.sqlite3LocateTable(this, name)) != null) {
+                                this.analyzeTable(pTab, null);
+                            }
+                            name = null;
+                            //sqlite3DbFree( db, z );
+                        }
+                    }
+                }
+                else {
+                    ///Form 3: Analyze the fully qualified table name 
+                    var iDb = build.sqlite3TwoPartName(this, pName1, pName2, ref pTableName);
+                    if (iDb >= 0) {
+                        var zDb = db.Backends[iDb].Name;
+                        var z = build.Token2Name(db, pTableName);
+                        if (z != null) {
+                            if ((pIdx = IndexBuilder.sqlite3FindIndex(db, z, zDb)) != null) {
+                                this.analyzeTable(pIdx.pTable, pIdx);
+                            }
+                            else
+                                if ((pTab = TableBuilder.sqlite3LocateTable(this, z, zDb)) != null) {
+                                this.analyzeTable(pTab, null);
+                            }
+                            z = null;
+                            //sqlite3DbFree( db, z );
+                        }
+                    }
+                }
+            }
+            /**
 ///<summary>
 ///This procedure generates VDBE code for a single invocation of either the
 ///sqlite_detach() or sqlite_attach() SQL user functions.
 ///</summary>
-*/public void codeAttach(///
-			///<summary>
-			///The parser context 
-			///</summary>
+*/
+            public void codeAttach(///
+                                   ///<summary>
+                                   ///The parser context 
+                                   ///</summary>
             AuthTarget type,///
-			///<summary>
-			///Either SQLITE_ATTACH or SQLITE_DETACH 
-			///</summary>
-			FuncDef pFunc,///
-			///<summary>
-			///FuncDef wrapper for detachFunc() or attachFunc() 
-			///</summary>
-			Expr pAuthArg,///
-			///<summary>
-			///Expression to pass to authorization callback 
-			///</summary>
-			Expr pFilename,///
-			///<summary>
-			///Name of database file 
-			///</summary>
-			Expr pDbname,///
-			///<summary>
-			///Name of the database to use internally 
-			///</summary>
-			Expr pKey///
-			///<summary>
-			///Database key for encryption extension 
-			///</summary>
-			) {
-				SqlResult rc;
-				NameContext sName;
-				Vdbe v;
-				Connection db=this.db;
-				int regArgs;
-				sName=new NameContext();
-				// memset( &sName, 0, sizeof(NameContext));
-				sName.pParse=this;
-				if(SqlResult.SQLITE_OK!=(rc=sName.resolveAttachExpr(pFilename))||SqlResult.SQLITE_OK!=(rc=sName.resolveAttachExpr(pDbname))||SqlResult.SQLITE_OK!=(rc=sName.resolveAttachExpr(pKey))) {
-					this.nErr++;
-					goto attach_end;
-				}
-				#if !SQLITE_OMIT_AUTHORIZATION
+                            ///<summary>
+                            ///Either SQLITE_ATTACH or SQLITE_DETACH 
+                            ///</summary>
+            FuncDef pFunc,///
+                          ///<summary>
+                          ///FuncDef wrapper for detachFunc() or attachFunc() 
+                          ///</summary>
+          Expr pAuthArg,///
+                        ///<summary>
+                        ///Expression to pass to authorization callback 
+                        ///</summary>
+            Expr pFilename,///
+                           ///<summary>
+                           ///Name of database file 
+                           ///</summary>
+         Expr pDbname,///
+                      ///<summary>
+                      ///Name of the database to use internally 
+                      ///</summary>
+          Expr pKey///
+                   ///<summary>
+                   ///Database key for encryption extension 
+                   ///</summary>
+         ) {
+                SqlResult rc;
+                NameContext sName;
+                Vdbe v;
+                Connection db = this.db;
+                int regArgs;
+                sName = new NameContext();
+                // memset( &sName, 0, sizeof(NameContext));
+                sName.pParse = this;
+                if (SqlResult.SQLITE_OK != (rc = sName.resolveAttachExpr(pFilename)) || SqlResult.SQLITE_OK != (rc = sName.resolveAttachExpr(pDbname)) || SqlResult.SQLITE_OK != (rc = sName.resolveAttachExpr(pKey))) {
+                    this.nErr++;
+                    goto attach_end;
+                }
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																														if( pAuthArg ){
 char *zAuthArg;
 if( pAuthArg->op==TokenType.TK_STRING ){
@@ -1755,907 +1601,884 @@ goto attach_end;
 }
 }
 #endif
-				v=this.sqlite3GetVdbe();
-				regArgs=this.sqlite3GetTempRange(4);
-				this.sqlite3ExprCode(pFilename,regArgs);
-				this.sqlite3ExprCode(pDbname,regArgs+1);
-				this.sqlite3ExprCode(pKey,regArgs+2);
-				Debug.Assert(v!=null///
-				///<summary>
-				///|| db.mallocFailed != 0 
-				///</summary>
-				);
-				if(v!=null) {
-					v.sqlite3VdbeAddOp3( OpCode.OP_Function,0,regArgs+3-pFunc.nArg,regArgs+3);
-					Debug.Assert(pFunc.nArg==-1||(pFunc.nArg&0xff)==pFunc.nArg);
-					v.sqlite3VdbeChangeP5((u8)(pFunc.nArg));
-					v.sqlite3VdbeChangeP4(-1,pFunc, P4Usage.P4_FUNCDEF);
-					///
-					///<summary>
-					///Code an  OpCode.OP_Expire. For an ATTACH statement, set P1 to true (expire this
-					///statement only). For DETACH, set it to false (expire all existing
-					///statements).
-					///
-					///</summary>
+                v = this.sqlite3GetVdbe();
+                regArgs = this.sqlite3GetTempRange(4);
+                this.sqlite3ExprCode(pFilename, regArgs);
+                this.sqlite3ExprCode(pDbname, regArgs + 1);
+                this.sqlite3ExprCode(pKey, regArgs + 2);
+                Debug.Assert(v != null///
+                                      ///<summary>
+                                      ///|| db.mallocFailed != 0 
+                                      ///</summary>
+              );
+                if (v != null) {
+                    v.sqlite3VdbeAddOp3(OpCode.OP_Function, 0, regArgs + 3 - pFunc.nArg, regArgs + 3);
+                    Debug.Assert(pFunc.nArg == -1 || (pFunc.nArg & 0xff) == pFunc.nArg);
+                    v.sqlite3VdbeChangeP5((u8)(pFunc.nArg));
+                    v.sqlite3VdbeChangeP4(-1, pFunc, P4Usage.P4_FUNCDEF);
+                    ///
+                    ///<summary>
+                    ///Code an  OpCode.OP_Expire. For an ATTACH statement, set P1 to true (expire this
+                    ///statement only). For DETACH, set it to false (expire all existing
+                    ///statements).
+                    ///
+                    ///</summary>
                     v.sqlite3VdbeAddOp1(OpCode.OP_Expire, (type == AuthTarget.SQLITE_ATTACH) ? 1 : 0);
-				}
-				attach_end:
-				exprc.Delete(db,ref pFilename);
-				exprc.Delete(db,ref pDbname);
-				exprc.Delete(db,ref pKey);
-			}
-			public void sqlite3Detach(Expr pDbname) {
+                }
+                attach_end:
+                exprc.Delete(db, ref pFilename);
+                exprc.Delete(db, ref pDbname);
+                exprc.Delete(db, ref pKey);
+            }
+            public void sqlite3Detach(Expr pDbname) {
                 this.codeAttach(AuthTarget.SQLITE_DETACH, detach_func, pDbname, null, null, pDbname);
-			}
-			public void sqlite3Attach(Expr p,Expr pDbname,Expr pKey) {
+            }
+            public void sqlite3Attach(Expr p, Expr pDbname, Expr pKey) {
                 this.codeAttach(AuthTarget.SQLITE_ATTACH, attach_func, p, p, pDbname, pKey);
-			}
-			public///<summary>
-			/// VDBE Calling Convention
-			/// -----------------------
-			///
-			/// Example:
-			///
-			///   For the following INSERT statement:
-			///
-			///     CREATE TABLE t1(a, b INTEGER PRIMARY KEY, c);
-			///     INSERT INTO t1 VALUES(1, 2, 3.1);
-			///
-			///   Register (x):        2    (type integer)
-			///   Register (x+1):      1    (type integer)
-			///   Register (x+2):      NULL (type NULL)
-			///   Register (x+3):      3.1  (type real)
-			///
-			///</summary>
-			///<summary>
-			/// A foreign key constraint requires that the key columns in the parent
-			/// table are collectively subject to a UNIQUE or PRIMARY KEY constraint.
-			/// Given that pParent is the parent table for foreign key constraint pFKey,
-			/// search the schema a unique index on the parent key columns.
-			///
-			/// If successful, zero is returned. If the parent key is an INTEGER PRIMARY
-			/// KEY column, then output variable *ppIdx is set to NULL. Otherwise, *ppIdx
-			/// is set to point to the unique index.
-			///
-			/// If the parent key consists of a single column (the foreign key constraint
-			/// is not a composite foreign key), refput variable *paiCol is set to NULL.
-			/// Otherwise, it is set to point to an allocated array of size N, where
-			/// N is the number of columns in the parent key. The first element of the
-			/// array is the index of the child table column that is mapped by the FK
-			/// constraint to the parent table column stored in the left-most column
-			/// of index *ppIdx. The second element of the array is the index of the
-			/// child table column that corresponds to the second left-most column of
-			/// *ppIdx, and so on.
-			///
-			/// If the required index cannot be found, either because:
-			///
-			///   1) The named parent key columns do not exist, or
-			///
-			///   2) The named parent key columns do exist, but are not subject to a
-			///      UNIQUE or PRIMARY KEY constraint, or
-			///
-			///   3) No parent key columns were provided explicitly as part of the
-			///      foreign key definition, and the parent table does not have a
-			///      PRIMARY KEY, or
-			///
-			///   4) No parent key columns were provided explicitly as part of the
-			///      foreign key definition, and the PRIMARY KEY of the parent table
-			///      consists of a different number of columns to the child key in
-			///      the child table.
-			///
-			/// then non-zero is returned, and a "foreign key mismatch" error loaded
-			/// into pParse. If an OOM error occurs, non-zero is returned and the
-			/// pParse.db.mallocFailed flag is set.
-			///
-			///</summary>
-			int locateFkeyIndex(///
-			///<summary>
-			///Parse context to store any error in 
-			///</summary>
-			Table pParent,///
-			///<summary>
-			///Parent table of FK constraint pFKey 
-			///</summary>
-			FKey pFKey,///
-			///<summary>
-			///Foreign key to find index for 
-			///</summary>
-			out Index ppIdx,///
-			///<summary>
-			///OUT: Unique index on parent table 
-			///</summary>
-			out int[] paiCol///
-			///<summary>
-			///OUT: Map of index columns in pFKey 
-			///</summary>
-			) {
-				Index pIdx=null;
-				///
-				///<summary>
-				///Value to return via *ppIdx 
-				///</summary>
-				ppIdx=null;
-				int[] aiCol=null;
-				///
-				///<summary>
-				///Value to return via *paiCol 
-				///</summary>
-				paiCol=null;
-				int nCol=pFKey.nCol;
-				///
-				///<summary>
-				///Number of columns in parent key 
-				///</summary>
-				string zKey=pFKey.aCol[0].zCol;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Name of left">most parent key column </param>
-				///
-				///<summary>
-				///The caller is responsible for zeroing output parameters. 
-				///</summary>
-				//assert( ppIdx && *ppIdx==0 );
-				//assert( !paiCol || *paiCol==0 );
-				Debug.Assert(this!=null);
-				///
-				///<summary>
-				///</summary>
-				///<param name="If this is a non">composite (single column) foreign key, check if it </param>
-				///<param name="maps to the INTEGER PRIMARY KEY of table pParent. If so, leave *ppIdx ">maps to the INTEGER PRIMARY KEY of table pParent. If so, leave *ppIdx </param>
-				///<param name="and *paiCol set to zero and return early. ">and *paiCol set to zero and return early. </param>
-				///<param name=""></param>
-				///<param name="Otherwise, for a composite foreign key (more than one column), allocate">Otherwise, for a composite foreign key (more than one column), allocate</param>
-				///<param name="space for the aiCol array (returned via output parameter *paiCol).">space for the aiCol array (returned via output parameter *paiCol).</param>
-				///<param name="Non">composite foreign keys do not require the aiCol array.</param>
-				///<param name=""></param>
-				if(nCol==1) {
-					///
-					///<summary>
-					///The FK maps to the IPK if any of the following are true:
-					///
-					///1) There is an INTEGER PRIMARY KEY column and the FK is implicitly 
-					///mapped to the primary key of table pParent, or
-					///2) The FK is explicitly mapped to a column declared as INTEGER
-					///PRIMARY KEY.
-					///
-					///</summary>
-					if(pParent.iPKey>=0) {
-						if(null==zKey)
-							return 0;
-						if(pParent.aCol[pParent.iPKey].zName.Equals(zKey,StringComparison.InvariantCultureIgnoreCase))
-							return 0;
-					}
-				}
-				else//if( paiCol ){
-				 {
-					Debug.Assert(nCol>1);
-					aiCol=new int[nCol];
-					// (int*)sqlite3DbMallocRaw( pParse.db, nCol * sizeof( int ) );
-					//if( !aiCol ) return 1;
-					paiCol=aiCol;
-				}
-				for(pIdx=pParent.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-					if(pIdx.nColumn==nCol&&pIdx.onError!=OnConstraintError.OE_None) {
-						///
-						///<summary>
-						///pIdx is a UNIQUE index (or a PRIMARY KEY) and has the right number
-						///of columns. If each indexed column corresponds to a foreign key
-						///column of pFKey, then this index is a winner.  
-						///</summary>
-						if(zKey==null) {
-							///
-							///<summary>
-							///If zKey is NULL, then this foreign key is implicitly mapped to 
-							///the PRIMARY KEY of table pParent. The PRIMARY KEY index may be 
-							///identified by the test (Index.autoIndex==2).  
-							///</summary>
-							if(pIdx.autoIndex==2) {
-								if(aiCol!=null) {
-									int i;
-									for(i=0;i<nCol;i++)
-										aiCol[i]=pFKey.aCol[i].iFrom;
-								}
-								break;
-							}
-						}
-						else {
-							///
-							///<summary>
-							///</summary>
-							///<param name="If zKey is non">NULL, then this foreign key was declared to</param>
-							///<param name="map to an explicit list of columns in table pParent. Check if this">map to an explicit list of columns in table pParent. Check if this</param>
-							///<param name="index matches those columns. Also, check that the index uses">index matches those columns. Also, check that the index uses</param>
-							///<param name="the default collation sequences for each column. ">the default collation sequences for each column. </param>
-							int i,j;
-							for(i=0;i<nCol;i++) {
-								int iCol=pIdx.aiColumn[i];
-								///
-								///<summary>
-								///Index of column in parent tbl 
-								///</summary>
-								string zDfltColl;
-								///
-								///<summary>
-								///Def. collation for column 
-								///</summary>
-								string zIdxCol;
-								///
-								///<summary>
-								///Name of indexed column 
-								///</summary>
-								///
-								///<summary>
-								///If the index uses a collation sequence that is different from
-								///the default collation sequence for the column, this index is
-								///unusable. Bail out early in this case.  
-								///</summary>
-								zDfltColl=pParent.aCol[iCol].zColl;
-								if(String.IsNullOrEmpty(zDfltColl)) {
-									zDfltColl="BINARY";
-								}
-								if(!pIdx.azColl[i].Equals(zDfltColl,StringComparison.InvariantCultureIgnoreCase))
-									break;
-								zIdxCol=pParent.aCol[iCol].zName;
-								for(j=0;j<nCol;j++) {
-									if(pFKey.aCol[j].zCol.Equals(zIdxCol,StringComparison.InvariantCultureIgnoreCase)) {
-										if(aiCol!=null)
-											aiCol[i]=pFKey.aCol[j].iFrom;
-										break;
-									}
-								}
-								if(j==nCol)
-									break;
-							}
-							if(i==nCol)
-								break;
-							///
-							///<summary>
-							///pIdx is usable 
-							///</summary>
-						}
-					}
-				}
-				if(null==pIdx) {
-					if(0==this.disableTriggers) {
-						utilc.sqlite3ErrorMsg(this,"foreign key mismatch");
-					}
-					this.db.sqlite3DbFree(ref aiCol);
-					return 1;
-				}
-				ppIdx=pIdx;
-				return 0;
-			}
-			public///<summary>
-			/// This function is called when a row is inserted into or deleted from the
-			/// child table of foreign key constraint pFKey. If an SQL UPDATE is executed
-			/// on the child table of pFKey, this function is invoked twice for each row
-			/// affected - once to "delete" the old row, and then again to "insert" the
-			/// new row.
-			///
-			/// Each time it is called, this function generates VDBE code to locate the
-			/// row in the parent table that corresponds to the row being inserted into
-			/// or deleted from the child table. If the parent row can be found, no
-			/// special action is taken. Otherwise, if the parent row can *not* be
-			/// found in the parent table:
-			///
-			///   Op | FK type   | Action taken
-			///   --------------------------------------------------------------------------
-			///   INSERT      immediate   Increment the "immediate constraint counter".
-			///
-			///   DELETE      immediate   Decrement the "immediate constraint counter".
-			///
-			///   INSERT      deferred    Increment the "deferred constraint counter".
-			///
-			///   DELETE      deferred    Decrement the "deferred constraint counter".
-			///
-			/// These operations are identified in the comment at the top of this file
-			/// (fkey.c) as "I.1" and "D.1".
-			///
-			///</summary>
-			void fkLookupParent(///
-			///<summary>
-			///Parse context 
-			///</summary>
-			int iDb,///
-			///<summary>
-			///Index of database housing pTab 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Parent table of FK pFKey 
-			///</summary>
-			Index pIdx,///
-			///<summary>
-			///Unique index on parent key columns in pTab 
-			///</summary>
-			FKey pFKey,///
-			///<summary>
-			///Foreign key constraint 
-			///</summary>
-			int[] aiCol,///
-			///<summary>
-			///Map from parent key columns to child table columns 
-			///</summary>
-			int regData,///
-			///<summary>
-			///Address of array containing child table row 
-			///</summary>
-			int nIncr,///
-			///<summary>
-			///Increment constraint counter by this 
-			///</summary>
-			int isIgnore///
-			///<summary>
-			///If true, pretend pTab contains all NULL values 
-			///</summary>
-			) {
-				int i;
-				///
-				///<summary>
-				///Iterator variable 
-				///</summary>
-				Vdbe v=this.sqlite3GetVdbe();
-				///
-				///<summary>
-				///Vdbe to add code to 
-				///</summary>
-				int iCur=this.nTab-1;
-				///
-				///<summary>
-				///Cursor number to use 
-				///</summary>
-				int iOk=v.sqlite3VdbeMakeLabel();
-				///
-				///<summary>
-				///jump here if parent key found 
-				///</summary>
-				///
-				///<summary>
-				///If nIncr is less than zero, then check at runtime if there are any
-				///outstanding constraints to resolve. If there are not, there is no need
-				///to check if deleting this row resolves any outstanding violations.
-				///
-				///Check if any of the key columns in the child table row are NULL. If 
-				///any are, then the constraint is considered satisfied. No need to 
-				///search for a matching row in the parent table.  
-				///</summary>
-				if(nIncr<0) {
-					v.sqlite3VdbeAddOp2( OpCode.OP_FkIfZero,pFKey.isDeferred,iOk);
-				}
-				for(i=0;i<pFKey.nCol;i++) {
-					int iReg=aiCol[i]+regData+1;
+            }
+            public///<summary>
+                  /// VDBE Calling Convention
+                  /// -----------------------
+                  ///
+                  /// Example:
+                  ///
+                  ///   For the following INSERT statement:
+                  ///
+                  ///     CREATE TABLE t1(a, b INTEGER PRIMARY KEY, c);
+                  ///     INSERT INTO t1 VALUES(1, 2, 3.1);
+                  ///
+                  ///   Register (x):        2    (type integer)
+                  ///   Register (x+1):      1    (type integer)
+                  ///   Register (x+2):      NULL (type NULL)
+                  ///   Register (x+3):      3.1  (type real)
+                  ///
+                  ///</summary>
+                  ///<summary>
+                  /// A foreign key constraint requires that the key columns in the parent
+                  /// table are collectively subject to a UNIQUE or PRIMARY KEY constraint.
+                  /// Given that pParent is the parent table for foreign key constraint pFKey,
+                  /// search the schema a unique index on the parent key columns.
+                  ///
+                  /// If successful, zero is returned. If the parent key is an INTEGER PRIMARY
+                  /// KEY column, then output variable *ppIdx is set to NULL. Otherwise, *ppIdx
+                  /// is set to point to the unique index.
+                  ///
+                  /// If the parent key consists of a single column (the foreign key constraint
+                  /// is not a composite foreign key), refput variable *paiCol is set to NULL.
+                  /// Otherwise, it is set to point to an allocated array of size N, where
+                  /// N is the number of columns in the parent key. The first element of the
+                  /// array is the index of the child table column that is mapped by the FK
+                  /// constraint to the parent table column stored in the left-most column
+                  /// of index *ppIdx. The second element of the array is the index of the
+                  /// child table column that corresponds to the second left-most column of
+                  /// *ppIdx, and so on.
+                  ///
+                  /// If the required index cannot be found, either because:
+                  ///
+                  ///   1) The named parent key columns do not exist, or
+                  ///
+                  ///   2) The named parent key columns do exist, but are not subject to a
+                  ///      UNIQUE or PRIMARY KEY constraint, or
+                  ///
+                  ///   3) No parent key columns were provided explicitly as part of the
+                  ///      foreign key definition, and the parent table does not have a
+                  ///      PRIMARY KEY, or
+                  ///
+                  ///   4) No parent key columns were provided explicitly as part of the
+                  ///      foreign key definition, and the PRIMARY KEY of the parent table
+                  ///      consists of a different number of columns to the child key in
+                  ///      the child table.
+                  ///
+                  /// then non-zero is returned, and a "foreign key mismatch" error loaded
+                  /// into pParse. If an OOM error occurs, non-zero is returned and the
+                  /// pParse.db.mallocFailed flag is set.
+                  ///
+                  ///</summary>
+          int locateFkeyIndex(///
+                                ///<summary>
+                                ///Parse context to store any error in 
+                                ///</summary>
+            Table pParent,///
+                          ///<summary>
+                          ///Parent table of FK constraint pFKey 
+                          ///</summary>
+          FKey pFKey,///
+                       ///<summary>
+                       ///Foreign key to find index for 
+                       ///</summary>
+         out Index ppIdx,///
+                            ///<summary>
+                            ///OUT: Unique index on parent table 
+                            ///</summary>
+            out int[] paiCol///
+                            ///<summary>
+                            ///OUT: Map of index columns in pFKey 
+                            ///</summary>
+            ) {
+                Index pIdx = null;
+                ///
+                ///<summary>
+                ///Value to return via *ppIdx 
+                ///</summary>
+                ppIdx = null;
+                int[] aiCol = null;
+                ///
+                ///<summary>
+                ///Value to return via *paiCol 
+                ///</summary>
+                paiCol = null;
+                int nCol = pFKey.nCol;
+                ///
+                ///<summary>
+                ///Number of columns in parent key 
+                ///</summary>
+                string zKey = pFKey.aCol[0].zCol;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Name of left">most parent key column </param>
+                ///
+                ///<summary>
+                ///The caller is responsible for zeroing output parameters. 
+                ///</summary>
+                //assert( ppIdx && *ppIdx==0 );
+                //assert( !paiCol || *paiCol==0 );
+                Debug.Assert(this != null);
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="If this is a non">composite (single column) foreign key, check if it </param>
+                ///<param name="maps to the INTEGER PRIMARY KEY of table pParent. If so, leave *ppIdx ">maps to the INTEGER PRIMARY KEY of table pParent. If so, leave *ppIdx </param>
+                ///<param name="and *paiCol set to zero and return early. ">and *paiCol set to zero and return early. </param>
+                ///<param name=""></param>
+                ///<param name="Otherwise, for a composite foreign key (more than one column), allocate">Otherwise, for a composite foreign key (more than one column), allocate</param>
+                ///<param name="space for the aiCol array (returned via output parameter *paiCol).">space for the aiCol array (returned via output parameter *paiCol).</param>
+                ///<param name="Non">composite foreign keys do not require the aiCol array.</param>
+                ///<param name=""></param>
+                if (nCol == 1) {
+                    ///
+                    ///<summary>
+                    ///The FK maps to the IPK if any of the following are true:
+                    ///
+                    ///1) There is an INTEGER PRIMARY KEY column and the FK is implicitly 
+                    ///mapped to the primary key of table pParent, or
+                    ///2) The FK is explicitly mapped to a column declared as INTEGER
+                    ///PRIMARY KEY.
+                    ///
+                    ///</summary>
+                    if (pParent.iPKey >= 0) {
+                        if (null == zKey)
+                            return 0;
+                        if (pParent.aCol[pParent.iPKey].zName.Equals(zKey, StringComparison.InvariantCultureIgnoreCase))
+                            return 0;
+                    }
+                }
+                else//if( paiCol ){
+                {
+                    Debug.Assert(nCol > 1);
+                    aiCol = new int[nCol];
+                    // (int*)sqlite3DbMallocRaw( pParse.db, nCol * sizeof( int ) );
+                    //if( !aiCol ) return 1;
+                    paiCol = aiCol;
+                }
+                for (pIdx = pParent.pIndex; pIdx != null; pIdx = pIdx.pNext) {
+                    if (pIdx.nColumn == nCol && pIdx.onError != OnConstraintError.OE_None) {
+                        ///
+                        ///<summary>
+                        ///pIdx is a UNIQUE index (or a PRIMARY KEY) and has the right number
+                        ///of columns. If each indexed column corresponds to a foreign key
+                        ///column of pFKey, then this index is a winner.  
+                        ///</summary>
+                        if (zKey == null) {
+                            ///
+                            ///<summary>
+                            ///If zKey is NULL, then this foreign key is implicitly mapped to 
+                            ///the PRIMARY KEY of table pParent. The PRIMARY KEY index may be 
+                            ///identified by the test (Index.autoIndex==2).  
+                            ///</summary>
+                            if (pIdx.autoIndex == 2) {
+                                if (aiCol != null) {
+                                    int i;
+                                    for (i = 0; i < nCol; i++)
+                                        aiCol[i] = pFKey.aCol[i].iFrom;
+                                }
+                                break;
+                            }
+                        }
+                        else {
+                            ///
+                            ///<summary>
+                            ///</summary>
+                            ///<param name="If zKey is non">NULL, then this foreign key was declared to</param>
+                            ///<param name="map to an explicit list of columns in table pParent. Check if this">map to an explicit list of columns in table pParent. Check if this</param>
+                            ///<param name="index matches those columns. Also, check that the index uses">index matches those columns. Also, check that the index uses</param>
+                            ///<param name="the default collation sequences for each column. ">the default collation sequences for each column. </param>
+                            int i, j;
+                            for (i = 0; i < nCol; i++) {
+                                int iCol = pIdx.aiColumn[i];
+                                ///
+                                ///<summary>
+                                ///Index of column in parent tbl 
+                                ///</summary>
+                                string zDfltColl;
+                                ///
+                                ///<summary>
+                                ///Def. collation for column 
+                                ///</summary>
+                                string zIdxCol;
+                                ///
+                                ///<summary>
+                                ///Name of indexed column 
+                                ///</summary>
+                                ///
+                                ///<summary>
+                                ///If the index uses a collation sequence that is different from
+                                ///the default collation sequence for the column, this index is
+                                ///unusable. Bail out early in this case.  
+                                ///</summary>
+                                zDfltColl = pParent.aCol[iCol].zColl;
+                                if (String.IsNullOrEmpty(zDfltColl)) {
+                                    zDfltColl = "BINARY";
+                                }
+                                if (!pIdx.azColl[i].Equals(zDfltColl, StringComparison.InvariantCultureIgnoreCase))
+                                    break;
+                                zIdxCol = pParent.aCol[iCol].zName;
+                                for (j = 0; j < nCol; j++) {
+                                    if (pFKey.aCol[j].zCol.Equals(zIdxCol, StringComparison.InvariantCultureIgnoreCase)) {
+                                        if (aiCol != null)
+                                            aiCol[i] = pFKey.aCol[j].iFrom;
+                                        break;
+                                    }
+                                }
+                                if (j == nCol)
+                                    break;
+                            }
+                            if (i == nCol)
+                                break;
+                            ///
+                            ///<summary>
+                            ///pIdx is usable 
+                            ///</summary>
+                        }
+                    }
+                }
+                if (null == pIdx) {
+                    if (0 == this.disableTriggers) {
+                        utilc.sqlite3ErrorMsg(this, "foreign key mismatch");
+                    }
+                    this.db.sqlite3DbFree(ref aiCol);
+                    return 1;
+                }
+                ppIdx = pIdx;
+                return 0;
+            }
+            public///<summary>
+                  /// This function is called when a row is inserted into or deleted from the
+                  /// child table of foreign key constraint pFKey. If an SQL UPDATE is executed
+                  /// on the child table of pFKey, this function is invoked twice for each row
+                  /// affected - once to "delete" the old row, and then again to "insert" the
+                  /// new row.
+                  ///
+                  /// Each time it is called, this function generates VDBE code to locate the
+                  /// row in the parent table that corresponds to the row being inserted into
+                  /// or deleted from the child table. If the parent row can be found, no
+                  /// special action is taken. Otherwise, if the parent row can *not* be
+                  /// found in the parent table:
+                  ///
+                  ///   Op | FK type   | Action taken
+                  ///   --------------------------------------------------------------------------
+                  ///   INSERT      immediate   Increment the "immediate constraint counter".
+                  ///
+                  ///   DELETE      immediate   Decrement the "immediate constraint counter".
+                  ///
+                  ///   INSERT      deferred    Increment the "deferred constraint counter".
+                  ///
+                  ///   DELETE      deferred    Decrement the "deferred constraint counter".
+                  ///
+                  /// These operations are identified in the comment at the top of this file
+                  /// (fkey.c) as "I.1" and "D.1".
+                  ///
+                  ///</summary>
+          void fkLookupParent(///
+                                ///<summary>
+                                ///Parse context 
+                                ///</summary>
+            int iDb,///
+                    ///<summary>
+                    ///Index of database housing pTab 
+                    ///</summary>
+            Table pTab,///
+                       ///<summary>
+                       ///Parent table of FK pFKey 
+                       ///</summary>
+         Index pIdx,///
+                       ///<summary>
+                       ///Unique index on parent key columns in pTab 
+                       ///</summary>
+         FKey pFKey,///
+                       ///<summary>
+                       ///Foreign key constraint 
+                       ///</summary>
+         int[] aiCol,///
+                        ///<summary>
+                        ///Map from parent key columns to child table columns 
+                        ///</summary>
+            int regData,///
+                        ///<summary>
+                        ///Address of array containing child table row 
+                        ///</summary>
+            int nIncr,///
+                      ///<summary>
+                      ///Increment constraint counter by this 
+                      ///</summary>
+          int isIgnore///
+                        ///<summary>
+                        ///If true, pretend pTab contains all NULL values 
+                        ///</summary>
+            ) {
+
+                Vdbe v = this.sqlite3GetVdbe();
+                ///Vdbe to add code to 				
+                int iCur = this.nTab - 1;
+                ///Cursor number to use 
+                int iOk = v.sqlite3VdbeMakeLabel();
+                ///jump here if parent key found 
+                ///<summary>
+                ///If nIncr is less than zero, then check at runtime if there are any
+                ///outstanding constraints to resolve. If there are not, there is no need
+                ///to check if deleting this row resolves any outstanding violations.
+                ///
+                ///Check if any of the key columns in the child table row are NULL. If 
+                ///any are, then the constraint is considered satisfied. No need to 
+                ///search for a matching row in the parent table.  
+                ///</summary>
+                if (nIncr < 0) {
+                    v.sqlite3VdbeAddOp2(OpCode.OP_FkIfZero, pFKey.isDeferred, iOk);
+                }
+                for (var i = 0; i < pFKey.nCol; i++) {
+                    int iReg = aiCol[i] + regData + 1;
                     v.sqlite3VdbeAddOp2(OpCode.OP_IsNull, iReg, iOk);
-				}
-				if(isIgnore==0) {
-					if(pIdx==null) {
-						///
-						///<summary>
-						///If pIdx is NULL, then the parent key is the INTEGER PRIMARY KEY
-						///column of the parent table (table pTab).  
-						///</summary>
-						int iMustBeInt;
-						///
-						///<summary>
-						///Address of MustBeInt instruction 
-						///</summary>
-						int regTemp=this.allocTempReg();
-						///
-						///<summary>
-						///Invoke MustBeInt to coerce the child key value to an integer (i.e. 
-						///apply the affinity of the parent key). If this fails, then there
-						///is no matching parent key. Before using MustBeInt, make a copy of
-						///the value. Otherwise, the value inserted into the child key column
-						///will have INTEGER affinity applied to it, which may not be correct.  
-						///</summary>
+                }
+                if (isIgnore == 0) {
+                    if (pIdx == null) {
+                        ///If pIdx is NULL, then the parent key is the INTEGER PRIMARY KEY
+                        ///column of the parent table (table pTab).  
+
+                        ///Address of MustBeInt instruction 
+                        int regTemp = this.allocTempReg();
+                        ///
+                        ///<summary>
+                        ///Invoke MustBeInt to coerce the child key value to an integer (i.e. 
+                        ///apply the affinity of the parent key). If this fails, then there
+                        ///is no matching parent key. Before using MustBeInt, make a copy of
+                        ///the value. Otherwise, the value inserted into the child key column
+                        ///will have INTEGER affinity applied to it, which may not be correct.  
+                        ///</summary>
                         v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, aiCol[0] + 1 + regData, regTemp);
-						iMustBeInt=v.sqlite3VdbeAddOp2( OpCode.OP_MustBeInt,regTemp,0);
-						///
-						///<summary>
-						///If the parent table is the same as the child table, and we are about
-						///</summary>
-						///<param name="to increment the constraint">counter (i.e. this is an INSERT operation),</param>
-						///<param name="then check if the row being inserted matches itself. If so, do not">then check if the row being inserted matches itself. If so, do not</param>
-						///<param name="increment the constraint">counter.  </param>
-						if(pTab==pFKey.pFrom&&nIncr==1) {
-							v.sqlite3VdbeAddOp3( OpCode.OP_Eq,regData,iOk,regTemp);
-						}
-						this.sqlite3OpenTable(iCur,iDb,pTab,OpCode.OP_OpenRead);
+                        var iMustBeInt = v.sqlite3VdbeAddOp2(OpCode.OP_MustBeInt, regTemp, 0);
+                        ///If the parent table is the same as the child table, and we are about
+                        ///<param name="to increment the constraint">counter (i.e. this is an INSERT operation),</param>
+                        ///<param name="then check if the row being inserted matches itself. If so, do not">then check if the row being inserted matches itself. If so, do not</param>
+                        ///<param name="increment the constraint">counter.  </param>
+                        if (pTab == pFKey.pFrom && nIncr == 1) {
+                            v.sqlite3VdbeAddOp3(OpCode.OP_Eq, regData, iOk, regTemp);
+                        }
+                        this.sqlite3OpenTable(iCur, iDb, pTab, OpCode.OP_OpenRead);
                         v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iCur, 0, regTemp);
-						v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,iOk);
-						v.sqlite3VdbeJumpHere(v.sqlite3VdbeCurrentAddr()-2);
-						v.sqlite3VdbeJumpHere(iMustBeInt);
-						this.deallocTempReg(regTemp);
-					}
-					else {
-						int nCol=pFKey.nCol;
-						int regTemp=this.sqlite3GetTempRange(nCol);
-						int regRec=this.allocTempReg();
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, iOk);
+                        v.sqlite3VdbeJumpHere(v.sqlite3VdbeCurrentAddr() - 2);
+                        v.sqlite3VdbeJumpHere(iMustBeInt);
+                        this.deallocTempReg(regTemp);
+                    }
+                    else {
+                        int nCol = pFKey.nCol;
+                        int regTemp = this.sqlite3GetTempRange(nCol);
+                        int regRec = this.allocTempReg();
                         KeyInfo pKey = pIdx.sqlite3IndexKeyinfo(this);
-						v.sqlite3VdbeAddOp3( OpCode.OP_OpenRead,iCur,pIdx.tnum,iDb);
-						v.sqlite3VdbeChangeP4(-1,pKey, P4Usage.P4_KEYINFO_HANDOFF);
-						for(i=0;i<nCol;i++) {
+                        v.sqlite3VdbeAddOp3(OpCode.OP_OpenRead, iCur, pIdx.tnum, iDb);
+                        v.sqlite3VdbeChangeP4(-1, pKey, P4Usage.P4_KEYINFO_HANDOFF);
+                        for (var i = 0; i < nCol; i++) {
                             v.sqlite3VdbeAddOp2(OpCode.OP_Copy, aiCol[i] + 1 + regData, regTemp + i);
-						}
-						///
-						///<summary>
-						///If the parent table is the same as the child table, and we are about
-						///</summary>
-						///<param name="to increment the constraint">counter (i.e. this is an INSERT operation),</param>
-						///<param name="then check if the row being inserted matches itself. If so, do not">then check if the row being inserted matches itself. If so, do not</param>
-						///<param name="increment the constraint">counter. </param>
-						///<param name=""></param>
-						///<param name="If any of the parent">key values are NULL, then the row cannot match </param>
-						///<param name="itself. So set JUMPIFNULL to make sure we do the  OpCode.OP_Found if any">itself. So set JUMPIFNULL to make sure we do the  OpCode.OP_Found if any</param>
-						///<param name="of the parent">key values are NULL (at this point it is known that</param>
-						///<param name="none of the child key values are).">none of the child key values are).</param>
-						///<param name=""></param>
-						if(pTab==pFKey.pFrom&&nIncr==1) {
-							int iJump=v.sqlite3VdbeCurrentAddr()+nCol+1;
-							for(i=0;i<nCol;i++) {
-								int iChild=aiCol[i]+1+regData;
-								int iParent=pIdx.aiColumn[i]+1+regData;
-								Debug.Assert(aiCol[i]!=pTab.iPKey);
-								if(pIdx.aiColumn[i]==pTab.iPKey) {
-									///
-									///<summary>
-									///The parent key is a composite key that includes the IPK column 
-									///</summary>
-									iParent=regData;
-								}
-								v.sqlite3VdbeAddOp3( OpCode.OP_Ne,iChild,iJump,iParent);
-								v.sqlite3VdbeChangeP5(sqliteinth.SQLITE_JUMPIFNULL);
-							}
-							v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,iOk);
-						}
-						v.sqlite3VdbeAddOp3( OpCode.OP_MakeRecord,regTemp,nCol,regRec);
-						v.sqlite3VdbeChangeP4(-1,v.sqlite3IndexAffinityStr(pIdx), P4Usage.P4_TRANSIENT);
-						v.sqlite3VdbeAddOp4Int( OpCode.OP_Found,iCur,iOk,regRec,0);
-						this.deallocTempReg(regRec);
-						this.sqlite3ReleaseTempRange(regTemp,nCol);
-					}
-				}
-				if(0==pFKey.isDeferred&&null==this.pToplevel&&0==this.isMultiWrite) {
-					///
-					///<summary>
-					///Special case: If this is an INSERT statement that will insert exactly
-					///one row into the table, raise a constraint immediately instead of
-					///incrementing a counter. This is necessary as the VM code is being
-					///generated for will not open a statement transaction.  
-					///</summary>
-					Debug.Assert(nIncr==1);
-					build.sqlite3HaltConstraint(this,OnConstraintError.OE_Abort,"foreign key constraint failed", P4Usage.P4_STATIC);
-				}
-				else {
-					if(nIncr>0&&pFKey.isDeferred==0) {
-						sqliteinth.sqlite3ParseToplevel(this).mayAbort=1;
-					}
-					v.sqlite3VdbeAddOp2( OpCode.OP_FkCounter,pFKey.isDeferred,nIncr);
-				}
-				v.sqlite3VdbeResolveLabel(iOk);
-				v.sqlite3VdbeAddOp1(OpCode.OP_Close,iCur);
-			}
-			public///<summary>
-			/// This function is called to generate code executed when a row is deleted
-			/// from the parent table of foreign key constraint pFKey and, if pFKey is
-			/// deferred, when a row is inserted into the same table. When generating
-			/// code for an SQL UPDATE operation, this function may be called twice -
-			/// once to "delete" the old row and once to "insert" the new row.
-			///
-			/// The code generated by this function scans through the rows in the child
-			/// table that correspond to the parent table row being deleted or inserted.
-			/// For each child row found, one of the following actions is taken:
-			///
-			///   Op | FK type   | Action taken
-			///   --------------------------------------------------------------------------
-			///   DELETE      immediate   Increment the "immediate constraint counter".
-			///                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
-			///                           throw a "foreign key constraint failed" exception.
-			///
-			///   INSERT      immediate   Decrement the "immediate constraint counter".
-			///
-			///   DELETE      deferred    Increment the "deferred constraint counter".
-			///                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
-			///                           throw a "foreign key constraint failed" exception.
-			///
-			///   INSERT      deferred    Decrement the "deferred constraint counter".
-			///
-			/// These operations are identified in the comment at the top of this file
-			/// (fkey.c) as "I.2" and "D.2".
-			///
-			///</summary>
-			void fkScanChildren(///
-			///<summary>
-			///Parse context 
-			///</summary>
-			SrcList pSrc,///
-			///<summary>
-			///SrcList containing the table to scan 
-			///</summary>
-			Table pTab,Index pIdx,///
-			///<summary>
-			///Foreign key index 
-			///</summary>
-			FKey pFKey,///
-			///<summary>
-			///Foreign key relationship 
-			///</summary>
-			int[] aiCol,///
-			///<summary>
-			///Map from pIdx cols to child table cols 
-			///</summary>
-			int regData,///
-			///<summary>
-			///Referenced table data starts here 
-			///</summary>
-			int nIncr///
-			///<summary>
-			///Amount to increment deferred counter by 
-			///</summary>
-			) {
-				Connection db=this.db;
-				///
-				///<summary>
-				///Database handle 
-				///</summary>
-				int i;
-				///
-				///<summary>
-				///Iterator variable 
-				///</summary>
-				Expr pWhere=null;
-				///
-				///<summary>
-				///WHERE clause to scan with 
-				///</summary>
-				NameContext sNameContext;
-				///
-				///<summary>
-				///Context used to resolve WHERE clause 
-				///</summary>
-				WhereInfo pWInfo;
-				///
-				///<summary>
-				///Context used by sqlite3WhereXXX() 
-				///</summary>
-				int iFkIfZero=0;
-				///
-				///<summary>
-				///Address of  OpCode.OP_FkIfZero 
-				///</summary>
-				Vdbe v=this.sqlite3GetVdbe();
-				Debug.Assert(null==pIdx||pIdx.pTable==pTab);
-				if(nIncr<0) {
-					iFkIfZero=v.sqlite3VdbeAddOp2( OpCode.OP_FkIfZero,pFKey.isDeferred,0);
-				}
-				///
-				///<summary>
-				///Create an Expr object representing an SQL expression like:
-				///
-				///</summary>
-				///<param name="<parent">key2> ...</param>
-				///<param name=""></param>
-				///<param name="The collation sequence used for the comparison should be that of">The collation sequence used for the comparison should be that of</param>
-				///<param name="the parent key columns. The affinity of the parent key column should">the parent key columns. The affinity of the parent key column should</param>
-				///<param name="be applied to each child key value before the comparison takes place.">be applied to each child key value before the comparison takes place.</param>
-				///<param name=""></param>
-				for(i=0;i<pFKey.nCol;i++) {
-					Expr pLeft;
-					///
-					///<summary>
-					///Value from parent table row 
-					///</summary>
-					Expr pRight;
-					///
-					///<summary>
-					///Column ref to child table 
-					///</summary>
-					Expr pEq;
-					///
-					///<summary>
-					///Expression (pLeft = pRight) 
-					///</summary>
-					int iCol;
-					///
-					///<summary>
-					///Index of column in child table 
-					///</summary>
-					string zCol;
-					///
-					///<summary>
-					///Name of column in child table 
-					///</summary>
-					pLeft=exprc.sqlite3Expr(db,TokenType.TK_REGISTER,null);
-					if(pLeft!=null) {
-						///
-						///<summary>
-						///Set the collation sequence and affinity of the LHS of each TokenType.TK_EQ
-						///expression to the parent key column defaults.  
-						///</summary>
-						if(pIdx!=null) {
-							Column pCol;
-							iCol=pIdx.aiColumn[i];
-							pCol=pTab.aCol[iCol];
-							if(pTab.iPKey==iCol)
-								iCol=-1;
-							pLeft.iTable=regData+iCol+1;
-							pLeft.affinity=pCol.affinity;
-							pLeft.CollatingSequence=build.sqlite3LocateCollSeq(this,pCol.zColl);
-						}
-						else {
-							pLeft.iTable=regData;
+                        }
+                        ///
+                        ///<summary>
+                        ///If the parent table is the same as the child table, and we are about
+                        ///</summary>
+                        ///<param name="to increment the constraint">counter (i.e. this is an INSERT operation),</param>
+                        ///<param name="then check if the row being inserted matches itself. If so, do not">then check if the row being inserted matches itself. If so, do not</param>
+                        ///<param name="increment the constraint">counter. </param>
+                        ///<param name=""></param>
+                        ///<param name="If any of the parent">key values are NULL, then the row cannot match </param>
+                        ///<param name="itself. So set JUMPIFNULL to make sure we do the  OpCode.OP_Found if any">itself. So set JUMPIFNULL to make sure we do the  OpCode.OP_Found if any</param>
+                        ///<param name="of the parent">key values are NULL (at this point it is known that</param>
+                        ///<param name="none of the child key values are).">none of the child key values are).</param>
+                        ///<param name=""></param>
+                        if (pTab == pFKey.pFrom && nIncr == 1) {
+                            int iJump = v.sqlite3VdbeCurrentAddr() + nCol + 1;
+                            for (var i = 0; i < nCol; i++) {
+                                int iChild = aiCol[i] + 1 + regData;
+                                int iParent = pIdx.aiColumn[i] + 1 + regData;
+                                Debug.Assert(aiCol[i] != pTab.iPKey);
+                                if (pIdx.aiColumn[i] == pTab.iPKey) {
+                                    ///
+                                    ///<summary>
+                                    ///The parent key is a composite key that includes the IPK column 
+                                    ///</summary>
+                                    iParent = regData;
+                                }
+                                v.sqlite3VdbeAddOp3(OpCode.OP_Ne, iChild, iJump, iParent);
+                                v.sqlite3VdbeChangeP5(sqliteinth.SQLITE_JUMPIFNULL);
+                            }
+                            v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, iOk);
+                        }
+                        v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, regTemp, nCol, regRec);
+                        v.sqlite3VdbeChangeP4(-1, v.sqlite3IndexAffinityStr(pIdx), P4Usage.P4_TRANSIENT);
+                        v.sqlite3VdbeAddOp4Int(OpCode.OP_Found, iCur, iOk, regRec, 0);
+                        this.deallocTempReg(regRec);
+                        this.sqlite3ReleaseTempRange(regTemp, nCol);
+                    }
+                }
+                if (0 == pFKey.isDeferred && null == this.pToplevel && 0 == this.isMultiWrite) {
+                    ///
+                    ///<summary>
+                    ///Special case: If this is an INSERT statement that will insert exactly
+                    ///one row into the table, raise a constraint immediately instead of
+                    ///incrementing a counter. This is necessary as the VM code is being
+                    ///generated for will not open a statement transaction.  
+                    ///</summary>
+                    Debug.Assert(nIncr == 1);
+                    build.sqlite3HaltConstraint(this, OnConstraintError.OE_Abort, "foreign key constraint failed", P4Usage.P4_STATIC);
+                }
+                else {
+                    if (nIncr > 0 && pFKey.isDeferred == 0) {
+                        sqliteinth.sqlite3ParseToplevel(this).mayAbort = 1;
+                    }
+                    v.sqlite3VdbeAddOp2(OpCode.OP_FkCounter, pFKey.isDeferred, nIncr);
+                }
+                v.sqlite3VdbeResolveLabel(iOk);
+                v.sqlite3VdbeAddOp1(OpCode.OP_Close, iCur);
+            }
+            public///<summary>
+                  /// This function is called to generate code executed when a row is deleted
+                  /// from the parent table of foreign key constraint pFKey and, if pFKey is
+                  /// deferred, when a row is inserted into the same table. When generating
+                  /// code for an SQL UPDATE operation, this function may be called twice -
+                  /// once to "delete" the old row and once to "insert" the new row.
+                  ///
+                  /// The code generated by this function scans through the rows in the child
+                  /// table that correspond to the parent table row being deleted or inserted.
+                  /// For each child row found, one of the following actions is taken:
+                  ///
+                  ///   Op | FK type   | Action taken
+                  ///   --------------------------------------------------------------------------
+                  ///   DELETE      immediate   Increment the "immediate constraint counter".
+                  ///                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
+                  ///                           throw a "foreign key constraint failed" exception.
+                  ///
+                  ///   INSERT      immediate   Decrement the "immediate constraint counter".
+                  ///
+                  ///   DELETE      deferred    Increment the "deferred constraint counter".
+                  ///                           Or, if the ON (UPDATE|DELETE) action is RESTRICT,
+                  ///                           throw a "foreign key constraint failed" exception.
+                  ///
+                  ///   INSERT      deferred    Decrement the "deferred constraint counter".
+                  ///
+                  /// These operations are identified in the comment at the top of this file
+                  /// (fkey.c) as "I.2" and "D.2".
+                  ///
+                  ///</summary>
+          void fkScanChildren(///
+                                ///<summary>
+                                ///Parse context 
+                                ///</summary>
+            SrcList pSrc,///
+                         ///<summary>
+                         ///SrcList containing the table to scan 
+                         ///</summary>
+           Table pTab, Index pIdx,///
+                                   ///<summary>
+                                   ///Foreign key index 
+                                   ///</summary>
+         FKey pFKey,///
+                       ///<summary>
+                       ///Foreign key relationship 
+                       ///</summary>
+         int[] aiCol,///
+                        ///<summary>
+                        ///Map from pIdx cols to child table cols 
+                        ///</summary>
+            int regData,///
+                        ///<summary>
+                        ///Referenced table data starts here 
+                        ///</summary>
+            int nIncr///
+                     ///<summary>
+                     ///Amount to increment deferred counter by 
+                     ///</summary>
+           ) {
+                Connection db = this.db;
+                ///
+                ///<summary>
+                ///Database handle 
+                ///</summary>
+                int i;
+                ///
+                ///<summary>
+                ///Iterator variable 
+                ///</summary>
+                Expr pWhere = null;
+                ///
+                ///<summary>
+                ///WHERE clause to scan with 
+                ///</summary>
+                NameContext sNameContext;
+                ///
+                ///<summary>
+                ///Context used to resolve WHERE clause 
+                ///</summary>
+                WhereInfo pWInfo;
+                ///
+                ///<summary>
+                ///Context used by sqlite3WhereXXX() 
+                ///</summary>
+                int iFkIfZero = 0;
+                ///
+                ///<summary>
+                ///Address of  OpCode.OP_FkIfZero 
+                ///</summary>
+                Vdbe v = this.sqlite3GetVdbe();
+                Debug.Assert(null == pIdx || pIdx.pTable == pTab);
+                if (nIncr < 0) {
+                    iFkIfZero = v.sqlite3VdbeAddOp2(OpCode.OP_FkIfZero, pFKey.isDeferred, 0);
+                }
+                ///
+                ///<summary>
+                ///Create an Expr object representing an SQL expression like:
+                ///
+                ///</summary>
+                ///<param name="<parent">key2> ...</param>
+                ///<param name=""></param>
+                ///<param name="The collation sequence used for the comparison should be that of">The collation sequence used for the comparison should be that of</param>
+                ///<param name="the parent key columns. The affinity of the parent key column should">the parent key columns. The affinity of the parent key column should</param>
+                ///<param name="be applied to each child key value before the comparison takes place.">be applied to each child key value before the comparison takes place.</param>
+                ///<param name=""></param>
+                for (i = 0; i < pFKey.nCol; i++) {
+                    Expr pLeft;
+                    ///
+                    ///<summary>
+                    ///Value from parent table row 
+                    ///</summary>
+                    Expr pRight;
+                    ///
+                    ///<summary>
+                    ///Column ref to child table 
+                    ///</summary>
+                    Expr pEq;
+                    ///
+                    ///<summary>
+                    ///Expression (pLeft = pRight) 
+                    ///</summary>
+                    int iCol;
+                    ///
+                    ///<summary>
+                    ///Index of column in child table 
+                    ///</summary>
+                    string zCol;
+                    ///
+                    ///<summary>
+                    ///Name of column in child table 
+                    ///</summary>
+                    pLeft = exprc.sqlite3Expr(db, TokenType.TK_REGISTER, null);
+                    if (pLeft != null) {
+                        ///
+                        ///<summary>
+                        ///Set the collation sequence and affinity of the LHS of each TokenType.TK_EQ
+                        ///expression to the parent key column defaults.  
+                        ///</summary>
+                        if (pIdx != null) {
+                            Column pCol;
+                            iCol = pIdx.aiColumn[i];
+                            pCol = pTab.aCol[iCol];
+                            if (pTab.iPKey == iCol)
+                                iCol = -1;
+                            pLeft.iTable = regData + iCol + 1;
+                            pLeft.affinity = pCol.affinity;
+                            pLeft.CollatingSequence = build.sqlite3LocateCollSeq(this, pCol.zColl);
+                        }
+                        else {
+                            pLeft.iTable = regData;
                             pLeft.affinity = sqliteinth.SQLITE_AFF_INTEGER;
-						}
-					}
-					iCol=aiCol!=null?aiCol[i]:pFKey.aCol[0].iFrom;
-					Debug.Assert(iCol>=0);
-					zCol=pFKey.pFrom.aCol[iCol].zName;
-					pRight=exprc.sqlite3Expr(db,TokenType.TK_ID,zCol);
-					pEq=this.sqlite3PExpr(TokenType.TK_EQ,pLeft,pRight,0);
-					pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
-				}
-				///
-				///<summary>
-				///If the child table is the same as the parent table, and this scan
-				///is taking place as part of a DELETE operation (operation D.2), omit the
-				///row being deleted from the scan by adding ($rowid != rowid) to the WHERE 
-				///clause, where $rowid is the rowid of the row being deleted.  
-				///</summary>
-				if(pTab==pFKey.pFrom&&nIncr>0) {
-					Expr pEq;
-					///
-					///<summary>
-					///Expression (pLeft = pRight) 
-					///</summary>
-					Expr pLeft;
-					///
-					///<summary>
-					///Value from parent table row 
-					///</summary>
-					Expr pRight;
-					///
-					///<summary>
-					///Column ref to child table 
-					///</summary>
-					pLeft=exprc.sqlite3Expr(db,TokenType.TK_REGISTER,null);
-					pRight=exprc.sqlite3Expr(db,TokenType.TK_COLUMN,null);
-					if(pLeft!=null&&pRight!=null) {
+                        }
+                    }
+                    iCol = aiCol != null ? aiCol[i] : pFKey.aCol[0].iFrom;
+                    Debug.Assert(iCol >= 0);
+                    zCol = pFKey.pFrom.aCol[iCol].zName;
+                    pRight = exprc.sqlite3Expr(db, TokenType.TK_ID, zCol);
+                    pEq = this.sqlite3PExpr(TokenType.TK_EQ, pLeft, pRight, 0);
+                    pWhere = exprc.sqlite3ExprAnd(db, pWhere, pEq);
+                }
+                ///
+                ///<summary>
+                ///If the child table is the same as the parent table, and this scan
+                ///is taking place as part of a DELETE operation (operation D.2), omit the
+                ///row being deleted from the scan by adding ($rowid != rowid) to the WHERE 
+                ///clause, where $rowid is the rowid of the row being deleted.  
+                ///</summary>
+                if (pTab == pFKey.pFrom && nIncr > 0) {
+                    Expr pEq;
+                    ///
+                    ///<summary>
+                    ///Expression (pLeft = pRight) 
+                    ///</summary>
+                    Expr pLeft;
+                    ///
+                    ///<summary>
+                    ///Value from parent table row 
+                    ///</summary>
+                    Expr pRight;
+                    ///
+                    ///<summary>
+                    ///Column ref to child table 
+                    ///</summary>
+                    pLeft = exprc.sqlite3Expr(db, TokenType.TK_REGISTER, null);
+                    pRight = exprc.sqlite3Expr(db, TokenType.TK_COLUMN, null);
+                    if (pLeft != null && pRight != null) {
                         pLeft.iTable = regData;
                         pLeft.affinity = sqliteinth.SQLITE_AFF_INTEGER;
-						pRight.iTable=pSrc.a[0].iCursor;
-						pRight.iColumn=-1;
-					}
-					pEq=this.sqlite3PExpr(TokenType.TK_NE,pLeft,pRight,0);
-					pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
-				}
-				///
-				///<summary>
-				///Resolve the references in the WHERE clause. 
-				///</summary>
-				sNameContext=new NameContext();
-				// memset( &sNameContext, 0, sizeof( NameContext ) );
-				sNameContext.pSrcList=pSrc;
-				sNameContext.pParse=this;
-				ResolveExtensions.sqlite3ResolveExprNames(sNameContext,ref pWhere);
-				///
-				///<summary>
-				///Create VDBE to loop through the entries in pSrc that match the WHERE
-				///clause. If the constraint is not deferred, throw an exception for
-				///each row found. Otherwise, for deferred constraints, increment the
-				///deferred constraint counter by nIncr for each row selected.  
-				///</summary>
-				ExprList elDummy=null;
-				pWInfo=this.sqlite3WhereBegin(pSrc,pWhere,ref elDummy,0);
-				if(nIncr>0&&pFKey.isDeferred==0) {
-					sqliteinth.sqlite3ParseToplevel(this).mayAbort=1;
-				}
-				v.sqlite3VdbeAddOp2( OpCode.OP_FkCounter,pFKey.isDeferred,nIncr);
-				if(pWInfo!=null) {
-					pWInfo.sqlite3WhereEnd();
-				}
-				///
-				///<summary>
-				///Clean up the WHERE clause constructed above. 
-				///</summary>
-				exprc.Delete(db,ref pWhere);
-				if(iFkIfZero!=0) {
-					v.sqlite3VdbeJumpHere(iFkIfZero);
-				}
-			}
-			public///<summary>
-			/// This function is called to generate code that runs when table pTab is
-			/// being dropped from the database. The SrcList passed as the second argument
-			/// to this function contains a single entry guaranteed to resolve to
-			/// table pTab.
-			///
-			/// Normally, no code is required. However, if either
-			///
-			///   (a) The table is the parent table of a FK constraint, or
-			///   (b) The table is the child table of a deferred FK constraint and it is
-			///       determined at runtime that there are outstanding deferred FK
-			///       constraint violations in the database,
-			///
-			/// then the equivalent of "DELETE FROM <tbl>" is executed before dropping
-			/// the table from the database. Triggers are disabled while running this
-			/// DELETE, but foreign key actions are not.
-			///
-			///</summary>
-			void sqlite3FkDropTable(SrcList pName,Table pTab) {
-				Connection db=this.db;
+                        pRight.iTable = pSrc.a[0].iCursor;
+                        pRight.iColumn = -1;
+                    }
+                    pEq = this.sqlite3PExpr(TokenType.TK_NE, pLeft, pRight, 0);
+                    pWhere = exprc.sqlite3ExprAnd(db, pWhere, pEq);
+                }
+                ///
+                ///<summary>
+                ///Resolve the references in the WHERE clause. 
+                ///</summary>
+                sNameContext = new NameContext();
+                // memset( &sNameContext, 0, sizeof( NameContext ) );
+                sNameContext.pSrcList = pSrc;
+                sNameContext.pParse = this;
+                ResolveExtensions.sqlite3ResolveExprNames(sNameContext, ref pWhere);
+                ///
+                ///<summary>
+                ///Create VDBE to loop through the entries in pSrc that match the WHERE
+                ///clause. If the constraint is not deferred, throw an exception for
+                ///each row found. Otherwise, for deferred constraints, increment the
+                ///deferred constraint counter by nIncr for each row selected.  
+                ///</summary>
+                ExprList elDummy = null;
+                pWInfo = this.sqlite3WhereBegin(pSrc, pWhere, ref elDummy, 0);
+                if (nIncr > 0 && pFKey.isDeferred == 0) {
+                    sqliteinth.sqlite3ParseToplevel(this).mayAbort = 1;
+                }
+                v.sqlite3VdbeAddOp2(OpCode.OP_FkCounter, pFKey.isDeferred, nIncr);
+                if (pWInfo != null) {
+                    pWInfo.sqlite3WhereEnd();
+                }
+                ///
+                ///<summary>
+                ///Clean up the WHERE clause constructed above. 
+                ///</summary>
+                exprc.Delete(db, ref pWhere);
+                if (iFkIfZero != 0) {
+                    v.sqlite3VdbeJumpHere(iFkIfZero);
+                }
+            }
+            public///<summary>
+                  /// This function is called to generate code that runs when table pTab is
+                  /// being dropped from the database. The SrcList passed as the second argument
+                  /// to this function contains a single entry guaranteed to resolve to
+                  /// table pTab.
+                  ///
+                  /// Normally, no code is required. However, if either
+                  ///
+                  ///   (a) The table is the parent table of a FK constraint, or
+                  ///   (b) The table is the child table of a deferred FK constraint and it is
+                  ///       determined at runtime that there are outstanding deferred FK
+                  ///       constraint violations in the database,
+                  ///
+                  /// then the equivalent of "DELETE FROM <tbl>" is executed before dropping
+                  /// the table from the database. Triggers are disabled while running this
+                  /// DELETE, but foreign key actions are not.
+                  ///
+                  ///</summary>
+          void sqlite3FkDropTable(SrcList pName, Table pTab) {
+                Connection db = this.db;
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0 && !pTab.IsVirtual() && null == pTab.pSelect)
                 {
-					int iSkip=0;
-					Vdbe v=this.sqlite3GetVdbe();
-					Debug.Assert(v!=null);
-					///
-					///<summary>
-					///VDBE has already been allocated 
-					///</summary>
-					if(fkeyc.sqlite3FkReferences(pTab)==null) {
-						///
-						///<summary>
-						///Search for a deferred foreign key constraint for which this table
-						///is the child table. If one cannot be found, return without 
-						///generating any VDBE code. If one can be found, then jump over
-						///the entire DELETE if there are no outstanding deferred constraints
-						///when this statement is run.  
-						///</summary>
-						FKey p;
-						for(p=pTab.pFKey;p!=null;p=p.pNextFrom) {
-							if(p.isDeferred!=0)
-								break;
-						}
-						if(null==p)
-							return;
-						iSkip=v.sqlite3VdbeMakeLabel();
-						v.sqlite3VdbeAddOp2( OpCode.OP_FkIfZero,1,iSkip);
-					}
-					this.disableTriggers=1;
-					this.sqlite3DeleteFrom(exprc.sqlite3SrcListDup(db,pName,0),null);
-					this.disableTriggers=0;
-					///
-					///<summary>
-					///If the DELETE has generated immediate foreign key constraint 
-					///violations, halt the VDBE and return an error at this point, before
-					///any modifications to the schema are made. This is because statement
-					///transactions are not able to rollback schema changes.  
-					///</summary>
-					v.sqlite3VdbeAddOp2( OpCode.OP_FkIfZero,0,v.sqlite3VdbeCurrentAddr()+2);
-					build.sqlite3HaltConstraint(this,OnConstraintError.OE_Abort,"foreign key constraint failed", P4Usage.P4_STATIC);
-					if(iSkip!=0) {
-						v.sqlite3VdbeResolveLabel(iSkip);
-					}
-				}
-			}
-			public///<summary>
-			/// This function is called when inserting, deleting or updating a row of
-			/// table pTab to generate VDBE code to perform foreign key constraint
-			/// processing for the operation.
-			///
-			/// For a DELETE operation, parameter regOld is passed the index of the
-			/// first register in an array of (pTab.nCol+1) registers containing the
-			/// rowid of the row being deleted, followed by each of the column values
-			/// of the row being deleted, from left to right. Parameter regNew is passed
-			/// zero in this case.
-			///
-			/// For an INSERT operation, regOld is passed zero and regNew is passed the
-			/// first register of an array of (pTab.nCol+1) registers containing the new
-			/// row data.
-			///
-			/// For an UPDATE operation, this function is called twice. Once before
-			/// the original record is deleted from the table using the calling convention
-			/// described for DELETE. Then again after the original record is deleted
-			/// but before the new record is inserted using the INSERT convention.
-			///
-			///</summary>
-			void sqlite3FkCheck(///
-			///<summary>
-			///Parse context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Row is being deleted from this table 
-			///</summary>
-			int regOld,///
-			///<summary>
-			///Previous row data is stored here 
-			///</summary>
-			int regNew///
-			///<summary>
-			///New row data is stored here 
-			///</summary>
-			) {
-				Connection db=this.db;
-				///
-				///<summary>
-				///Database handle 
-				///</summary>
-				FKey pFKey;
-				///
-				///<summary>
-				///Used to iterate through FKs 
-				///</summary>
-				int iDb;
-				///
-				///<summary>
-				///Index of database containing pTab 
-				///</summary>
-				string zDb;
-				///
-				///<summary>
-				///Name of database containing pTab 
-				///</summary>
-				int isIgnoreErrors=this.disableTriggers;
-				///
-				///<summary>
-				///</summary>
-				///<param name="Exactly one of regOld and regNew should be non">zero. </param>
-				Debug.Assert((regOld==0)!=(regNew==0));
-				///
-				///<summary>
-				///</summary>
-				///<param name="If foreign">op. </param>
+                    int iSkip = 0;
+                    Vdbe v = this.sqlite3GetVdbe();
+                    Debug.Assert(v != null);
+                    ///
+                    ///<summary>
+                    ///VDBE has already been allocated 
+                    ///</summary>
+                    if (fkeyc.sqlite3FkReferences(pTab) == null) {
+                        ///
+                        ///<summary>
+                        ///Search for a deferred foreign key constraint for which this table
+                        ///is the child table. If one cannot be found, return without 
+                        ///generating any VDBE code. If one can be found, then jump over
+                        ///the entire DELETE if there are no outstanding deferred constraints
+                        ///when this statement is run.  
+                        ///</summary>
+                        FKey p;
+                        for (p = pTab.pFKey; p != null; p = p.pNextFrom) {
+                            if (p.isDeferred != 0)
+                                break;
+                        }
+                        if (null == p)
+                            return;
+                        iSkip = v.sqlite3VdbeMakeLabel();
+                        v.sqlite3VdbeAddOp2(OpCode.OP_FkIfZero, 1, iSkip);
+                    }
+                    this.disableTriggers = 1;
+                    this.sqlite3DeleteFrom(exprc.sqlite3SrcListDup(db, pName, 0), null);
+                    this.disableTriggers = 0;
+                    ///
+                    ///<summary>
+                    ///If the DELETE has generated immediate foreign key constraint 
+                    ///violations, halt the VDBE and return an error at this point, before
+                    ///any modifications to the schema are made. This is because statement
+                    ///transactions are not able to rollback schema changes.  
+                    ///</summary>
+                    v.sqlite3VdbeAddOp2(OpCode.OP_FkIfZero, 0, v.sqlite3VdbeCurrentAddr() + 2);
+                    build.sqlite3HaltConstraint(this, OnConstraintError.OE_Abort, "foreign key constraint failed", P4Usage.P4_STATIC);
+                    if (iSkip != 0) {
+                        v.sqlite3VdbeResolveLabel(iSkip);
+                    }
+                }
+            }
+            public///<summary>
+                  /// This function is called when inserting, deleting or updating a row of
+                  /// table pTab to generate VDBE code to perform foreign key constraint
+                  /// processing for the operation.
+                  ///
+                  /// For a DELETE operation, parameter regOld is passed the index of the
+                  /// first register in an array of (pTab.nCol+1) registers containing the
+                  /// rowid of the row being deleted, followed by each of the column values
+                  /// of the row being deleted, from left to right. Parameter regNew is passed
+                  /// zero in this case.
+                  ///
+                  /// For an INSERT operation, regOld is passed zero and regNew is passed the
+                  /// first register of an array of (pTab.nCol+1) registers containing the new
+                  /// row data.
+                  ///
+                  /// For an UPDATE operation, this function is called twice. Once before
+                  /// the original record is deleted from the table using the calling convention
+                  /// described for DELETE. Then again after the original record is deleted
+                  /// but before the new record is inserted using the INSERT convention.
+                  ///
+                  ///</summary>
+          void sqlite3FkCheck(///
+                                ///<summary>
+                                ///Parse context 
+                                ///</summary>
+            Table pTab,///
+                       ///<summary>
+                       ///Row is being deleted from this table 
+                       ///</summary>
+         int regOld,///
+                       ///<summary>
+                       ///Previous row data is stored here 
+                       ///</summary>
+         int regNew///
+                      ///<summary>
+                      ///New row data is stored here 
+                      ///</summary>
+          ) {
+                Connection db = this.db;
+                ///
+                ///<summary>
+                ///Database handle 
+                ///</summary>
+                FKey pFKey;
+                ///
+                ///<summary>
+                ///Used to iterate through FKs 
+                ///</summary>
+                int iDb;
+                ///
+                ///<summary>
+                ///Index of database containing pTab 
+                ///</summary>
+                string zDb;
+                ///
+                ///<summary>
+                ///Name of database containing pTab 
+                ///</summary>
+                int isIgnoreErrors = this.disableTriggers;
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="Exactly one of regOld and regNew should be non">zero. </param>
+                Debug.Assert((regOld == 0) != (regNew == 0));
+                ///
+                ///<summary>
+                ///</summary>
+                ///<param name="If foreign">op. </param>
                 if ((db.flags & SqliteFlags.SQLITE_ForeignKeys) == 0)
-					return;
-				iDb=db.indexOf(pTab.pSchema);
-				zDb=db.Backends[iDb].Name;
-				///
-				///<summary>
-				///Loop through all the foreign key constraints for which pTab is the
-				///child table (the table that the foreign key definition is part of).  
-				///</summary>
-				for(pFKey=pTab.pFKey;pFKey!=null;pFKey=pFKey.pNextFrom) {
-					Table pTo;
-					///
-					///<summary>
-					///Parent table of foreign key pFKey 
-					///</summary>
-					Index pIdx=null;
-					///
-					///<summary>
-					///Index on key columns in pTo 
-					///</summary>
-					int[] aiFree=null;
-					int[] aiCol;
-					int iCol;
-					int i;
-					int isIgnore=0;
-					///
-					///<summary>
-					///Find the parent table of this foreign key. Also find a unique index 
-					///on the parent key columns in the parent table. If either of these 
-					///schema items cannot be located, set an error in pParse and return 
-					///early.  
-					///</summary>
-					if(this.disableTriggers!=0) {
-						pTo=TableBuilder.sqlite3FindTable(db, zDb, pFKey.zTo);
-					}
-					else {
-						pTo=TableBuilder.sqlite3LocateTable(this,0,pFKey.zTo,zDb);
-					}
-					if(null==pTo||this.locateFkeyIndex(pTo,pFKey,out pIdx,out aiFree)!=0) {
-						if(0==isIgnoreErrors///
-						///<summary>
-						///|| db.mallocFailed 
-						///</summary>
-						)
-							return;
-						continue;
-					}
-					Debug.Assert(pFKey.nCol==1||(aiFree!=null&&pIdx!=null));
-					if(aiFree!=null) {
-						aiCol=aiFree;
-					}
-					else {
-						iCol=pFKey.aCol[0].iFrom;
-						aiCol=new int[1];
-						aiCol[0]=iCol;
-					}
-					for(i=0;i<pFKey.nCol;i++) {
-						if(aiCol[i]==pTab.iPKey) {
-							aiCol[i]=-1;
-						}
-						#if !SQLITE_OMIT_AUTHORIZATION
+                    return;
+                iDb = db.indexOfBackendWithSchema(pTab.pSchema);
+                zDb = db.Backends[iDb].Name;
+                ///
+                ///<summary>
+                ///Loop through all the foreign key constraints for which pTab is the
+                ///child table (the table that the foreign key definition is part of).  
+                ///</summary>
+                for (pFKey = pTab.pFKey; pFKey != null; pFKey = pFKey.pNextFrom) {
+                    Table pTo;
+                    ///
+                    ///<summary>
+                    ///Parent table of foreign key pFKey 
+                    ///</summary>
+                    Index pIdx = null;
+                    ///
+                    ///<summary>
+                    ///Index on key columns in pTo 
+                    ///</summary>
+                    int[] aiFree = null;
+                    int[] aiCol;
+                    int iCol;
+                    int i;
+                    int isIgnore = 0;
+                    ///
+                    ///<summary>
+                    ///Find the parent table of this foreign key. Also find a unique index 
+                    ///on the parent key columns in the parent table. If either of these 
+                    ///schema items cannot be located, set an error in pParse and return 
+                    ///early.  
+                    ///</summary>
+                    if (this.disableTriggers != 0) {
+                        pTo = TableBuilder.sqlite3FindTable(db, zDb, pFKey.zTo);
+                    }
+                    else {
+                        pTo = TableBuilder.sqlite3LocateTable(this, pFKey.zTo, zDb);
+                    }
+                    if (null == pTo || this.locateFkeyIndex(pTo, pFKey, out pIdx, out aiFree) != 0) {
+                        if (0 == isIgnoreErrors///
+                                               ///<summary>
+                                               ///|| db.mallocFailed 
+                                               ///</summary>
+                     )
+                            return;
+                        continue;
+                    }
+                    Debug.Assert(pFKey.nCol == 1 || (aiFree != null && pIdx != null));
+                    if (aiFree != null) {
+                        aiCol = aiFree;
+                    }
+                    else {
+                        iCol = pFKey.aCol[0].iFrom;
+                        aiCol = new int[1];
+                        aiCol[0] = iCol;
+                    }
+                    for (i = 0; i < pFKey.nCol; i++) {
+                        if (aiCol[i] == pTab.iPKey) {
+                            aiCol[i] = -1;
+                        }
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																																																																																																											      /* Request permission to read the parent key columns. If the 
       ** authorization callback returns SQLITE_IGNORE, behave as if any
       ** values read from the parent table are NULL. */
@@ -2666,336 +2489,266 @@ goto attach_end;
         isIgnore = (rcauth==SQLITE_IGNORE);
       }
 #endif
-					}
-					///
-					///<summary>
-					///</summary>
-					///<param name="Take a shared">lock on the parent table. Allocate </param>
-					///<param name="a cursor to use to search the unique index on the parent key columns ">a cursor to use to search the unique index on the parent key columns </param>
-					///<param name="in the parent table.  ">in the parent table.  </param>
-					sqliteinth.sqlite3TableLock(this,iDb,pTo.tnum,0,pTo.zName);
-					this.nTab++;
-					if(regOld!=0) {
-						///
-						///<summary>
-						///A row is being removed from the child table. Search for the parent.
-						///If the parent does not exist, removing the child row resolves an 
-						///outstanding foreign key constraint violation. 
-						///</summary>
-						this.fkLookupParent(iDb,pTo,pIdx,pFKey,aiCol,regOld,-1,isIgnore);
-					}
-					if(regNew!=0) {
-						///
-						///<summary>
-						///A row is being added to the child table. If a parent row cannot
-						///be found, adding the child row has violated the FK constraint. 
-						///</summary>
-						this.fkLookupParent(iDb,pTo,pIdx,pFKey,aiCol,regNew,+1,isIgnore);
-					}
-					db.sqlite3DbFree(ref aiFree);
-				}
-				///
-				///<summary>
-				///Loop through all the foreign key constraints that refer to this table 
-				///</summary>
-				for(pFKey=fkeyc.sqlite3FkReferences(pTab);pFKey!=null;pFKey=pFKey.pNextTo) {
-					Index pIdx=null;
-					///
-					///<summary>
-					///Foreign key index for pFKey 
-					///</summary>
-					SrcList pSrc;
-					int[] aiCol=null;
-					if(0==pFKey.isDeferred&&null==this.pToplevel&&0==this.isMultiWrite) {
-						Debug.Assert(regOld==0&&regNew!=0);
-						///
-						///<summary>
-						///Inserting a single row into a parent table cannot cause an immediate
-						///foreign key violation. So do nothing in this case.  
-						///</summary>
-						continue;
-					}
-					if(this.locateFkeyIndex(pTab,pFKey,out pIdx,out aiCol)!=0) {
-						if(0==isIgnoreErrors///
-						///<summary>
-						///|| db.mallocFailed 
-						///</summary>
-						)
-							return;
-						continue;
-					}
-					Debug.Assert(aiCol!=null||pFKey.nCol==1);
-					///
-					///<summary>
-					///Create a SrcList structure containing a single table (the table 
-					///the foreign key that refers to this table is attached to). This
-					///is required for the sqlite3WhereXXX() interface.  
-					///</summary>
-					pSrc=build.sqlite3SrcListAppend(db,0,null,null);
-					if(pSrc!=null) {
-						SrcList_item pItem=pSrc.a[0];
-						pItem.pTab=pFKey.pFrom;
-						pItem.zName=pFKey.pFrom.zName;
-						pItem.pTab.nRef++;
-						pItem.iCursor=this.nTab++;
-						if(regNew!=0) {
-							this.fkScanChildren(pSrc,pTab,pIdx,pFKey,aiCol,regNew,-1);
-						}
-						if(regOld!=0) {
-							///
-							///<summary>
-							///If there is a RESTRICT action configured for the current operation
-							///on the parent table of this FK, then throw an exception 
-							///immediately if the FK constraint is violated, even if this is a
-							///deferred trigger. That's what RESTRICT means. To defer checking
-							///the constraint, the FK should specify NO ACTION (represented
-							///using OnConstraintError.OE_None). NO ACTION is the default.  
-							///</summary>
-							this.fkScanChildren(pSrc,pTab,pIdx,pFKey,aiCol,regOld,1);
-						}
-						pItem.zName=null;
-						build.sqlite3SrcListDelete(db,ref pSrc);
-					}
-					db.sqlite3DbFree(ref aiCol);
-				}
-			}
-			public///<summary>
-			/// This function is called before generating code to update or delete a
-			/// row contained in table pTab.
-			///
-			///</summary>
-			u32 sqlite3FkOldmask(///
-			///<summary>
-			///Parse context 
-			///</summary>
-			Table pTab///
-			///<summary>
-			///Table being modified 
-			///</summary>
+                    }
+                    ///
+                    ///<summary>
+                    ///</summary>
+                    ///<param name="Take a shared">lock on the parent table. Allocate </param>
+                    ///<param name="a cursor to use to search the unique index on the parent key columns ">a cursor to use to search the unique index on the parent key columns </param>
+                    ///<param name="in the parent table.  ">in the parent table.  </param>
+                    sqliteinth.sqlite3TableLock(this, iDb, pTo.tnum, 0, pTo.zName);
+                    this.nTab++;
+                    if (regOld != 0) {
+                        ///
+                        ///<summary>
+                        ///A row is being removed from the child table. Search for the parent.
+                        ///If the parent does not exist, removing the child row resolves an 
+                        ///outstanding foreign key constraint violation. 
+                        ///</summary>
+                        this.fkLookupParent(iDb, pTo, pIdx, pFKey, aiCol, regOld, -1, isIgnore);
+                    }
+                    if (regNew != 0) {
+                        ///
+                        ///<summary>
+                        ///A row is being added to the child table. If a parent row cannot
+                        ///be found, adding the child row has violated the FK constraint. 
+                        ///</summary>
+                        this.fkLookupParent(iDb, pTo, pIdx, pFKey, aiCol, regNew, +1, isIgnore);
+                    }
+                    db.sqlite3DbFree(ref aiFree);
+                }
+                ///
+                ///<summary>
+                ///Loop through all the foreign key constraints that refer to this table 
+                ///</summary>
+                for (pFKey = fkeyc.sqlite3FkReferences(pTab); pFKey != null; pFKey = pFKey.pNextTo) {
+                    Index pIdx = null;
+                    ///
+                    ///<summary>
+                    ///Foreign key index for pFKey 
+                    ///</summary>
+                    SrcList pSrc;
+                    int[] aiCol = null;
+                    if (0 == pFKey.isDeferred && null == this.pToplevel && 0 == this.isMultiWrite) {
+                        Debug.Assert(regOld == 0 && regNew != 0);
+                        ///
+                        ///<summary>
+                        ///Inserting a single row into a parent table cannot cause an immediate
+                        ///foreign key violation. So do nothing in this case.  
+                        ///</summary>
+                        continue;
+                    }
+                    if (this.locateFkeyIndex(pTab, pFKey, out pIdx, out aiCol) != 0) {
+                        if (0 == isIgnoreErrors///
+                                               ///<summary>
+                                               ///|| db.mallocFailed 
+                                               ///</summary>
+                     )
+                            return;
+                        continue;
+                    }
+                    Debug.Assert(aiCol != null || pFKey.nCol == 1);
+                    ///
+                    ///<summary>
+                    ///Create a SrcList structure containing a single table (the table 
+                    ///the foreign key that refers to this table is attached to). This
+                    ///is required for the sqlite3WhereXXX() interface.  
+                    ///</summary>
+                    pSrc = build.sqlite3SrcListAppend(db, 0, null, null);
+                    if (pSrc != null) {
+                        SrcList_item pItem = pSrc.a[0];
+                        pItem.pTab = pFKey.pFrom;
+                        pItem.zName = pFKey.pFrom.zName;
+                        pItem.pTab.nRef++;
+                        pItem.iCursor = this.nTab++;
+                        if (regNew != 0) {
+                            this.fkScanChildren(pSrc, pTab, pIdx, pFKey, aiCol, regNew, -1);
+                        }
+                        if (regOld != 0) {
+                            ///
+                            ///<summary>
+                            ///If there is a RESTRICT action configured for the current operation
+                            ///on the parent table of this FK, then throw an exception 
+                            ///immediately if the FK constraint is violated, even if this is a
+                            ///deferred trigger. That's what RESTRICT means. To defer checking
+                            ///the constraint, the FK should specify NO ACTION (represented
+                            ///using OnConstraintError.OE_None). NO ACTION is the default.  
+                            ///</summary>
+                            this.fkScanChildren(pSrc, pTab, pIdx, pFKey, aiCol, regOld, 1);
+                        }
+                        pItem.zName = null;
+                        build.sqlite3SrcListDelete(db, ref pSrc);
+                    }
+                    db.sqlite3DbFree(ref aiCol);
+                }
+            }
+
+            ///<summary>
+            /// This function is called before generating code to update or delete a
+            /// row contained in table pTab.
+            ///</summary>
+            public u32 sqlite3FkOldmask(///
+                Table pTab///Table being modified 
 			) {
-				u32 mask=0;
+                u32 mask = 0;
                 if ((this.db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
                 {
-					FKey p;
-					int i;
-					for(p=pTab.pFKey;p!=null;p=p.pNextFrom) {
-						for(i=0;i<p.nCol;i++)
-							mask|=fkeyc.COLUMN_MASK(p.aCol[i].iFrom);
-					}
-					for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
-						Index pIdx;
-						int[] iDummy;
-						this.locateFkeyIndex(pTab,p,out pIdx,out iDummy);
-						if(pIdx!=null) {
-							for(i=0;i<pIdx.nColumn;i++)
-								mask|=fkeyc.COLUMN_MASK(pIdx.aiColumn[i]);
-						}
-					}
-				}
-				return mask;
-			}
-			public///<summary>
-			/// This function is called before generating code to update or delete a
-			/// row contained in table pTab. If the operation is a DELETE, then
-			/// parameter aChange is passed a NULL value. For an UPDATE, aChange points
-			/// to an array of size N, where N is the number of columns in table pTab.
-			/// If the i'th column is not modified by the UPDATE, then the corresponding
-			/// entry in the aChange[] array is set to -1. If the column is modified,
-			/// the value is 0 or greater. Parameter chngRowid is set to true if the
-			/// UPDATE statement modifies the rowid fields of the table.
-			///
-			/// If any foreign key processing will be required, this function returns
-			/// true. If there is no foreign key related processing, this function
-			/// returns false.
-			///
-			///</summary>
-			int sqlite3FkRequired(///
-			///<summary>
-			///Parse context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Table being modified 
-			///</summary>
-			int[] aChange,///
-			///<summary>
-			///</summary>
-			///<param name="Non">NULL for UPDATE operations </param>
-			int chngRowid///
-			///<summary>
-			///True for UPDATE that affects rowid 
-			///</summary>
-			) {
+                    FKey p;
+                    int i;
+                    for (p = pTab.pFKey; p != null; p = p.pNextFrom) {
+                        for (i = 0; i < p.nCol; i++)
+                            mask |= fkeyc.COLUMN_MASK(p.aCol[i].iFrom);
+                    }
+                    for (p = fkeyc.sqlite3FkReferences(pTab); p != null; p = p.pNextTo) {
+                        Index pIdx;
+                        int[] iDummy;
+                        this.locateFkeyIndex(pTab, p, out pIdx, out iDummy);
+                        if (pIdx != null) {
+                            for (i = 0; i < pIdx.nColumn; i++)
+                                mask |= fkeyc.COLUMN_MASK(pIdx.aiColumn[i]);
+                        }
+                    }
+                }
+                return mask;
+            }
+            public///<summary>
+                  /// This function is called before generating code to update or delete a
+                  /// row contained in table pTab. If the operation is a DELETE, then
+                  /// parameter aChange is passed a NULL value. For an UPDATE, aChange points
+                  /// to an array of size N, where N is the number of columns in table pTab.
+                  /// If the i'th column is not modified by the UPDATE, then the corresponding
+                  /// entry in the aChange[] array is set to -1. If the column is modified,
+                  /// the value is 0 or greater. Parameter chngRowid is set to true if the
+                  /// UPDATE statement modifies the rowid fields of the table.
+                  ///
+                  /// If any foreign key processing will be required, this function returns
+                  /// true. If there is no foreign key related processing, this function
+                  /// returns false.
+                  ///
+                  ///</summary>
+          bool sqlite3FkRequired(
+            Table pTab,///
+                       ///<summary>
+                       ///Table being modified 
+                       ///</summary>
+         int[] aChange,///
+                       ///<summary>
+                       ///</summary>
+                       ///<param name="Non">NULL for UPDATE operations </param>
+          int chngRowid///
+                       ///<summary>
+                       ///True for UPDATE that affects rowid 
+                       ///</summary>
+           )
+            {
+                bool res = false;
+
                 if ((this.db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
                 {
-					if(null==aChange) {
-						///
-						///<summary>
-						///A DELETE operation. Foreign key processing is required if the 
-						///table in question is either the child or parent table for any 
-						///foreign key constraint.  
-						///</summary>
-						return (fkeyc.sqlite3FkReferences(pTab)!=null||pTab.pFKey!=null)?1:0;
-					}
-					else {
-						///
-						///<summary>
-						///This is an UPDATE. Foreign key processing is only required if the
+                    if (null == aChange)
+                    {
+                        ///A DELETE operation. Foreign key processing is required if the 
+                        ///table in question is either the child or parent table for any 
+                        ///foreign key constraint.  
+                        return (fkeyc.sqlite3FkReferences(pTab) != null || pTab.pFKey != null);
+                    }
+                    else {
+                        ///This is an UPDATE. Foreign key processing is only required if the
 						///operation modifies one or more child or parent key columns. 
-						///</summary>
-						int i;
-						FKey p;
-						///
-						///<summary>
-						///Check if any child key columns are being modified. 
-						///</summary>
-						for(p=pTab.pFKey;p!=null;p=p.pNextFrom) {
-							for(i=0;i<p.nCol;i++) {
-								int iChildKey=p.aCol[i].iFrom;
-								if(aChange[iChildKey]>=0)
-									return 1;
-								if(iChildKey==pTab.iPKey&&chngRowid!=0)
-									return 1;
-							}
-						}
-						///
-						///<summary>
-						///Check if any parent key columns are being modified. 
-						///</summary>
-						for(p=fkeyc.sqlite3FkReferences(pTab);p!=null;p=p.pNextTo) {
-							for(i=0;i<p.nCol;i++) {
-								string zKey=p.aCol[i].zCol;
-								int iKey;
-								for(iKey=0;iKey<pTab.nCol;iKey++) {
-									Column pCol=pTab.aCol[iKey];
-									if((!String.IsNullOrEmpty(zKey)?pCol.zName.Equals(zKey,StringComparison.InvariantCultureIgnoreCase):pCol.isPrimKey!=0)) {
-										if(aChange[iKey]>=0)
-											return 1;
-										if(iKey==pTab.iPKey&&chngRowid!=0)
-											return 1;
-									}
-								}
-							}
-						}
-					}
-				}
-				return 0;
-			}
-			public///<summary>
-			/// This function is called when an UPDATE or DELETE operation is being
-			/// compiled on table pTab, which is the parent table of foreign-key pFKey.
-			/// If the current operation is an UPDATE, then the pChanges parameter is
-			/// passed a pointer to the list of columns being modified. If it is a
-			/// DELETE, pChanges is passed a NULL pointer.
-			///
-			/// It returns a pointer to a Trigger structure containing a trigger
-			/// equivalent to the ON UPDATE or ON DELETE action specified by pFKey.
-			/// If the action is "NO ACTION" or "RESTRICT", then a NULL pointer is
-			/// returned (these actions require no special handling by the triggers
-			/// sub-system, code for them is created by fkScanChildren()).
-			///
-			/// For example, if pFKey is the foreign key and pTab is table "p" in
-			/// the following schema:
-			///
-			///   CREATE TABLE p(pk PRIMARY KEY);
-			///   CREATE TABLE c(ck REFERENCES p ON DELETE CASCADE);
-			///
-			/// then the returned trigger structure is equivalent to:
-			///
-			///   CREATE TRIGGER ... DELETE ON p BEGIN
-			///     DELETE FROM c WHERE ck = old.pk;
-			///   END;
-			///
-			/// The returned pointer is cached as part of the foreign key object. It
-			/// is eventually freed along with the rest of the foreign key object by
-			/// sqlite3FkDelete().
-			///
-			///</summary>
-			Trigger fkActionTrigger(///
-			///<summary>
-			///Parse context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Table being updated or deleted from 
-			///</summary>
-			FKey pFKey,///
-			///<summary>
-			///Foreign key to get action for 
-			///</summary>
-			ExprList pChanges///
-			///<summary>
-			///</summary>
-			///<param name="Change">list for UPDATE, NULL for DELETE </param>
+                        ///Check if any child key columns are being modified. 
+                        pTab.pFKey.path(x => x.pNextFrom).ForEach(p =>
+                        {
+                            for (var i = 0; i < p.nCol; i++)
+                            {
+                                int iChildKey = p.aCol[i].iFrom;
+                                if (aChange[iChildKey] >= 0)
+                                    res = true;
+                                if (iChildKey == pTab.iPKey && chngRowid != 0)
+                                    res = true;
+                            }
+                        }
+                        );
+                        ///Check if any parent key columns are being modified. 
+                        fkeyc.sqlite3FkReferences(pTab).path(x => x.pNextFrom).ForEach(p =>
+                        {
+                            for (var i = 0; i < p.nCol; i++)
+                            {
+                                string zKey = p.aCol[i].zCol;
+                                for (var iKey = 0; iKey < pTab.nCol; iKey++)
+                                {
+                                    Column pCol = pTab.aCol[iKey];
+                                    if ((!String.IsNullOrEmpty(zKey) ? pCol.zName.Equals(zKey, StringComparison.InvariantCultureIgnoreCase) : pCol.isPrimKey != 0))
+                                    {
+                                        if (aChange[iKey] >= 0)
+                                            res = true;
+                                        if (iKey == pTab.iPKey && chngRowid != 0)
+                                            res = true;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                return res;
+            }
+            ///<summary>
+            /// This function is called when an UPDATE or DELETE operation is being
+            /// compiled on table pTab, which is the parent table of foreign-key pFKey.
+            /// If the current operation is an UPDATE, then the pChanges parameter is
+            /// passed a pointer to the list of columns being modified. If it is a
+            /// DELETE, pChanges is passed a NULL pointer.
+            ///
+            /// It returns a pointer to a Trigger structure containing a trigger
+            /// equivalent to the ON UPDATE or ON DELETE action specified by pFKey.
+            /// If the action is "NO ACTION" or "RESTRICT", then a NULL pointer is
+            /// returned (these actions require no special handling by the triggers
+            /// sub-system, code for them is created by fkScanChildren()).
+            ///
+            /// For example, if pFKey is the foreign key and pTab is table "p" in
+            /// the following schema:
+            ///
+            ///   CREATE TABLE p(pk PRIMARY KEY);
+            ///   CREATE TABLE c(ck REFERENCES p ON DELETE CASCADE);
+            ///
+            /// then the returned trigger structure is equivalent to:
+            ///
+            ///   CREATE TRIGGER ... DELETE ON p BEGIN
+            ///     DELETE FROM c WHERE ck = old.pk;
+            ///   END;
+            ///
+            /// The returned pointer is cached as part of the foreign key object. It
+            /// is eventually freed along with the rest of the foreign key object by
+            /// sqlite3FkDelete().
+            ///
+            ///</summary>
+            public Trigger fkActionTrigger(
+			    Table pTab,///Table being updated or deleted from 
+			    FKey pFKey,///Foreign key to get action for 			
+			    ExprList pChanges///Change list for UPDATE, NULL for DELETE 
 			) {
-				Connection db=this.db;
-				///
-				///<summary>
-				///Database handle 
-				///</summary>
-                OnConstraintError action;
-				///
-				///<summary>
-				///One of OnConstraintError.OE_None, OnConstraintError.OE_Cascade etc. 
-				///</summary>
-				Trigger pTrigger;
-				///
-				///<summary>
-				///Trigger definition to return 
-				///</summary>
-				int iAction=(pChanges!=null)?1:0;
-				///
-				///<summary>
-				///1 for UPDATE, 0 for DELETE 
-				///</summary>
-				action=pFKey.aAction[iAction];
-				pTrigger=pFKey.apTrigger[iAction];
-				if(action!=OnConstraintError.OE_None&&null==pTrigger) {
+				Connection db=this.db;///Database handle 				
+				int iAction=(pChanges!=null)?1:0;///1 for UPDATE, 0 for DELETE 
+				var action=pFKey.aAction[iAction];///One of OnConstraintError.OE_None, OnConstraintError.OE_Cascade etc. 
+				var pTrigger = pFKey.apTrigger[iAction];///Trigger definition to return 
+				if (action!=OnConstraintError.OE_None&&null==pTrigger) {
 					u8 enableLookaside;
-					///
-					///<summary>
 					///Copy of db.lookaside.bEnabled 
-					///</summary>
 					string zFrom;
-					///
-					///<summary>
 					///Name of child table 
-					///</summary>
 					int nFrom;
-					///
-					///<summary>
 					///Length in bytes of zFrom 
-					///</summary>
 					Index pIdx=null;
-					///
-					///<summary>
 					///Parent key index for this FK 
-					///</summary>
 					int[] aiCol=null;
-					///
-					///<summary>
 					///child table cols . parent key cols 
-					///</summary>
 					TriggerStep pStep=null;
-					///
-					///<summary>
 					///First (only) step of trigger program 
-					///</summary>
 					Expr pWhere=null;
-					///
-					///<summary>
 					///WHERE clause of trigger step 
-					///</summary>
 					ExprList pList=null;
-					///
-					///<summary>
 					///Changes list if ON UPDATE CASCADE 
-					///</summary>
 					Select pSelect=null;
-					///
-					///<summary>
 					///If RESTRICT, "SELECT RAISE(...)" 
-					///</summary>
 					int i;
 					///
 					///<summary>
@@ -3168,31 +2921,16 @@ goto attach_end;
 				}
 				return pTrigger;
 			}
-			public///<summary>
-			/// This function is called when deleting or updating a row to implement
-			/// any required CASCADE, SET NULL or SET DEFAULT actions.
-			///
-			///</summary>
-			void sqlite3FkActions(///
-			///<summary>
-			///Parse context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Table being updated or deleted from 
-			///</summary>
-			ExprList pChanges,///
-			///<summary>
-			///</summary>
-			///<param name="Change">list for UPDATE, NULL for DELETE </param>
-			int regOld///
-			///<summary>
-			///Address of array containing old row 
-			///</summary>
+            ///<summary>
+            /// This function is called when deleting or updating a row to implement
+            /// any required CASCADE, SET NULL or SET DEFAULT actions.
+            ///
+            ///</summary>
+            public void sqlite3FkActions(
+                Table pTab,///Table being updated or deleted from 
+			    ExprList pChanges,///<param name="Change">list for UPDATE, NULL for DELETE </param>
+			    int regOld///Address of array containing old row 
 			) {
-				///
-				///<summary>
-				///</summary>
 				///<param name="If foreign">key support is enabled, iterate through all FKs that </param>
 				///<param name="refer to table pTab. If there is an action a6ssociated with the FK ">refer to table pTab. If there is an action a6ssociated with the FK </param>
 				///<param name="for this operation (either update or delete), invoke the associated ">for this operation (either update or delete), invoke the associated </param>
@@ -3200,14 +2938,11 @@ goto attach_end;
                 if ((this.db.flags & SqliteFlags.SQLITE_ForeignKeys) != 0)
                 {
 					FKey pFKey;
-					///
-					///<summary>
 					///Iterator variable 
-					///</summary>
 					for(pFKey=fkeyc.sqlite3FkReferences(pTab);pFKey!=null;pFKey=pFKey.pNextTo) {
 						Trigger pAction=this.fkActionTrigger(pTab,pFKey,pChanges);
 						if(pAction!=null) {
-							TriggerParser.sqlite3CodeRowTriggerDirect(this,pAction,pTab,regOld,OnConstraintError.OE_Abort,0);
+                            TriggerBuilder.sqlite3CodeRowTriggerDirect(this,pAction,pTab,regOld,OnConstraintError.OE_Abort,0);
 						}
 					}
 				}
@@ -3671,7 +3406,7 @@ pParse.nTableLock = 0;
 				if(pTab==null) {
 					goto insert_cleanup;
 				}
-				iDb=db.indexOf(pTab.pSchema);
+				iDb=db.indexOfBackendWithSchema(pTab.pSchema);
 				Debug.Assert(iDb<db.BackendCount);
 				pDb=db.Backends[iDb];
 				zDb=pDb.Name;
@@ -3793,7 +3528,7 @@ isView = false;
 					///<param name=""></param>
 					var rc=(SqlResult)0;
                     int j1;
-					regEof=++this.nMem;
+					regEof=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regEof);
 					///
 					///<summary>
@@ -3802,7 +3537,7 @@ isView = false;
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "SELECT eof flag" );
 #endif
-                    dest.Init(SelectResultType.Coroutine, ++this.nMem);
+                    dest.Init(SelectResultType.Coroutine, ++this.UsedCellCount);
 					addrSelect=v.sqlite3VdbeCurrentAddr()+2;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,addrSelect-1,dest.iParm);
 					j1=v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,0);
@@ -4005,7 +3740,7 @@ isView = false;
 				///
 				///</summary>
 				if((db.flags&SqliteFlags.SQLITE_CountRows)!=0) {
-					regRowCount=++this.nMem;
+					regRowCount=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regRowCount);
 				}
 				///
@@ -4022,7 +3757,7 @@ isView = false;
 						goto insert_cleanup;
 					}
 					for(i=0;i<nIdx;i++) {
-						aRegIdx[i]=++this.nMem;
+						aRegIdx[i]=++this.UsedCellCount;
 					}
 				}
 				///
@@ -4068,11 +3803,11 @@ isView = false;
 				///the content of the new row, and the assemblied row record.
 				///
 				///</summary>
-				regRowid=regIns=this.nMem+1;
-				this.nMem+=pTab.nCol+1;
+				regRowid=regIns=this.UsedCellCount+1;
+				this.UsedCellCount+=pTab.nCol+1;
 				if(pTab.IsVirtual()) {
 					regRowid++;
-					this.nMem++;
+					this.UsedCellCount++;
 				}
 				regData=regRowid+1;
 				///
@@ -4145,30 +3880,20 @@ isView = false;
 							}
 							else {
 								Debug.Assert(pSelect==null);
-								///
-								///<summary>
 								///Otherwise useTempTable is true 
-								///</summary>
 								this.sqlite3ExprCodeAndCache(pList.a[j].pExpr,regCols+i+1);
 							}
 					}
-					///
-					///<summary>
 					///If this is an INSERT on a view with an INSTEAD OF INSERT trigger,
 					///do not attempt any conversions before assembling the record.
 					///If this is a real table, attempt conversions as required by the
 					///table column affinities.
-					///
-					///</summary>
 					if(!isView) {
                         v.sqlite3VdbeAddOp2(OpCode.OP_Affinity, regCols + 1, pTab.nCol);
 						v.sqlite3TableAffinityStr(pTab);
 					}
-                    ///
-                    ///<summary>
                     ///Fire BEFORE or INSTEAD OF triggers 
-                    ///</summary>
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,pTab,regCols-pTab.nCol-1,onError,endOfLoop);
+                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,pTab,regCols-pTab.nCol-1,onError,endOfLoop);
 					this.sqlite3ReleaseTempRange(regCols,pTab.nCol+1);
 				}
 				#endif
@@ -4326,11 +4051,8 @@ isView = false;
 				}
 				#if !SQLITE_OMIT_TRIGGER
 				if(pTrigger!=null) {
-                    ///
-                    ///<summary>
                     ///Code AFTER triggers 
-                    ///</summary>
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_AFTER,pTab,regData-2-pTab.nCol,onError,endOfLoop);
+                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_AFTER,pTab,regData-2-pTab.nCol,onError,endOfLoop);
 				}
 				#endif
 				///
@@ -4733,7 +4455,7 @@ isView = false;
 							TriggerType iDummy;
 							pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_DELETE,null,out iDummy);
 						}
-						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=0) {
+						if(pTrigger!=null||this.sqlite3FkRequired(pTab,null,0)!=false) {
 							build.sqlite3MultiWrite(this);
 							this.codegenRowDelete(pTab,baseCur,regRowid,0,pTrigger,OnConstraintError.OE_Replace);
 						}
@@ -4985,7 +4707,7 @@ isView = false;
 				Vdbe v;
 				if(pTab.IsVirtual())
 					return 0;
-				iDb= this.db.indexOf(pTab.pSchema);
+				iDb= this.db.indexOfBackendWithSchema(pTab.pSchema);
 				v=this.sqlite3GetVdbe();
 				Debug.Assert(v!=null);
 				this.sqlite3OpenTable(baseCur,iDb,pTab,op);
@@ -5035,17 +4757,17 @@ isView = false;
 						pToplevel.pAinc=pInfo;
 						pInfo.pTab=pTab;
 						pInfo.iDb=iDb;
-						pToplevel.nMem++;
+						pToplevel.UsedCellCount++;
 						///
 						///<summary>
 						///Register to hold name of table 
 						///</summary>
-						pInfo.regCtr=++pToplevel.nMem;
+						pInfo.regCtr=++pToplevel.UsedCellCount;
 						///
 						///<summary>
 						///Max rowid register 
 						///</summary>
-						pToplevel.nMem++;
+						pToplevel.UsedCellCount++;
 						///
 						///<summary>
 						///Rowid in sqlite_sequence 
@@ -5304,7 +5026,7 @@ isView = false;
 				pTab=this.sqlite3SrcListLookup(pTabList);
 				if(pTab==null)
 					goto update_cleanup;
-				iDb= this.db.indexOf(pTab.pSchema);
+				iDb= this.db.indexOfBackendWithSchema(pTab.pSchema);
 				///
 				///<summary>
 				///Figure out if we have any triggers and if the table being
@@ -5402,7 +5124,7 @@ aXRef[j] = -1;
 }
 #endif
 				}
-				hasFK=this.sqlite3FkRequired(pTab,aXRef,chngRowid?1:0)!=0;
+				hasFK=this.sqlite3FkRequired(pTab,aXRef,chngRowid?1:0)!=false;
 				///
 				///<summary>
 				///Allocate memory for the array aRegIdx[].  There is one entry in the
@@ -5422,13 +5144,13 @@ aXRef[j] = -1;
 				for(j=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,j++) {
 					int reg;
 					if(hasFK||chngRowid) {
-						reg=++this.nMem;
+						reg=++this.UsedCellCount;
 					}
 					else {
 						reg=0;
 						for(i=0;i<pIdx.nColumn;i++) {
 							if(aXRef[pIdx.aiColumn[i]]>=0) {
-								reg=++this.nMem;
+								reg=++this.UsedCellCount;
 								break;
 							}
 						}
@@ -5461,16 +5183,16 @@ aXRef[j] = -1;
 				///<summary>
 				///Allocate required registers. 
 				///</summary>
-				regOldRowid=regNewRowid=++this.nMem;
+				regOldRowid=regNewRowid=++this.UsedCellCount;
 				if(pTrigger!=null||hasFK) {
-					regOld=this.nMem+1;
-					this.nMem+=pTab.nCol;
+					regOld=this.UsedCellCount+1;
+					this.UsedCellCount+=pTab.nCol;
 				}
 				if(chngRowid||pTrigger!=null||hasFK) {
-					regNewRowid=++this.nMem;
+					regNewRowid=++this.UsedCellCount;
 				}
-				regNew=this.nMem+1;
-				this.nMem+=pTab.nCol;
+				regNew=this.UsedCellCount+1;
+				this.UsedCellCount+=pTab.nCol;
 				///
 				///<summary>
 				///Start the view context. 
@@ -5515,7 +5237,7 @@ aXRef[j] = -1;
 				///</summary>
                 v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iCur, regOldRowid);
 				if(!okOnePass) {
-					regRowSet=++this.nMem;
+					regRowSet=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp2( OpCode.OP_RowSetAdd,regRowSet,regOldRowid);
 				}
 				///
@@ -5531,7 +5253,7 @@ aXRef[j] = -1;
 				///</summary>
                 if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && null == this.pTriggerTab)
                 {
-					regRowCount=++this.nMem;
+					regRowCount=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regRowCount);
 				}
 				if(!isView) {
@@ -5668,7 +5390,7 @@ aXRef[j] = -1;
 				if((tmask&TriggerType.TRIGGER_BEFORE)!=0) {
                     v.sqlite3VdbeAddOp2(OpCode.OP_Affinity, regNew, pTab.nCol);
 					v.sqlite3TableAffinityStr(pTab);
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_UPDATE,pChanges,TriggerType.TRIGGER_BEFORE,pTab,regOldRowid,onError,addr);
+                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_UPDATE,pChanges,TriggerType.TRIGGER_BEFORE,pTab,regOldRowid,onError,addr);
 					///
 					///<summary>
 					///</summary>
@@ -5730,7 +5452,7 @@ aXRef[j] = -1;
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
 				}
-                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_UPDATE,pChanges,TriggerType.TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
+                TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_UPDATE,pChanges,TriggerType.TRIGGER_AFTER,pTab,regOldRowid,onError,addr);
 				///
 				///<summary>
 				///Repeat the above with the next record to be updated, until
@@ -5905,8 +5627,8 @@ aXRef[j] = -1;
 				///<summary>
 				///Generate code to scan the ephemeral table and call VUpdate. 
 				///</summary>
-				iReg=++this.nMem;
-				this.nMem+=pTab.nCol+1;
+				iReg=++this.UsedCellCount;
+				this.UsedCellCount+=pTab.nCol+1;
                 addr = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, ephemTab, 0);
 				v.sqlite3VdbeAddOp3( OpCode.OP_Column,ephemTab,0,iReg);
 				v.sqlite3VdbeAddOp3( OpCode.OP_Column,ephemTab,(pRowid!=null?1:0),iReg+1);
@@ -5930,7 +5652,7 @@ aXRef[j] = -1;
 				SrcList_item pItem=pSrc.a[0];
 				Table pTab;
 				Debug.Assert(pItem!=null&&pSrc.Count==1);
-				pTab=TableBuilder.sqlite3LocateTable(this,0,pItem.zName,pItem.zDatabase);
+				pTab=TableBuilder.sqlite3LocateTable(this, pItem.zName, pItem.zDatabase);
 				TableBuilder.sqlite3DeleteTable(this.db,ref pItem.pTab);
 				pItem.pTab=pTab;
 				if(pTab!=null) {
@@ -6162,7 +5884,7 @@ isView = false;
 				if(this.sqlite3IsReadOnly(pTab,(TriggerType)(pTrigger!=null?1:0))) {
 					goto delete_from_cleanup;
 				}
-				iDb=db.indexOf(pTab.pSchema);
+				iDb=db.indexOfBackendWithSchema(pTab.pSchema);
 				Debug.Assert(iDb<db.BackendCount);
 				zDb=db.Backends[iDb].Name;
 				#if !SQLITE_OMIT_AUTHORIZATION
@@ -6234,7 +5956,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///</summary>
                 if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0)
                 {
-					memCnt=++this.nMem;
+					memCnt=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,memCnt);
 				}
 				#if !SQLITE_OMIT_TRUNCATE_OPTIMIZATION
@@ -6245,7 +5967,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///this optimization caused the row change count (the value returned by 
 				///API function sqlite3_count_changes) to be set incorrectly.  
 				///</summary>
-				if(rcauth==AuthResult.SQLITE_OK&&pWhere==null&&null==pTrigger&&!pTab.IsVirtual()&&0==this.sqlite3FkRequired(pTab,null,0)) {
+				if(rcauth==AuthResult.SQLITE_OK&&pWhere==null&&null==pTrigger&&!pTab.IsVirtual()&&false==this.sqlite3FkRequired(pTab,null,0)) {
 					Debug.Assert(!isView);
                     v.sqlite3VdbeAddOp4(OpCode.OP_Clear, pTab.tnum, iDb, memCnt, pTab.zName, P4Usage.P4_STATIC);
 					for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
@@ -6261,12 +5983,12 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///the table and pick which records to delete.
 				///</summary>
 				 {
-					int iRowSet=++this.nMem;
+					int iRowSet=++this.UsedCellCount;
 					///
 					///<summary>
 					///Register for rowset of rows to delete 
 					///</summary>
-					int iRowid=++this.nMem;
+					int iRowid=++this.UsedCellCount;
 					///
 					///<summary>
 					///Used for storing rowid values. 
@@ -6409,7 +6131,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
                 v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iCur, iLabel, iRowid);
 				///If there are any triggers to fire, allocate a range of registers to
 				///use for the old.* references in the triggers.  
-				if(this.sqlite3FkRequired(pTab,null,0)!=0||pTrigger!=null) {
+				if(this.sqlite3FkRequired(pTab,null,0)!=false||pTrigger!=null) {
                     ///Iterator used while populating OLD.* 
                     ///
                     ///TODO: Could use temporary registers here. Also could attempt to
@@ -6418,8 +6140,8 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 
                     var mask = TriggerParser.sqlite3TriggerColmask(this,pTrigger,null,0,TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER,pTab,onconf);
 					mask|=this.sqlite3FkOldmask(pTab);
-					iOld=this.nMem+1;
-					this.nMem+=(1+pTab.nCol);
+					iOld=this.UsedCellCount+1;
+					this.UsedCellCount+=(1+pTab.nCol);
 					///<param name="Populate the OLD.* pseudo">table register array. These values will be </param>
 					///<param name="used by any BEFORE and AFTER triggers that exist.  ">used by any BEFORE and AFTER triggers that exist.  </param>
                     v.sqlite3VdbeAddOp2(OpCode.OP_Copy, iRowid, iOld);
@@ -6429,7 +6151,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 						}
 					}
                     ///Invoke BEFORE DELETE trigger programs. 
-                    TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
+                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_BEFORE,pTab,iOld,onconf,iLabel);
 					///Seek the cursor to the row to be deleted again. It may be that
 					///the BEFORE triggers coded above have already removed the row
 					///being deleted. Do not attempt to delete the row a second time, and 
@@ -6455,19 +6177,16 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///to the row just deleted. 
 				this.sqlite3FkActions(pTab,null,iOld);
                 ///Invoke AFTER DELETE trigger programs. 
-                TriggerParser.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
+                TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_DELETE,null,TriggerType.TRIGGER_AFTER,pTab,iOld,onconf,iLabel);
 				///Jump here if the row had already been deleted before any BEFORE
 				///trigger programs were invoked. Or if a trigger program throws a 
 				///RAISE(IGNORE) exception.  
 				v.sqlite3VdbeResolveLabel(iLabel);
 			}
-			public void codegenRowIndexDelete(///
-			    Table pTab,///
-			    ///Table containing the row to be deleted 
-			    int iCur,///
-			    ///VdbeCursor number for the table 
-			    int nothing///
-			    ///Only delete if aRegIdx!=0 && aRegIdx[i]>0 
+			public void codegenRowIndexDelete(
+			    Table pTab,///Table containing the row to be deleted 
+			    int iCur,///VdbeCursor number for the table 
+			    int nothing///Only delete if aRegIdx!=0 && aRegIdx[i]>0 
 			) {
 				int[] aRegIdx=null;
 				this.codegenRowIndexDelete(pTab,iCur,aRegIdx);
@@ -6497,7 +6216,7 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 				///Dequoted name of collation sequence 
 				CollSeq pColl;
 				Connection db=this.db;
-				zColl=build.sqlite3NameFromToken(db,pCollName);
+				zColl=build.Token2Name(db,pCollName);
 				pColl=build.sqlite3LocateCollSeq(this,zColl);
 				pExpr.sqlite3ExprSetColl(pColl);
 				db.DbFree(ref zColl);
@@ -6534,24 +6253,11 @@ sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 			public Expr sqlite3PExpr(TokenType op,Expr pLeft,Expr pRight,int null_5) {
 				return this.sqlite3PExpr(op,pLeft,pRight,null);
 			}
-			public Expr sqlite3PExpr(///
-
-            TokenType op,///
-			///<summary>
-			///Expression opcode 
-			///</summary>
-			Expr pLeft,///
-			///<summary>
-			///Left operand 
-			///</summary>
-			Expr pRight,///
-			///<summary>
-			///Right operand 
-			///</summary>
-			Token pToken///
-			///<summary>
-			///Argument Token 
-			///</summary>
+			public Expr sqlite3PExpr(
+                TokenType op,///Expression opcode 
+			    Expr pLeft,///Left operand 
+			    Expr pRight,///Right operand 
+			    Token pToken///Argument Token 
 			) {
 				//Log.WriteHeader(@"sqlite3PExpr");
 				//Log.Indent();
@@ -6758,7 +6464,7 @@ return;
 				///Various register numbers 
 				Connection db=this.db;
 				///The database connection 
-				Debug.Assert(target>0&&target<=this.nMem);
+				Debug.Assert(target>0&&target<=this.UsedCellCount);
 				if(v==null) {
 					//Debug.Assert( pParse.db.mallocFailed != 0 );
 					return 0;
@@ -7375,7 +7081,7 @@ return;
 			
 			public int sqlite3ExprCode(Expr pExpr,int target) {
 				int inReg;
-				Debug.Assert(target>0&&target<=this.nMem);
+				Debug.Assert(target>0&&target<=this.UsedCellCount);
 				if(pExpr!=null&&pExpr.Operator == TokenType.TK_REGISTER) {
                     this.pVdbe.sqlite3VdbeAddOp2(OpCode.OP_Copy, pExpr.iTable, target);
 				}
@@ -7408,7 +7114,7 @@ return;
 				///</summary>
 				if(Sqlite3.ALWAYS(pExpr.Operator != TokenType.TK_REGISTER)) {
 					int iMem;
-					iMem=++this.nMem;
+					iMem=++this.UsedCellCount;
                     v.sqlite3VdbeAddOp2(OpCode.OP_Copy, inReg, iMem);
 					pExpr.iTable=iMem;
 					pExpr.op2=pExpr.op;
@@ -8127,7 +7833,7 @@ return;
 				///</summary>
 				v=this.pVdbe;
 				Debug.Assert(v!=null);
-				regIsInit=++this.nMem;
+				regIsInit=++this.UsedCellCount;
 				addrInit=v.sqlite3VdbeAddOp1(OpCode.OP_If,regIsInit);
 				v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,regIsInit);
 				///
@@ -9641,9 +9347,9 @@ range_est_fallback:
 				///Figure out how many memory cells we will need then allocate them.
 				///
 				///</summary>
-				regBase=this.nMem+1;
+				regBase=this.UsedCellCount+1;
 				nReg=(int)(pLevel.plan.nEq+nExtraReg);
-				this.nMem+=nReg;
+				this.UsedCellCount+=nReg;
 				zAff=new StringBuilder(v.sqlite3IndexAffinityStr(pIdx));
 				//sqlite3DbStrDup(pParse.db, sqlite3IndexAffinityStr(v, pIdx));
 				//if( null==zAff ){
@@ -10384,7 +10090,7 @@ range_est_fallback:
 					pTab=pTabItem.pTab;
 					pLevel.iTabCur=pTabItem.iCursor;
 					pWInfo.nRowOut*=pLevel.plan.nRow;
-					iDb=db.indexOf(pTab.pSchema);
+					iDb=db.indexOfBackendWithSchema(pTab.pSchema);
 					if((pTab.tabFlags&TableFlags.TF_Ephemeral)!=0||pTab.pSelect!=null) {
 						///
 						///<summary>
@@ -10840,7 +10546,7 @@ range_est_fallback:
 					///<summary>
 					///Code an  OpCode.OP_VerifyCookie and  OpCode.OP_TableLock for <table>. 
 					///</summary>
-					iDb=db.indexOf(pTab.pSchema);
+					iDb=db.indexOfBackendWithSchema(pTab.pSchema);
 					build.sqlite3CodeVerifySchema(this,iDb);
 					sqliteinth.sqlite3TableLock(this,iDb,pTab.tnum,0,pTab.zName);
 					///
@@ -10852,7 +10558,7 @@ range_est_fallback:
 					///</summary>
 					Debug.Assert(v!=null);
 					if(iCol<0) {
-						int iMem=++this.nMem;
+						int iMem=++this.UsedCellCount;
 						int iAddr;
 						iAddr=v.sqlite3VdbeAddOp1(OpCode.OP_If,iMem);
 						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,iMem);
@@ -10884,7 +10590,7 @@ range_est_fallback:
                         bool affinity_ok = (pTab.aCol[iCol].affinity == aff || aff == sqliteinth.SQLITE_AFF_NONE);
 						for(pIdx=pTab.pIndex;pIdx!=null&&eType==0&&affinity_ok;pIdx=pIdx.pNext) {
 							if((pIdx.aiColumn[0]==iCol)&&(db.sqlite3FindCollSeq(sqliteinth.ENC(db),pIdx.azColl[0],0)==pReq)&&(mustBeUnique==false||(pIdx.nColumn==1&&pIdx.onError!=OnConstraintError.OE_None))) {
-								int iMem=++this.nMem;
+								int iMem=++this.UsedCellCount;
 								int iAddr;
 								KeyInfo pKey;
                                 pKey = pIdx.sqlite3IndexKeyinfo(this);
@@ -10898,7 +10604,7 @@ range_est_fallback:
 								v.sqlite3VdbeJumpHere(iAddr);
 								if(//prNotFound != null &&         -- always exists under C#
 								pTab.aCol[iCol].notNull==0) {
-									prNotFound=++this.nMem;
+									prNotFound=++this.UsedCellCount;
 								}
 							}
 						}
@@ -10916,7 +10622,7 @@ range_est_fallback:
 					eType=sqliteinth.IN_INDEX_EPH;
 					if(prNotFound!=-1)// Klude to show prNotFound not available
 					 {
-						prNotFound=rMayHaveNull=++this.nMem;
+						prNotFound=rMayHaveNull=++this.UsedCellCount;
 					}
 					else {
 						sqliteinth.testcase(this.nQueryLoop>(double)1);
@@ -10978,7 +10684,7 @@ range_est_fallback:
 				///<param name="save the results, and reuse the same result on subsequent invocations.">save the results, and reuse the same result on subsequent invocations.</param>
 				///<param name=""></param>
 				if(!pExpr.ExprHasAnyProperty(ExprFlags.EP_VarSelect)&&null==this.pTriggerTab) {
-					int mem=++this.nMem;
+					int mem=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp1(OpCode.OP_If,mem);
 					testAddr=v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,mem);
 					Debug.Assert(testAddr>0///
@@ -11165,7 +10871,7 @@ range_est_fallback:
 					Debug.Assert(pExpr.Operator==TokenType.TK_EXISTS||pExpr.Operator==TokenType.TK_SELECT);
 					Debug.Assert(pExpr.HasProperty(ExprFlags.EP_xIsSelect));
 					pSel=pExpr.x.pSelect;
-					dest.Init(0,++this.nMem);
+					dest.Init(0,++this.UsedCellCount);
 					if(pExpr.Operator==TokenType.TK_SELECT) {
 						dest.eDest=SelectResultType.Mem;
                         v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, dest.iParm);
@@ -11419,11 +11125,11 @@ range_est_fallback:
 					return;
 				Debug.Assert(null==pTable.pIndex);
 				db=this.db;
-				iDb=db.indexOf(pTable.pSchema);
+				iDb=db.indexOfBackendWithSchema(pTable.pSchema);
 				Debug.Assert(iDb>=0);
 				pTable.tabFlags|=TableFlags.TF_Virtual;
 				pTable.nModuleArg=0;
-                VTableMethodsExtensions.addModuleArgument(db, pTable, build.sqlite3NameFromToken(db, pModuleName));
+                VTableMethodsExtensions.addModuleArgument(db, pTable, build.Token2Name(db, pModuleName));
                 VTableMethodsExtensions.addModuleArgument(db, pTable, db.Backends[iDb].Name);
 				//sqlite3DbStrDup( db, db.aDb[iDb].zName ) );
 				VTableMethodsExtensions.addModuleArgument(db,pTable,pTable.zName);
@@ -11484,11 +11190,11 @@ range_est_fallback:
 					///The VM register number pParse.regRowid holds the rowid of an
 					///entry in the sqlite_master table tht was created for this vtab
 					///by build.sqlite3StartTable().
-					iDb=db.indexOf(pTab.pSchema);
+					iDb=db.indexOfBackendWithSchema(pTab.pSchema);
                     build.sqlite3NestedParse(this, "UPDATE %Q.%s " + "SET type='table', name=%Q, tbl_name=%Q, rootpage=0, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName, pTab.zName, zStmt, this.regRowid);
 					db.DbFree(ref zStmt);
 					v=this.sqlite3GetVdbe();
-					build.sqlite3ChangeCookie(this,iDb);
+					build.codegenChangeCookie(this,iDb);
 					v.sqlite3VdbeAddOp2( OpCode.OP_Expire,0,0);
 					zWhere=io.sqlite3MPrintf(db,"name='%q' AND type='table'",pTab.zName);
 					v.codegenAddParseSchemaOp(iDb,zWhere);
@@ -11508,7 +11214,7 @@ range_est_fallback:
 					string zName=pTab.zName;
 					int nName=StringExtensions.Strlen30(zName);
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pSchema));
-					pOld=HashExtensions.sqlite3HashInsert(ref pSchema.tblHash,zName,nName,pTab);
+					pOld=HashExtensions.Insert(pSchema.Tables,zName,nName,pTab);
 					if(pOld!=null) {
 						//db.mallocFailed = 1;
 						Debug.Assert(pTab==pOld);
@@ -11549,7 +11255,7 @@ range_est_fallback:
 				}
 				///Locate the required virtual table module 
 				zMod=pTab.azModuleArg[0];
-				pMod=(Module)db.aModule.Find(zMod,StringExtensions.Strlen30(zMod),(Module)null);
+				pMod=db.aModule.Find(zMod,zMod.Strlen30());
 				if(null==pMod) {
 					string zModule=pTab.azModuleArg[0];
 					utilc.sqlite3ErrorMsg(this,"no such module: %s",zModule);

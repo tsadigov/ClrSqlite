@@ -13,13 +13,14 @@ using Community.CsharpSqlite.Utils;
 namespace Community
 {
     namespace CsharpSqlite.Utils{
-    using Metadata;
-	using System.Globalization;
-    using System.Collections.Generic;
-    using Parse = Sqlite3.Parse;
-    using Community.CsharpSqlite.Os;
+        using Metadata;
+        using System.Globalization;
+        using System.Collections.Generic;
+        using Parse = Sqlite3.Parse;
+        using Community.CsharpSqlite.Os;
+        using Ast;
 
-    public class utilc
+        public class utilc
     {
         ///
         ///<summary>
@@ -1114,6 +1115,13 @@ return n;
                 return 0x7fffffff;
             return -x;
         }
+
+            public static void swap<T>(ref T pDatabase, ref T pTable)
+            {
+                T pTemp = pDatabase;
+                pDatabase = pTable;
+                pTable = pTemp;
+            }
 #if SQLITE_ENABLE_8_3_NAMES
 																				/*
 ** If SQLITE_ENABLE_8_3_NAME is set at compile-time and if the database
@@ -1139,7 +1147,7 @@ static void sqlite3FileSuffix3(string zBaseFilename, string z){
   }
 }
 #endif
-    }
+        }
 }
     //--------------------------------------------------------- 
     

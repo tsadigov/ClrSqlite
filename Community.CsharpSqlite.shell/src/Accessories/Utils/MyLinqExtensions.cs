@@ -80,7 +80,7 @@ namespace Community.CsharpSqlite.Utils
         }
         public static Str sub(this String buffer)
         {
-            return new Str(buffer, StringExtensions.Strlen30(buffer));
+            return new Str(buffer, buffer.Strlen30());
         }
         public static Str sub(this String buffer,int len) {
             return new Str(buffer, len);

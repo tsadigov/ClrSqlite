@@ -19,6 +19,7 @@ namespace Community.CsharpSqlite.Metadata
     using sqlite3_int64 = System.Int64;
     using Engine;
     using Os;
+    using Ast;
     public static partial class SchemaExtensions
     {
         ///<summary>
@@ -36,7 +37,7 @@ namespace Community.CsharpSqlite.Metadata
         ///</summary>
         public static int InitTableDefinitionCallback(InitData pData, sqlite3_int64 argc, object p2, object NotUsed)
         {
-            string[] argv = (string[])p2;
+            string[] argv = p2 as string[];
             
             Connection db = pData.db;
             int iDb = pData.iDb;
@@ -140,18 +141,10 @@ namespace Community.CsharpSqlite.Metadata
         /// that the database is corrupt.
         ///
         ///</summary>
-        static void corruptSchema(InitData pData,///
-                                                 ///<summary>
-                                                 ///Initialization context 
-                                                 ///</summary>
-       string zObj,///
-                   ///<summary>
-                   ///Object being parsed at the point of error 
-                   ///</summary>
-        string zExtra///
-                     ///<summary>
-                     ///Error information 
-                     ///</summary>
+        static void corruptSchema(
+            InitData pData,///Initialization context                                                  
+            string zObj,///Object being parsed at the point of error                    
+            string zExtra////Error information                      
        )
         {
             Connection db = pData.db;
@@ -191,30 +184,39 @@ namespace Community.CsharpSqlite.Metadata
         ///
         ///</summary>    
 		public static void sqlite3SchemaClear(this Schema p)
-        {
-            Hash temp1;
-            Hash temp2;
-            HashElem pElem;
+        {   
             Schema pSchema = p;
-            temp1 = pSchema.tblHash;
-            temp2 = pSchema.trigHash;
-            pSchema.trigHash.sqlite3HashInit();
-            pSchema.idxHash.sqlite3HashClear();
-            for (pElem = temp2.sqliteHashFirst(); pElem != null; pElem = pElem.sqliteHashNext())
+            pSchema.Indexes.sqlite3HashClear();
+
             {
-                Trigger pTrigger = (Trigger)pElem.sqliteHashData();
-                TriggerParser.sqlite3DeleteTrigger(null, ref pTrigger);
+                var triggers = pSchema.Triggers;
+                triggers.sqlite3HashInit();
+                triggers.sqliteHashFirst().linkedList().ForEach(pElem =>
+                    {
+                        var pTrigger = pElem.sqliteHashData() as Trigger;
+                        TriggerParser.sqlite3DeleteTrigger(null, ref pTrigger);
+                    }
+                );
+                triggers.sqlite3HashClear();
+                triggers.sqlite3HashInit();
             }
-            temp2.sqlite3HashClear();
-            pSchema.trigHash.sqlite3HashInit();
-            for (pElem = temp1.first; pElem != null; pElem = pElem.next)//sqliteHashFirst(&temp1); pElem; pElem = sqliteHashNext(pElem))
+
             {
-                Table pTab = (Table)pElem.data;
-                //sqliteHashData(pElem);
-                TableBuilder.sqlite3DeleteTable(null, ref pTab);
+                var tables = pSchema.Tables;
+                tables.first.linkedList().ForEach(pElem =>
+                    {
+                        Table pTab = pElem.data as Table;
+                    //sqliteHashData(pElem);
+                    TableBuilder.sqlite3DeleteTable(null, ref pTab);
+                    }
+                );
+                tables.sqlite3HashClear();
             }
-            temp1.sqlite3HashClear();
-            pSchema.fkeyHash.sqlite3HashClear();
+           
+            
+            pSchema.ForeignKeys.sqlite3HashClear();
+
+
             pSchema.pSeqTab = null;
             if ((pSchema.flags & sqliteinth.DB_SchemaLoaded) != 0)
             {
@@ -223,38 +225,42 @@ namespace Community.CsharpSqlite.Metadata
             }
             p.Clear();
         }
-        ///
+        
         ///<summary>
         ///Find and return the schema associated with a BTree.  Create
         ///a new one if necessary.
-        ///
         ///</summary>
-        public static Schema sqlite3SchemaGet(this Btree pBt, Connection connection)
+        public static Schema GetSchema(this Btree btree, Connection connection)
         {
-            Schema p;
-            if (pBt != null)
+            Schema p=(null==btree)? new Schema(): btree.sqlite3BtreeSchema(-1, (dxFreeSchema)sqlite3SchemaClear); ;
+            
+            if (0 == p.file_format)
             {
-                p = pBt.sqlite3BtreeSchema(-1, (dxFreeSchema)sqlite3SchemaClear);
-                //Schema.Length, sqlite3SchemaFree);
-            }
-            else
-            {
-                p = new Schema();
-                // (Schema *)sqlite3DbMallocZero(0, sizeof(Schema));
-            }
-            if (p == null)
-            {
-                ////        db.mallocFailed = 1;
-            }
-            else
-                if (0 == p.file_format)
-            {
-                p.tblHash.sqlite3HashInit();
-                p.idxHash.sqlite3HashInit();
-                p.trigHash.sqlite3HashInit();
-                p.fkeyHash.sqlite3HashInit();
+                p.initHashes();
                 p.enc = SqliteEncoding.UTF8;
             }
+            return p;
+        }
+
+
+
+        public static T FindInBackendsSchemas<T>(this Connection db, string zName, string zDb, Func<Schema, Hash<T>> prop) where T : class
+        {
+            T p = null;
+            int nName = StringExtensions.Strlen30(zName);
+            ///All mutexes are required for schema access.  Make sure we hold them. 
+            Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
+
+            var backend = db.Backends.Take(db.BackendCount)
+                    .Swap(0, 1)///Search TEMP before MAIN //        int j = (i < 2) ? i ^ 1 : i;
+                    .Where(
+                        b => !(zDb != null && !zDb.Equals(b.Name, StringComparison.InvariantCultureIgnoreCase))//Debug.Assert(pSchema != null);
+                    )
+                    .Select(b => { Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, b, null)); return b; })//Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));)
+                    .FirstOrDefault(//Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
+                        b => null != (p = prop(b.pSchema).Find(zName, nName))
+                    );
+
             return p;
         }
     }

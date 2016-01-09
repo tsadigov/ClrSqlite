@@ -1477,7 +1477,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 db = p.db;
                 //Debug.Assert( db.mallocFailed == 0 );
                 nVar = pParse.nVar;
-                nMem = pParse.nMem;
+                nMem = pParse.UsedCellCount;
                 nCursor = pParse.nTab;
                 nArg = pParse.nMaxArg;
                 ///

@@ -340,7 +340,7 @@ namespace Community.CsharpSqlite.Ast
                     {
                         ///An ordinary table or view name in the FROM clause 
                         Debug.Assert(pFrom.pTab == null);
-                        pFrom.pTab = pTab = TableBuilder.sqlite3LocateTable(pParse, 0, pFrom.zName, pFrom.zDatabase);
+                        pFrom.pTab = pTab = TableBuilder.sqlite3LocateTable(pParse, pFrom.zName, pFrom.zDatabase);
                         if (pTab == null)
                             return WRC.WRC_Abort;
                         pTab.nRef++;
@@ -1014,16 +1014,16 @@ namespace Community.CsharpSqlite.Ast
                         addrSortingIdx = v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, sAggInfo.sortingIdx, sAggInfo.nSortingColumn, 0, pKeyInfo, P4Usage.P4_KEYINFO_HANDOFF);
                         ///Initialize memory locations used by GROUP BY aggregate processing
                         ///x
-                        iUseFlag = ++pParse.nMem;
-                        iAbortFlag = ++pParse.nMem;
-                        regOutputRow = ++pParse.nMem;
+                        iUseFlag = ++pParse.UsedCellCount;
+                        iAbortFlag = ++pParse.UsedCellCount;
+                        regOutputRow = ++pParse.UsedCellCount;
                         addrOutputRow = v.sqlite3VdbeMakeLabel();
-                        regReset = ++pParse.nMem;
+                        regReset = ++pParse.UsedCellCount;
                         addrReset = v.sqlite3VdbeMakeLabel();
-                        iAMem = pParse.nMem + 1;
-                        pParse.nMem += pGroupBy.Count;
-                        iBMem = pParse.nMem + 1;
-                        pParse.nMem += pGroupBy.Count;
+                        iAMem = pParse.UsedCellCount + 1;
+                        pParse.UsedCellCount += pGroupBy.Count;
+                        iBMem = pParse.UsedCellCount + 1;
+                        pParse.UsedCellCount += pGroupBy.Count;
                         v.sqlite3VdbeAddOp2(OpCode.OP_Integer, 0, iAbortFlag);
 #if SQLITE_DEBUG
 																																																																																																																													          VdbeComment( v, "clear abort flag" );
@@ -1216,7 +1216,7 @@ namespace Community.CsharpSqlite.Ast
                             ///contains the data for table <tbl> or on one of its indexes. It
                             ///is better to execute the op on an index, as indexes are almost
                             ///always spread across less pages than their corresponding tables.
-                            int iDb = pParse.db.indexOf( pTab.pSchema);
+                            int iDb = pParse.db.indexOfBackendWithSchema( pTab.pSchema);
                             int iCsr = pParse.nTab++;
                             ///<param name="Cursor to scan b">tree </param>
                             Index pIdx;

@@ -1419,7 +1419,7 @@ set { _op = value; }
                                     zOriginTab = pTab.zName;
                                     if (pNC.pParse != null)
                                     {
-                                        int iDb = pNC.pParse.db.indexOf( pTab.pSchema);
+                                        int iDb = pNC.pParse.db.indexOfBackendWithSchema( pTab.pSchema);
                                         zOriginDb = pNC.pParse.db.Backends[iDb].Name;
                                     }
                                 }

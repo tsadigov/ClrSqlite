@@ -47,7 +47,18 @@ namespace Community.CsharpSqlite
     using Compiler.Parser;
     public class VdbeFacade
     {
+        public VdbeFacade()
+        {
+
+        }
+        public VdbeFacade(Vdbe v)
+        {
+            this.pVdbe = v;
+        }
         Connection _db;
+        ///<summary>
+        ///The main database structure 
+        ///</summary>
         public Connection db
         {
             get
@@ -59,10 +70,7 @@ namespace Community.CsharpSqlite
                 _db = value;
             }
         }
-        ///
-        ///<summary>
-        ///The main database structure 
-        ///</summary>
+        
         
         ///
         ///<summary>
@@ -75,7 +83,7 @@ namespace Community.CsharpSqlite
         {
             if (this.nTempReg == 0)
             {
-                return ++this.nMem;
+                return ++this.UsedCellCount;
             }
             return this.aTempReg[--this.nTempReg];
         }
@@ -597,6 +605,58 @@ namespace Community.CsharpSqlite
             return pColl;
         }
         //---------------------------------------------------------
+        public void Drop_Trigger(Trigger trg, Vdbe v, int iDb)
+        {
+            var iTrigDb = this.db.indexOfBackendWithSchema(trg.pSchema);
+            Debug.Assert(iTrigDb == iDb || iTrigDb == 1);
+            v.sqlite3VdbeAddOp4(OpCode.OP_DropTrigger, iTrigDb, 0, 0, trg.zName, 0);
+        }
+
+        public void Drop_Table(Table pTab, Vdbe v, int iDb)
+        {
+            ///Drop the table and index from the internal schema. 
+            v.sqlite3VdbeAddOp4(OpCode.OP_DropTable, iDb, 0, 0, pTab.zName, 0);
+        }
+
+        /// <summary>
+        /// from vdbe
+        /// </summary>
+        /// <param name="iDb"></param>
+        /// <param name="zWhere"></param>
+        public void codegenAddParseSchemaOp(int iDb, string zWhere)
+        {
+            int j;
+            int addr = pVdbe.sqlite3VdbeAddOp3(OpCode.OP_ParseSchema, iDb, 0, 0);
+            pVdbe.sqlite3VdbeChangeP4(addr, zWhere, P4Usage.P4_DYNAMIC);
+            for (j = 0; j < this.db.BackendCount; j++)
+                vdbeaux.markUsed(pVdbe, j);
+        }
+
+
+        ///<summary>
+        /// Generate code to make sure the file format number is at least minFormat.
+        /// The generated code will increase the file format number if necessary.
+        ///</summary>
+        public void codegenMinimumFileFormat(int iDb, int minFormat)
+        {
+            var v = pVdbe;//this.sqlite3GetVdbe();
+            ///The VDBE should have been allocated before this routine is called.
+            ///If that allocation failed, we would have quit before reaching this
+            ///point 
+            if (Sqlite3.ALWAYS(v))
+            {
+                int r1 = this.allocTempReg(), r2 = this.allocTempReg();
+
+                v.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, r1, BTreeProp.FILE_FORMAT);      //r1=cookie[FILE_FORMAT]
+                vdbeaux.markUsed(v, iDb);
+                v.sqlite3VdbeAddOp2(OpCode.OP_Integer, minFormat, r2);                            //r2=minFormat
+                var j1 = v.sqlite3VdbeAddOp3(OpCode.OP_Ge, r2, 0, r1);                               //if(r2>r1)
+                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, r2);  //  cookie[FileFormat]=r2
+                v.sqlite3VdbeJumpHere(j1);
+
+                this.deallocTempReg(r1, r2);
+            }
+        }
         public void codeInteger(Expr pExpr, bool negFlag, int iMem)
         {
             Vdbe v = this.pVdbe;
@@ -731,14 +791,17 @@ namespace Community.CsharpSqlite
                 this.nRangeReg -= nReg;
             }
             else {
-                i = this.nMem + 1;
-                this.nMem += nReg;
+                i = this.UsedCellCount + 1;
+                this.UsedCellCount += nReg;
             }
             return i;
         }
 
         int _nMem;
-        public int nMem
+        ///<summary>
+        ///Name:nMem >>> Number of memory cells used so far 
+        ///</summary>
+        public int UsedCellCount
         {
             get
             {
@@ -749,10 +812,7 @@ namespace Community.CsharpSqlite
                 _nMem = value;
             }
         }
-        ///
-        ///<summary>
-        ///Number of memory cells used so far 
-        ///</summary>
+        
         public void sqlite3ReleaseTempRange(int iReg, int nReg)
         {
             this.sqlite3ExprCacheRemove(iReg, nReg);

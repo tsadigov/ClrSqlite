@@ -244,7 +244,7 @@ sqlite3ValueFree(ref pTmp);
                     
 					//memcpy(pColl[0].zName, zName, nName);
 					//pColl[0].zName[nName] = 0;
-					CollSeq[] pDelArray=HashExtensions.sqlite3HashInsert(ref db.aCollSeq,pColl[0].zName,nName,pColl);
+					CollSeq[] pDelArray=HashExtensions.Insert( db.aCollSeq,pColl[0].zName,nName,pColl);
 					if(pDelArray!=null)
 						pDel=pDelArray[0];
 					

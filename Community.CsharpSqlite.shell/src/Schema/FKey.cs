@@ -13,6 +13,8 @@ using u32 = System.UInt32;
 using u64 = System.UInt64;
 using unsigned = System.UInt64;
 using Pgno = System.UInt32;
+using Community.CsharpSqlite.Utils;
+using Community.CsharpSqlite.Ast;
 
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
@@ -24,14 +26,7 @@ using ynVar = System.Int32;
 
 namespace Community.CsharpSqlite.Metadata
 {
-
-
-
-
-
-
-
-
+    
         ///
         ///<summary>
         ///Each foreign key constraint is an instance of the following structure.
@@ -52,79 +47,54 @@ namespace Community.CsharpSqlite.Metadata
         ///<param name="Each REFERENCES clause generates an instance of the following structure">Each REFERENCES clause generates an instance of the following structure</param>
         ///<param name="which is attached to the from">table need not exist when</param>
         ///<param name="the from">table is not checked.</param>
-        public class FKey
+        public class FKey: ILinkedListNode<FKey>
         {
             public Table pFrom;
-            ///
-            ///<summary>
             ///Table containing the REFERENCES clause (aka: Child) 
-            ///</summary>
             public FKey pNextFrom;
-            ///
-            ///<summary>
             ///Next foreign key in pFrom 
-            ///</summary>
             public string zTo;
-            ///
-            ///<summary>
             ///Name of table that the key points to (aka: Parent) 
-            ///</summary>
             public FKey pNextTo;
-            ///
-            ///<summary>
             ///Next foreign key on table named zTo 
-            ///</summary>
             public FKey pPrevTo;
-            ///
-            ///<summary>
             ///Previous foreign key on table named zTo 
-            ///</summary>
             public int nCol;
-            ///
-            ///<summary>
             ///Number of columns in this key 
-            ///</summary>
             ///
-            ///<summary>
-            ///</summary>
             ///<param name="EV: R">21917 </param>
             public u8 isDeferred;
-            ///
-            ///<summary>
             ///True if constraint checking is deferred till COMMIT 
-            ///</summary>
             public OnConstraintError[] aAction = new OnConstraintError[2];
-            ///<summary>
             ///ON DELETE and ON UPDATE actions, respectively
-            ///</summary>
             public Trigger[] apTrigger = new Trigger[2];
-            ///<summary>
             ///Triggers for aAction[] actions
-            ///</summary>
             public class sColMap
             {
-                ///
-                ///<summary>
                 ///Mapping of columns in pFrom to columns in zTo 
-                ///</summary>
                 public int iFrom;
-                ///
-                ///<summary>
                 ///Index of column in pFrom 
-                ///</summary>
                 public string zCol;
-                ///
-                ///<summary>
                 ///Name of column in zTo.  If 0 use PRIMARY KEY 
-                ///</summary>
             };
 
             public sColMap[] aCol;
-            ///
-            ///<summary>
-            ///One entry for each of nCol column s 
-            ///</summary>
-            public FKey Copy()
+
+        public FKey pNext
+        {
+            get
+            {
+                return ((ILinkedListNode<FKey>)pNextFrom).pNext;
+            }
+
+            set
+            {
+                ((ILinkedListNode<FKey>)pNextFrom).pNext = value;
+            }
+        }
+
+        ///One entry for each of nCol column s 
+        public FKey Copy()
             {
                 if (this == null)
                     return null;

@@ -16,6 +16,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Utils;
     using System.Collections.Generic;
     using System.Linq;
+    using Ast;
     public static class prepare
     {
         ///<summary>
@@ -407,19 +408,17 @@ db.xAuth = 0;
         /// attached database is returned.
         ///
         ///</summary>
-        public static int indexOf(this Connection db, Schema pSchema)
+        public static int indexOfBackendWithSchema(this Connection db, Schema pSchema)
         {//TODO: extension method
             int i = -1000000;
-            ///<param name="If pSchema is NULL, then return ">1000000. This happens when code in</param>
-            ///<param name="expr.c is trying to resolve a reference to a transient table (i.e. one">expr.c is trying to resolve a reference to a transient table (i.e. one</param>
-            ///<param name="created by a sub">select). In this case the return value of this</param>
-            ///<param name="function should never be used.">function should never be used.</param>
-            ///<param name=""></param>
-            ///<param name="We return ">1 simply because using</param>
-            ///<param name="">>aDb[] is much</param>
-            ///<param name="more likely to cause a segfault than ">1 (of course there are assert()</param>
-            ///<param name="statements too, but it never hurts to play the odds).">statements too, but it never hurts to play the odds).</param>
-            ///<param name=""></param>
+            ///If pSchema is NULL, then return ">1000000. This happens when code in</param>
+            ///expr.c is trying to resolve a reference to a transient table (i.e. one
+            ///created by a sub-select). In this case the return value of this</param>
+            ///function should never be used.
+            ///We return 
+            ///">>aDb[] is much
+            ///more likely to cause a segfault than 1 (of course there are assert()
+            ///statements too, but it never hurts to play the odds).
             Debug.Assert(db.mutex.sqlite3_mutex_held());
             if (pSchema != null)
             {

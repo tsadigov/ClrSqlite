@@ -123,7 +123,7 @@ namespace Community.CsharpSqlite {
 			else
 				if(rc==SqlResult.SQLITE_OK) {
 					Pager pPager;
-					aNew.pSchema= aNew.BTree.sqlite3SchemaGet(db);
+					aNew.pSchema= aNew.BTree.GetSchema(db);
 					//if ( aNew.pSchema == null )
 					//{
 					//  rc = SQLITE_NOMEM;

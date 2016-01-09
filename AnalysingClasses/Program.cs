@@ -18,23 +18,19 @@ namespace AnalysingClasses
         {
             Sqlite3.sqlite3_initialize();
 
-
             SqlResult r;
             var fs = Sqlite3.winVfs;
-
 
             Connection pSrc = new Connection();
             var zSrcFile = "hehehe";
             Btree btree = null;
             r = Btree.Open(fs, "hehehe", pSrc, ref btree, 0, 262);
-            
 
             r = Sqlite3.sqlite3_open(zSrcFile, out pSrc);
             String m="";
             pSrc.init.busy = 1;
             pSrc.InitialiseAllDatabases(  ref m);
-            var schema = btree.sqlite3SchemaGet(pSrc);
-
+            var schema = btree.GetSchema(pSrc);
 
             var zMaster = sqliteinth.SCHEMA_TABLE(1);
             var initData = new InitData();
@@ -57,17 +53,11 @@ namespace AnalysingClasses
                 }
             }
 
-
-
-
-
-
             Pager p =null;
             
             PagerMethods.PagerOpen(fs, out p, "db123", Globals.BTree.EXTRA_SIZE,
                 Sqlite3.BTREE_OMIT_JOURNAL | Sqlite3.BTREE_SINGLE, 
                 262, BTreeMethods.pageReinit);
-
 
 
             Console.WriteLine(p.dbFileSize);

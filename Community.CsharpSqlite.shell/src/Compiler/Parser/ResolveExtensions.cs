@@ -384,7 +384,7 @@ namespace Community.CsharpSqlite
                             Column pCol;
                             pTab = pItem.pTab;
                             Debug.Assert(pTab != null && pTab.zName != null);
-                            iDb = db.indexOf( pTab.pSchema);
+                            iDb = db.indexOfBackendWithSchema( pTab.pSchema);
                             Debug.Assert(pTab.nCol > 0);
                             if (zTab != null)
                             {

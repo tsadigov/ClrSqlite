@@ -299,7 +299,7 @@ p.zName,  P4Usage.P4_STATIC );
                     pParse.rc = SqlResult.SQLITE_ERROR;
                 }
                 pParse.nTab = 0;
-                pParse.nMem = 0;
+                pParse.UsedCellCount = 0;
                 pParse.nSet = 0;
                 pParse.nVar = 0;
                 pParse.cookieMask = 0;
@@ -330,10 +330,8 @@ p.zName,  P4Usage.P4_STATIC );
                 if (pParse.nErr != 0)
                     return;
                 Debug.Assert(pParse.nested < 10);
-                ///
-                ///<summary>
                 ///Nesting should only be of limited depth 
-                ///</summary>
+                
                 //  va_list ap;
                 lock (_Custom.lock_va_list)
                 {
@@ -494,7 +492,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// is \000 terminated and is persistent.
             ///
             ///</summary>
-            public static string sqlite3NameFromToken(Connection db, Token pName)
+            public static string Token2Name(Connection db, Token pName)
             {
                 string zName;
                 if (pName != null && pName.zRestSql != null)
@@ -564,10 +562,7 @@ p.zName,  P4Usage.P4_STATIC );
             )
             {
                 int iDb;
-                ///
-                ///<summary>
                 ///Database holding the object 
-                ///</summary>
                 Connection db = pParse.db;
                 if (Sqlite3.ALWAYS(pName2 != null) && pName2.Length > 0)
                 {
@@ -578,7 +573,7 @@ p.zName,  P4Usage.P4_STATIC );
                         return -1;
                     }
                     pUnqual = pName2;
-                    iDb = db.sqlite3FindDb(pName1);
+                    iDb = db.FindDbIdxByToken(pName1);
                     if (iDb < 0)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "unknown database %T", pName1);
@@ -653,7 +648,7 @@ p.zName,  P4Usage.P4_STATIC );
                     return;
                 }
 #endif
-                z = build.sqlite3NameFromToken(db, pName);
+                z = build.Token2Name(db, pName);
                 if (z == null)
                     return;
                 for (i = 0; i < p.nCol; i++)
@@ -792,7 +787,7 @@ p.zName,  P4Usage.P4_STATIC );
                     return;
                 pCol = p.aCol[p.nCol - 1];
                 Debug.Assert(pCol.zType == null);
-                pCol.zType = build.sqlite3NameFromToken(pParse.db, pType);
+                pCol.zType = build.Token2Name(pParse.db, pType);
                 pCol.affinity = sqlite3AffinityType(pCol.zType);
             }
             ///
@@ -984,7 +979,7 @@ p.zName,  P4Usage.P4_STATIC );
                     return;
                 i = p.nCol - 1;
                 db = pParse.db;
-                zColl = build.sqlite3NameFromToken(db, pToken);
+                zColl = build.Token2Name(db, pToken);
                 if (zColl == null)
                     return;
                 if (build.sqlite3LocateCollSeq(pParse, zColl) != null)
@@ -1068,7 +1063,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// 1 chance in 2^32.  So we're safe enough.
             ///
             ///</summary>
-            public static void sqlite3ChangeCookie(Parse pParse, int iDb)
+            public static void codegenChangeCookie(Parse pParse, int iDb)
             {
                 int r1 = pParse.allocTempReg();
                 Connection db = pParse.db;
@@ -1190,7 +1185,7 @@ p.zName,  P4Usage.P4_STATIC );
                     return;
                 }
                 build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
-                var iDb = db.indexOf( p.pSchema);
+                var iDb = db.indexOfBackendWithSchema( p.pSchema);
                 if (sFix.sqlite3FixInit(pParse, iDb, "view", pName) != 0 && sFix.sqlite3FixSelect(pSelect) != 0)
                 {
                     SelectMethods.SelectDestructor(db, ref pSelect);
@@ -1362,7 +1357,7 @@ db.xAuth = xAuth;
                 if (!db.DbHasProperty(idx, sqliteinth.DB_UnresetViews))
                     return;
                 //for(i=sqliteHashFirst(&db.aDb[idx].pSchema.tblHash); i;i=sqliteHashNext(i)){
-                for (i = db.Backends[idx].pSchema.tblHash.first; i != null; i = i.next)
+                for (i = db.Backends[idx].pSchema.Tables.first; i != null; i = i.pNext)
                 {
                     Table pTab = (Table)i.data;
                     // sqliteHashData( i );
@@ -1406,8 +1401,8 @@ db.xAuth = xAuth;
                 DbBackend pDb;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 pDb = db.Backends[iDb];
-                pHash = pDb.pSchema.tblHash;
-                for (pElem = pHash.first; pElem != null; pElem = pElem.next)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
+                pHash = pDb.pSchema.Tables;
+                for (pElem = pHash.first; pElem != null; pElem = pElem.pNext)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
                 {
                     Table pTab = (Table)pElem.data;
                     // sqliteHashData( pElem );
@@ -1416,8 +1411,8 @@ db.xAuth = xAuth;
                         pTab.tnum = iTo;
                     }
                 }
-                pHash = pDb.pSchema.idxHash;
-                for (pElem = pHash.first; pElem != null; pElem = pElem.next)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
+                pHash = pDb.pSchema.Indexes;
+                for (pElem = pHash.first; pElem != null; pElem = pElem.pNext)// ( pElem = sqliteHashFirst( pHash ) ; pElem ; pElem = sqliteHashNext( pElem ) )
                 {
                     Index pIdx = (Index)pElem.data;
                     // sqliteHashData( pElem );
@@ -1613,7 +1608,7 @@ db.xAuth = xAuth;
                 
                 
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, p.pSchema));
-                pNextTo = HashExtensions.sqlite3HashInsert(ref p.pSchema.fkeyHash, pFKey.zTo, StringExtensions.Strlen30(pFKey.zTo), pFKey);
+                pNextTo = p.pSchema.ForeignKeys.Insert( pFKey.zTo, StringExtensions.Strlen30(pFKey.zTo), pFKey);
                 //if( pNextTo==pFKey ){
                 //  db.mallocFailed = 1;
                 //  goto fk_end;
@@ -1745,7 +1740,7 @@ db.xAuth = xAuth;
                     utilc.sqlite3ErrorMsg(pParse, "index associated with UNIQUE " + "or PRIMARY KEY constraint cannot be dropped", 0);
                     goto exit_drop_index;
                 }
-                iDb = db.indexOf( pIndex.pSchema);
+                iDb = db.indexOfBackendWithSchema( pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	{
 int code = SQLITE_DROP_INDEX;
@@ -1774,7 +1769,7 @@ goto exit_drop_index;
                     {
                         build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE idx=%Q", db.Backends[iDb].Name, pIndex.zName);
                     }
-                    sqlite3ChangeCookie(pParse, iDb);
+                    codegenChangeCookie(pParse, iDb);
                     destroyRootPage(pParse, pIndex.tnum, iDb);
                     v.sqlite3VdbeAddOp4( OpCode.OP_DropIndex, iDb, 0, 0, pIndex.zName, 0);
                 }
@@ -1882,7 +1877,7 @@ goto exit_drop_index;
                     build.sqlite3IdListDelete(db, ref pList);
                     return null;
                 }
-                pList.a[i].zName = build.sqlite3NameFromToken(db, pToken);
+                pList.a[i].zName = build.Token2Name(db, pToken);
                 return pList;
             }
             ///<summary>
@@ -1963,24 +1958,13 @@ goto exit_drop_index;
             {
                 return build.sqlite3SrcListAppend(db, null, pTable, pDatabase);
             }
-            public static SrcList sqlite3SrcListAppend(Connection db,///
-                ///<summary>
-                ///Connection to notify of malloc failures 
-                ///</summary>
-            SrcList pList,///
-                ///<summary>
-                ///Append to this SrcList. NULL creates a new SrcList 
-                ///</summary>
-            Token pTable,///
-                ///<summary>
-                ///Table to append 
-                ///</summary>
-            Token pDatabase,///
-                ///<summary>
-                ///Database of the table 
-                ///</summary>
-            Action<SrcList_item> action=null
-                )
+            public static SrcList sqlite3SrcListAppend(
+                Connection db,///Connection to notify of malloc failures 
+                SrcList pList,///Append to this SrcList. NULL creates a new SrcList 
+                Token pTable,///Table to append 
+                Token pDatabase,///Database of the table 
+                Action<SrcList_item> action=null
+            )
         {
             
             if (pDatabase != null && String.IsNullOrEmpty(pDatabase.zRestSql))
@@ -1988,18 +1972,14 @@ goto exit_drop_index;
                 pDatabase = null;
             }
             if (pDatabase != null)
-            {
-                Token pTemp = pDatabase;
-                pDatabase = pTable;
-                pTable = pTemp;
-            }
+                utilc.swap(ref pDatabase,ref pTable);
 
             pList = pList.Append<SrcList, SrcList_item>(
                 ()=> {
                     var r = new SrcList_item()
                     {
-                        zName = build.sqlite3NameFromToken(db, pTable),
-                        zDatabase = build.sqlite3NameFromToken(db, pDatabase)
+                        zName = build.Token2Name(db, pTable),
+                        zDatabase = build.Token2Name(db, pDatabase)
                     };
                     if (null != action) action(r);
                     return r;
@@ -2119,7 +2099,7 @@ goto exit_drop_index;
                         Debug.Assert(pAlias != null);
                         if (pAlias.Length != 0)
                         {
-                            pItem.zAlias = build.sqlite3NameFromToken(db, pAlias);
+                            pItem.zAlias = build.Token2Name(db, pAlias);
                         }
                         pItem.pSelect = pSubquery;
                         pItem.pOn = pOn;
@@ -2162,7 +2142,7 @@ goto exit_drop_index;
                     }
                     else
                     {
-                        pItem.zIndex = build.sqlite3NameFromToken(pParse.db, pIndexedBy);
+                        pItem.zIndex = build.Token2Name(pParse.db, pIndexedBy);
                     }
                 }
             }
@@ -2275,7 +2255,7 @@ goto exit_drop_index;
 #endif
             public static void sqlite3Savepoint(Parse pParse, int op, Token pName)
             {
-                string zName = build.sqlite3NameFromToken(pParse.db, pName);
+                string zName = build.Token2Name(pParse.db, pName);
                 if (zName != null)
                 {
                     Vdbe v = pParse.sqlite3GetVdbe();

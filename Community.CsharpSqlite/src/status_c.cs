@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 namespace Community.CsharpSqlite {
+    using Ast;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Paging;
@@ -10,7 +11,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Utils;
     using sqlite3_value = Engine.Mem;
     using Vdbe = Engine.Vdbe;
-	public partial class Sqlite3 {
+    public partial class Sqlite3 {
 		///
 		///<summary>
 		///2008 June 18
@@ -241,11 +242,11 @@ namespace Community.CsharpSqlite {
 						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.trigHash.ht );
 						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.idxHash.ht );
 						//nByte += (int)malloc_cs.sqlite3MallocSize( pSchema.fkeyHash.ht );
-						for(p= pSchema.trigHash.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
+						for(p= pSchema.Triggers.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
 							Trigger t=(Trigger)p.sqliteHashData();
 							TriggerParser.sqlite3DeleteTrigger(db,ref t);
 						}
-						for(p= pSchema.tblHash.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
+						for(p= pSchema.Tables.sqliteHashFirst();p!=null;p=p.sqliteHashNext()) {
 							Table t=(Table)p.sqliteHashData();
 							TableBuilder.sqlite3DeleteTable(db,ref t);
 						}

@@ -38,7 +38,7 @@ namespace Community.CsharpSqlite.builder
                 ///</summary>
                 ///<param name="Zero">length table names are allowed </param>
                 pDb = db.Backends[iDb];
-                p = HashExtensions.sqlite3HashInsert(ref pDb.pSchema.tblHash, zTabName, StringExtensions.Strlen30(zTabName), (Table)null);
+                p = HashExtensions.Insert( pDb.pSchema.Tables, zTabName, StringExtensions.Strlen30(zTabName), (Table)null);
                 TableBuilder.sqlite3DeleteTable(db, ref p);
                 db.flags |= SqliteFlags.SQLITE_InternChanges;
             }
@@ -59,24 +59,7 @@ namespace Community.CsharpSqlite.builder
             ///</summary>
             public static Table sqlite3FindTable(this Connection db, string zDatabase, string zName)
         {
-                Table p = null;
-                Debug.Assert(zName != null);
-                var nName = StringExtensions.Strlen30(zName);
-                ///All mutexes are required for schema access.  Make sure we hold them. 
-                Debug.Assert(zDatabase != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
-
-                var backend = db.Backends.Take(db.BackendCount)
-                    .Swap(0,1)///Search TEMP before MAIN //        int j = (i < 2) ? i ^ 1 : i;
-                    .Where(
-                        b => !(zDatabase != null && !zDatabase.Equals(b.Name, StringComparison.InvariantCultureIgnoreCase))
-                    )
-                    .Select(b => { Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, b, null)); return b; })//Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));)
-                    .FirstOrDefault(
-                        b => null != (p = b.pSchema.tblHash.Find(zName, nName, (Table)null))
-                    );
-
-                
-                return p;
+            return db.FindInBackendsSchemas(zName, zDatabase, schema => schema.Tables);            
             }
             ///<summary>
             /// Locate the in-memory structure that describes a particular database
@@ -89,16 +72,13 @@ namespace Community.CsharpSqlite.builder
             /// build.sqlite3FindTable() does not.
             ///
             ///</summary>
-            public static Table sqlite3LocateTable(Parse pParse,///
-                ///context in which to report errors 
-            int isView,///
-                ///True if looking for a VIEW rather than a TABLE 
-            string zName,///
-                ///Name of the table we are looking for 
-            string zDbase///
-                ///Name of the database.  Might be NULL 
+            public static Table sqlite3LocateTable(
+                Parse pParse,///True if looking for a VIEW rather than a TABLE 
+                string zName,///Name of the table we are looking for 
+                string zDbase=null,///context in which to report errors 
+                bool isView=false///Name of the database.  Might be NULL 
             )
-            {
+        {
                 ///Read the database schema. If an error occurs, leave an error message
                 ///and code in pParse and return NULL. 
                 if (SqlResult.SQLITE_OK != pParse.sqlite3ReadSchema())
@@ -108,7 +88,7 @@ namespace Community.CsharpSqlite.builder
                 Table p = pParse.db.sqlite3FindTable(zDbase, zName);
                 if (p == null)
                 {
-                    string zMsg = isView != 0 ? "no such view" : "no such table";
+                    string zMsg = isView ? "no such view" : "no such table";
                     if (zDbase != null)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s", zMsg, zDbase, zName);
@@ -193,7 +173,7 @@ namespace Community.CsharpSqlite.builder
             if (sqliteinth.OMIT_TEMPDB == 0 && isTemp != 0)
                 iDb = 1;
             pParse.sNameToken = pName;
-            zName = build.sqlite3NameFromToken(db, pName);
+            zName = build.Token2Name(db, pName);
             if (zName == null)
                 return;
             if (SqlResult.SQLITE_OK != build.sqlite3CheckObjectName(pParse, zName))
@@ -317,9 +297,9 @@ goto begin_table_error;
                     }
                     ///If the file format and encoding in the database have not been set,
                     ///set them now.
-                    var reg1 = pParse.regRowid = ++pParse.nMem;
-                    var reg2 = pParse.regRoot = ++pParse.nMem;
-                    var reg3 = ++pParse.nMem;
+                    var reg1 = pParse.regRowid = ++pParse.UsedCellCount;
+                    var reg2 = pParse.regRoot = ++pParse.UsedCellCount;
+                    var reg3 = ++pParse.UsedCellCount;
                     vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, reg3,(int) BTreeProp.FILE_FORMAT);
                     Engine.vdbeaux.markUsed(vdbEngine, iDb);
                     var j1 = vdbEngine.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
@@ -374,7 +354,7 @@ goto begin_table_error;
             ///This routine is called to do the work of a DROP TABLE statement.
             ///pName is the name of the table to be dropped.
             ///</summary>
-            public static void sqlite3DropTable(Parse pParse, SrcList pName, int isView, int noErr)
+            public static void sqlite3DropTable(Parse pParse, SrcList pName, bool isView, int noErr)
             {
                 //if ( db.mallocFailed != 0 )
                 //{
@@ -386,7 +366,7 @@ goto begin_table_error;
                 Connection db = pParse.db;
                 if (noErr != 0)
                     db.suppressErr++;
-                var pTab = TableBuilder.sqlite3LocateTable(pParse, isView, pName.a[0].zName, pName.a[0].zDatabase);
+                var pTab = TableBuilder.sqlite3LocateTable(pParse, pName.a[0].zName, pName.a[0].zDatabase, isView);
                 if (noErr != 0)
                     db.suppressErr--;
                 if (pTab == null)
@@ -395,7 +375,7 @@ goto begin_table_error;
                         build.sqlite3CodeVerifyNamedSchema(pParse, pName.a[0].zDatabase);
                     goto exit_drop_table;
                 }
-                var iDb = db.indexOf( pTab.pSchema);
+                var iDb = db.indexOfBackendWithSchema( pTab.pSchema);
                 Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
                 ///If pTab is a virtual table, call ViewGetColumnNames() to ensure
                 ///it is initialized.
@@ -444,12 +424,12 @@ goto exit_drop_table;
 #if !SQLITE_OMIT_VIEW
                 ///Ensure DROP TABLE is not used on a view, and DROP VIEW is not used
                 ///on a table.
-                if (isView != 0 && pTab.pSelect == null)
+                if (isView != false && pTab.pSelect == null)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "use DROP TABLE to delete table %s", pTab.zName);
                     goto exit_drop_table;
                 }
-                if (0 == isView && pTab.pSelect != null)
+                if (false == isView && pTab.pSelect != null)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "use DROP VIEW to delete view %s", pTab.zName);
                     goto exit_drop_table;
@@ -502,7 +482,7 @@ goto exit_drop_table;
                     {
                         build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE tbl=%Q", pDb.Name, pTab.zName);
                     }
-                    if (0 == isView && !pTab.IsVirtual())
+                    if (false == isView && !pTab.IsVirtual())
                     {
                         destroyTable(pParse, pTab);
                     }
@@ -513,7 +493,7 @@ goto exit_drop_table;
                         v.sqlite3VdbeAddOp4(OpCode.OP_VDestroy, iDb, 0, 0, pTab.zName, 0);
                     }
                     v.sqlite3VdbeAddOp4(OpCode.OP_DropTable, iDb, 0, 0, pTab.zName, 0);
-                    build.sqlite3ChangeCookie(pParse, iDb);
+                    build.codegenChangeCookie(pParse, iDb);
                 }
                 build.sqliteViewResetAll(db, iDb);
             exit_drop_table:
@@ -581,7 +561,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     }
                     else
                     {
-                        int iDb = pParse.db.indexOf( pTab.pSchema);
+                        int iDb = pParse.db.indexOfBackendWithSchema( pTab.pSchema);
                         build.destroyRootPage(pParse, iLargest, iDb);
                         iDestroyed = iLargest;
                     }
@@ -629,7 +609,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
                     //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
                     //  );
-                    HashExtensions.sqlite3HashInsert(ref pIndex.pSchema.idxHash, zName, StringExtensions.Strlen30(zName), (Index)null);
+                    HashExtensions.Insert( pIndex.pSchema.Indexes, zName, StringExtensions.Strlen30(zName), (Index)null);
 #endif
                     //}
                     var index = pIndex;
@@ -850,7 +830,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     pNewTable.tnum = db.init.newTnum;
                 }
 
-                var iDb = db.indexOf(pNewTable.pSchema);
+                var iDb = db.indexOfBackendWithSchema(pNewTable.pSchema);
 
                 ///If not initializing, then create a record for the new table
                 ///in the SQLITE_MASTER table of the database.
@@ -937,7 +917,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     ///the information we've collected.
                     build.sqlite3NestedParse(pParse, "UPDATE %Q.%s " + "SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), zType, pNewTable.zName, pNewTable.zName, pParse.regRoot, zStmt, pParse.regRowid);
                     db.DbFree(ref zStmt);
-                    build.sqlite3ChangeCookie(pParse, iDb);
+                    build.codegenChangeCookie(pParse, iDb);
 #if !SQLITE_OMIT_AUTOINCREMENT
                     ///Check to see if we need to create an sqlite_sequence table for
                     ///keeping track of autoincrement keys.
@@ -960,7 +940,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     Table pOld;
                     Schema pSchema = pNewTable.pSchema;
                     Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                    pOld = pSchema.tblHash.HashInsert(pNewTable.zName.sub(), pNewTable);
+                    pOld = pSchema.Tables.Insert(pNewTable.zName.sub(), pNewTable);
                     if (pOld != null)
                     {
                         Debug.Assert(pNewTable == pOld);
