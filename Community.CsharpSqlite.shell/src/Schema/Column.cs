@@ -46,13 +46,13 @@ namespace Community.CsharpSqlite.Metadata
             ///Default value of this column 
             ///</summary>
 
-            public Expr pDflt;
+            public Expr DefaultValue;
             
             ///
             ///<summary>
             ///Original text of the default value 
             ///</summary>
-            public string zDflt;
+            public string DefaultValueSource;
 
             ///
             ///<summary>
@@ -93,8 +93,8 @@ namespace Community.CsharpSqlite.Metadata
             public Column Copy()
             {
                 Column cp = (Column)MemberwiseClone();
-                if (cp.pDflt != null)
-                    cp.pDflt = pDflt.Clone();
+                if (cp.DefaultValue != null)
+                    cp.DefaultValue = DefaultValue.Clone();
                 return cp;
             }
 

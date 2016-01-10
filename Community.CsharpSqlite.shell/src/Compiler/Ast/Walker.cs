@@ -37,17 +37,14 @@ namespace Community.CsharpSqlite.Ast {
 			///Parser context.  
 			///</summary>
 			public struct uw {
-				///
 				///<summary>
 				///Extra data for callback 
 				///</summary>
 				public NameContext pNC;
-				///
 				///<summary>
 				///Naming context 
 				///</summary>
 				public int i;
-			///
 			///<summary>
 			///Integer value 
 			///</summary>

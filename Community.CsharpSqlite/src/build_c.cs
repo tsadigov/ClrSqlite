@@ -458,19 +458,17 @@ p.zName,  P4Usage.P4_STATIC );
             /// Table.aCol[] array).
             ///
             ///</summary>
-            public static void sqliteDeleteColumnNames(Connection db, Table pTable)
+            public static void DeleteColumnNames(Connection db, Table pTable)
             {
-                int i;
-                Column pCol;
                 Debug.Assert(pTable != null);
-                for (i = 0; i < pTable.nCol; i++)
+                for (var i = 0; i < pTable.nCol; i++)
                 {
-                    pCol = pTable.aCol[i];
+                    var pCol = pTable.aCol[i];
                     if (pCol != null && db != null)
                     {
                         db.DbFree(ref pCol.zName);
-                        exprc.Delete(db, ref pCol.pDflt);
-                        db.DbFree(ref pCol.zDflt);
+                        exprc.Delete(db, ref pCol.DefaultValue);
+                        db.DbFree(ref pCol.DefaultValueSource);
                         db.DbFree(ref pCol.zType);
                         db.DbFree(ref pCol.zColl);
                     }
@@ -803,37 +801,32 @@ p.zName,  P4Usage.P4_STATIC );
             ///
             ///</summary>
             public static void sqlite3AddDefaultValue(Parse pParse, ExprSpan pSpan)
-            {
-                Table p;
-                Column pCol;
+            {                
                 Connection db = pParse.db;
-                p = pParse.pNewTable;
+                var p = pParse.pNewTable;
                 if (p != null)
                 {
-                    pCol = (p.aCol[p.nCol - 1]);
+                    var pCol = (p.aCol[p.nCol - 1]);
                     if (pSpan.pExpr.sqlite3ExprIsConstantOrFunction() == 0)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "default value of column [%s] is not constant", pCol.zName);
                     }
                     else
                     {
-                        ///
-                        ///<summary>
                         ///A copy of pExpr is used instead of the original, as pExpr contains
                         ///tokens that point to volatile memory. The 'span' of the expression
-                        ///is required by pragma table_info.
-                        ///
-                        ///</summary>
-                        exprc.Delete(db, ref pCol.pDflt);
-                        pCol.pDflt = exprc.sqlite3ExprDup(db, pSpan.pExpr, Sqlite3.EXPRDUP_REDUCE);
-                        db.DbFree(ref pCol.zDflt);
-                        pCol.zDflt = pSpan.zStart.Substring(0, pSpan.zStart.Length - pSpan.zEnd.Length);
+                        ///is required by pragma table_info.                        
+                        exprc.Delete(db, ref pCol.DefaultValue);
+                        pCol.DefaultValue = exprc.sqlite3ExprDup(db, pSpan.pExpr, Sqlite3.EXPRDUP_REDUCE);
+                        db.DbFree(ref pCol.DefaultValueSource);
+                        pCol.DefaultValueSource = pSpan.zStart.Substring(0, pSpan.zStart.Length - pSpan.zEnd.Length);
                         //sqlite3DbStrNDup( db, pSpan.zStart,
                         //                               (int)( pSpan.zEnd.Length - pSpan.zStart.Length ) );
                     }
                 }
                 exprc.Delete(db, ref pSpan.pExpr);
             }
+
             ///<summary>
             /// Designate the PRIMARY KEY for the table.  pList is a list of names
             /// of columns that form the primary key.  If pList is NULL, then the
@@ -1363,7 +1356,7 @@ db.xAuth = xAuth;
                     // sqliteHashData( i );
                     if (pTab.pSelect != null)
                     {
-                        sqliteDeleteColumnNames(db, pTab);
+                        DeleteColumnNames(db, pTab);
                         pTab.aCol = null;
                         pTab.nCol = 0;
                     }

@@ -792,7 +792,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             ///Extract the value of R from register P3. 
                             ///</summary>
 
-                            pIn3.sqlite3VdbeMemIntegerify();
+                            pIn3.Integerify();
                             R = pIn3.u.AsInteger;
                             ///
                             ///<summary>
@@ -1021,7 +1021,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                     }
                                     Debug.Assert(pMem.memIsValid());
                                     Sqlite3.REGISTER_TRACE(vdbe, pOp.p3, pMem);
-                                    pMem.sqlite3VdbeMemIntegerify();
+                                    pMem.Integerify();
                                     Debug.Assert((pMem.flags & MemFlags.MEM_Int) != 0);
                                     ///
                                     ///<summary>
@@ -1458,7 +1458,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             //{
                             //  return RuntimeException.no_mem;
                             //}
-                            pRt.sqlite3VdbeMemRelease();
+                            pRt.Release();
                             pRt.flags = MemFlags.MEM_Frame;
                             pRt.u.pFrame = pFrame;
                             pFrame.v = vdbe;
@@ -1627,9 +1627,9 @@ namespace Community.CsharpSqlite.Engine.Op
                             _pIn1 = aMem[pOp.p1];
                         }
                         Debug.Assert(_pIn1.memIsValid());
-                        _pIn1.sqlite3VdbeMemIntegerify();
+                        _pIn1.Integerify();
                         pIn2 = aMem[pOp.p2];
-                        pIn2.sqlite3VdbeMemIntegerify();
+                        pIn2.Integerify();
                         if (_pIn1.u.AsInteger < pIn2.u.AsInteger)
                         {
                             _pIn1.u.AsInteger = pIn2.u.AsInteger;
@@ -1703,7 +1703,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             malloc_cs.sqlite3SetString(ref vdbe.zErrMsg, db, vdbeapi.sqlite3_value_text(ctx.s));
                             rc = ctx.isError;
                         }
-                        ctx.s.sqlite3VdbeMemRelease();
+                        ctx.s.Release();
                         break;
                     }
                 ///
@@ -2256,7 +2256,7 @@ break;
                         clumnOffsets[i] = 0;
                     }
                 }
-                sMem.sqlite3VdbeMemRelease();
+                sMem.Release();
                 sMem.flags = MemFlags.MEM_Null;
                 ///If we have read more header data than was contained in the header,
                 ///or if the end of the last field appears to be past the end of the

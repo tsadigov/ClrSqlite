@@ -493,7 +493,7 @@ return;
                 ///if initialising a database schema.
                 if (0 == db.init.busy)
                 {
-                    pTab = pParse.sqlite3SrcListLookup(pTblName);
+                    pTab = pParse.GetFirstTableInTheList(pTblName);
                     if (pName2.Length == 0 && pTab != null && pTab.pSchema == db.Backends[1].pSchema)
                     {
                         iDb = 1;

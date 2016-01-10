@@ -1874,7 +1874,7 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                     {
                         context.sqlite3_result_value(pRes);
                     }
-                    pRes.sqlite3VdbeMemRelease();
+                    pRes.Release();
                 }
             }
             ///<summary>

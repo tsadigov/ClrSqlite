@@ -137,7 +137,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         var pIn1 = aMem[pOp.p1];
                         if ((pIn1.flags & MemFlags.MEM_Null) == 0)
                         {
-                            pIn1.sqlite3VdbeMemIntegerify();
+                            pIn1.Integerify();
                         }
                         break;
                     }

@@ -9,7 +9,7 @@ using Community.CsharpSqlite.Ast;
 using Community.CsharpSqlite.Utils;
 namespace Community.CsharpSqlite
 {
-    public class fkeyc
+    public static class fkeyc
     {
         ///
         ///<summary>
@@ -193,7 +193,7 @@ namespace Community.CsharpSqlite
         ///table pTab. Remove the deleted foreign keys from the Schema.fkeyHash
         ///hash table.
         ///</summary>
-        public static void sqlite3FkDelete(Connection db, Table pTab)
+        public static void DeleteForeignKeys(this Connection db, Table pTab)
         {   
             ///Copy of pFKey.pNextFrom 
             Debug.Assert(db == null || Sqlite3.sqlite3SchemaMutexHeld(db, 0, pTab.pSchema));

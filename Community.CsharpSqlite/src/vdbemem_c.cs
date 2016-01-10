@@ -406,7 +406,7 @@ return r;
                 Debug.Assert(pFrom.db == null || pFrom.db.mutex.sqlite3_mutex_held());
                 Debug.Assert(pTo.db == null || pTo.db.mutex.sqlite3_mutex_held());
                 Debug.Assert(pFrom.db == null || pTo.db == null || pFrom.db == pTo.db);
-                pTo.sqlite3VdbeMemRelease();
+                pTo.Release();
                 pFrom.CopyTo(ref pTo);
                 // memcpy(pTo, pFrom, Mem).Length;
                 pFrom.flags = MemFlags.MEM_Null;
@@ -556,8 +556,8 @@ return r;
                             v2 = sqlite3ValueText((sqlite3_value)c2, pColl.enc);
                             n2 = v2 == null ? 0 : c2.CharacterCount;
                             rc = pColl.xCmp(pColl.pUser, n1, v1, n2, v2);
-                            c1.sqlite3VdbeMemRelease();
-                            c2.sqlite3VdbeMemRelease();
+                            c1.Release();
+                            c2.Release();
                             return rc;
                         }
                     }
@@ -654,7 +654,7 @@ return r;
                 Debug.Assert(zData != null);
                 if (offset + amt <= available && (pMem.flags & MemFlags.MEM_Dyn) == 0)
                 {
-                    pMem.sqlite3VdbeMemRelease();
+                    pMem.Release();
                     pMem.zBLOB = malloc_cs.sqlite3Malloc(amt);
                     Buffer.BlockCopy(zData, offset, pMem.zBLOB, 0, amt);
                     //pMem.z = &zData[offset];
@@ -681,7 +681,7 @@ return r;
                         //pMem.z[amt+1] = 0;
                         if (rc != SqlResult.SQLITE_OK)
                         {
-                            pMem.sqlite3VdbeMemRelease();
+                            pMem.Release();
                         }
                     }
                 pMem.CharacterCount = amt;
@@ -921,7 +921,7 @@ return r;
                                 nVal = StringExtensions.Strlen30(zVal) - 1;
                                 Debug.Assert(zVal[nVal] == '\'');
                                 byte[] blob = Converter.sqlite3HexToBlob(db, zVal, nVal);
-                                pVal.sqlite3VdbeMemSetStr(Encoding.UTF8.GetString(blob, 0, blob.Length), nVal / 2, 0, sqliteinth.SQLITE_DYNAMIC);
+                                pVal.Set(Encoding.UTF8.GetString(blob, 0, blob.Length), nVal / 2, 0, sqliteinth.SQLITE_DYNAMIC);
                             }
 #endif
                 if (pVal != null)
@@ -962,7 +962,7 @@ return r;
             )
             {
                 if (v != null)
-                    v.sqlite3VdbeMemSetStr(z, n, enc, xDel);
+                    v.Set(z, n, enc, xDel);
             }
             ///<summary>
             /// Free an sqlite3_value object
@@ -972,7 +972,7 @@ return r;
             {
                 if (v == null)
                     return;
-                v.sqlite3VdbeMemRelease();
+                v.Release();
                 v.db.sqlite3DbFree(ref v);
             }
             ///

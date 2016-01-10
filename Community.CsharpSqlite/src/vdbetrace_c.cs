@@ -54,7 +54,7 @@ namespace Community.CsharpSqlite
 			int n;
 			pnToken = 0;
 			while (iOffset < zSql.Length) {
-                var token = Lexer.GetToken(zSql, iOffset);
+                var token = Lexer.GetNextToken(zSql, iOffset);
 				n = token.Length;
 				Debug.Assert (n > 0 && token.TokenType != TokenType.TK_ILLEGAL);
 				if (tokenType == TokenType.TK_VARIABLE) {

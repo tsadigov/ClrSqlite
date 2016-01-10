@@ -1141,8 +1141,8 @@ else
 																					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,2,0,pCol.zName,0);
 																					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,3,0,pCol.zType!=null?pCol.zType:"",0);
 																					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,(pCol.notNull!=0?1:0),4);
-																					if(pCol.zDflt!=null) {
-																						v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,5,0,pCol.zDflt,0);
+																					if(pCol.DefaultValueSource!=null) {
+																						v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,5,0,pCol.DefaultValueSource,0);
 																					}
 																					else {
 																						v.sqlite3VdbeAddOp2(OpCode.OP_Null,0,5);

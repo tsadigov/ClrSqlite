@@ -969,7 +969,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         {
                             if ((pEnd.flags & (MemFlags.MEM_Agg | MemFlags.MEM_Dyn | MemFlags.MEM_Frame | MemFlags.MEM_RowSet)) != 0)
                             {
-                                pEnd.sqlite3VdbeMemRelease();
+                                pEnd.Release();
                             }
                             //else if ( pEnd.zMalloc != null )
                             //{
@@ -1227,7 +1227,7 @@ void sqlite3VdbeLeave(Vdbe *p){
                         z = displayP4(pOp, pMem.AsString, 32);
                         if (z != pMem.AsString)
                         {
-                            pMem.sqlite3VdbeMemSetStr(z, -1, SqliteEncoding.UTF8, null);
+                            pMem.Set(z, -1, SqliteEncoding.UTF8, null);
                         }
                         else
                         {
@@ -3415,7 +3415,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///</summary>
                 sqlite3VdbeSerialGet(m.zBLOB, (int)(m.CharacterCount - lenRowid), typeRowid, v);
                 rowid = v.u.AsInteger;
-                m.sqlite3VdbeMemRelease();
+                m.Release();
                 return SqlResult.SQLITE_OK;
             ///
             ///<summary>
@@ -3424,7 +3424,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             idx_rowid_corruption:
                 //sqliteinth.testcase( m.zMalloc != 0 );
-                m.sqlite3VdbeMemRelease();
+                m.Release();
             return sqliteinth.SQLITE_CORRUPT_BKPT();
             }
             ///<summary>
@@ -3483,7 +3483,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 }
                 Debug.Assert((pUnpacked.flags & UnpackedRecordFlags.UNPACKED_IGNORE_ROWID) != 0);
                 res = sqlite3VdbeRecordCompare(m.CharacterCount, m.zBLOB, pUnpacked);
-                m.sqlite3VdbeMemRelease();
+                m.Release();
                 return SqlResult.SQLITE_OK;
             }
             ///<summary>

@@ -301,32 +301,20 @@ set { _flags = value; }
 
 
 
-        public SqlResult sqlite3VdbeMemSetStr(
-        string z,
-            ///<summary>
-            ///Bytes in string, or negative 
-            ///</summary>
-            int ByteCountOrNegative,
-            ///<summary>
-            ///Encoding of z.  0 for BLOBs 
-            ///</summary>
-            SqliteEncoding enc,
-            ///<summary>
-            ///Destructor function 
-            ///</summary>         
-            dxDel xDel                      
+        public SqlResult Set(
+            string z,
+            int ByteCountOrNegative,///Bytes in string, or negative                                     
+            SqliteEncoding enc,///Encoding of z.  0 for BLOBs
+            dxDel xDel///Destructor function 
             )
         {
-            return this.sqlite3VdbeMemSetStr(z, 0, ByteCountOrNegative, enc, xDel);
+            return this.Set(z, 0, ByteCountOrNegative, enc, xDel);
         }
         // Call w/o offset
-        public SqlResult sqlite3VdbeMemSetStr(
+        public SqlResult Set(
             string z,
-            ///<summary>
-            ///offset into string 
-            ///</summary>
-            int offset,
-                       
+            int offset,///offset into string 
+
             int ByteCountOrNegative,
             SqliteEncoding enc,
             dxDel xDel//)(void*)/* Destructor function */
@@ -395,7 +383,7 @@ set { _flags = value; }
                 }
             }
             else {
-                pMem.sqlite3VdbeMemRelease();
+                pMem.Release();
                 if (enc == 0)
                 {
                     pMem.AsString = null;
@@ -460,7 +448,7 @@ return SQLITE_NOMEM;
         public void sqlite3VdbeMemSetZeroBlob(int n)
         {
             Mem pMem = this;
-            pMem.sqlite3VdbeMemRelease();
+            pMem.Release();
             pMem.flags = MemFlags.MEM_Blob | MemFlags.MEM_Zero;
             pMem.type = FoundationalType.SQLITE_BLOB;
             pMem.CharacterCount = 0;
@@ -486,7 +474,7 @@ return SQLITE_NOMEM;
         public void Set(i64 val)
         {
             Mem pMem = this;
-            pMem.sqlite3VdbeMemRelease();
+            pMem.Release();
             pMem.u.AsInteger = val;
             pMem.flags = MemFlags.MEM_Int;
             pMem.type = FoundationalType.SQLITE_INTEGER;
@@ -505,7 +493,7 @@ return SQLITE_NOMEM;
             }
             else
             {
-                pMem.sqlite3VdbeMemRelease();
+                pMem.Release();
                 pMem.AsReal = val;
                 pMem.flags = MemFlags.MEM_Real;
                 pMem.type = FoundationalType.SQLITE_FLOAT;
@@ -525,7 +513,7 @@ return SQLITE_NOMEM;
             Connection db = pMem.db;
             Debug.Assert(db != null);
             Debug.Assert((pMem.flags & MemFlags.MEM_RowSet) == 0);
-            pMem.sqlite3VdbeMemRelease();
+            pMem.Release();
             //pMem.zMalloc = sqlite3DbMallocRaw( db, 64 );
             //if ( db.mallocFailed != 0 )
             //{
@@ -563,7 +551,7 @@ return SQLITE_NOMEM;
                 {
                     vdbemem_cs.sqlite3VdbeMemFinalize(p, p.u.pDef);
                     Debug.Assert((p.flags & MemFlags.MEM_Agg) == 0);
-                    p.sqlite3VdbeMemRelease();
+                    p.Release();
                 }
                 else
                     if ((p.flags & MemFlags.MEM_Dyn) != 0 && p.xDel != null)
@@ -643,7 +631,7 @@ return SQLITE_NOMEM;
         /// (Mem.type==SQLITE_TEXT).
         ///
         ///</summary>
-        public void sqlite3VdbeMemRelease()
+        public void Release()
         {
             Mem p = this;
             p.sqlite3VdbeMemReleaseExternal();
@@ -659,7 +647,7 @@ return SQLITE_NOMEM;
         /// Convert pMem to type integer.  Invalidate any prior representations.
         ///
         ///</summary>
-        public SqlResult sqlite3VdbeMemIntegerify()
+        public SqlResult Integerify()
         {
             Mem pMem = this;
             Debug.Assert(pMem.db == null || pMem.db.mutex.sqlite3_mutex_held());

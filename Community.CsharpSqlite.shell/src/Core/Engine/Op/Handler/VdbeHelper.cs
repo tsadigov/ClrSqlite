@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite.Engine
                     {
                         ///<param name="out2">prerelease </param>
                         Debug.Assert(pOp.p1 <= db.aLimit[Globals.SQLITE_LIMIT_LENGTH]);
-                        pOut.sqlite3VdbeMemSetStr(pOp.p4.z, pOp.p1, 0, null);
+                        pOut.Set(pOp.p4.z, pOp.p1, 0, null);
                         pOut.enc = encoding;
 #if SQLITE_TEST
 																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pOut );

@@ -24,38 +24,38 @@ using ynVar = System.Int32;
 namespace Community.CsharpSqlite.Metadata
 {
     using Metadata;
-
-        ///<summary>
-        ///A prefix match is considered OK
-        ///</summary>
-        ///<summary>
-        /// Each SQL index is represented in memory by an
-        /// instance of the following structure.
-        ///
-        /// The columns of the table that are to be indexed are described
-        /// by the aiColumn[] field of this structure.  For example, suppose
-        /// we have the following table and index:
-        ///
-        ///     CREATE TABLE Ex1(c1 int, c2 int, c3 text);
-        ///     CREATE INDEX Ex2 ON Ex1(c3,c1);
-        ///
-        /// In the Table structure describing Ex1, nCol==3 because there are
-        /// three columns in the table.  In the Index structure describing
-        /// Ex2, nColumn==2 since 2 of the 3 columns of Ex1 are indexed.
-        /// The value of aiColumn is {2, 0}.  aiColumn[0]==2 because the
-        /// first column to be indexed (c3) has an index of 2 in Ex1.aCol[].
-        /// The second column to be indexed (c1) has an index of 0 in
-        /// Ex1.aCol[], hence Ex2.aiColumn[1]==0.
-        ///
-        /// The Index.onError field determines whether or not the indexed columns
-        /// must be unique and what to do if they are not.  When Index.onError=OnConstraintError.OE_None,
-        /// it means this is not a unique index.  Otherwise it is a unique index
-        /// and the value of Index.onError indicate the which conflict resolution
-        /// algorithm to employ whenever an attempt is made to insert a non-unique
-        /// element.
-        ///
-        ///</summary>
-        public class Index
+    using Utils;
+    ///<summary>
+    ///A prefix match is considered OK
+    ///</summary>
+    ///<summary>
+    /// Each SQL index is represented in memory by an
+    /// instance of the following structure.
+    ///
+    /// The columns of the table that are to be indexed are described
+    /// by the aiColumn[] field of this structure.  For example, suppose
+    /// we have the following table and index:
+    ///
+    ///     CREATE TABLE Ex1(c1 int, c2 int, c3 text);
+    ///     CREATE INDEX Ex2 ON Ex1(c3,c1);
+    ///
+    /// In the Table structure describing Ex1, nCol==3 because there are
+    /// three columns in the table.  In the Index structure describing
+    /// Ex2, nColumn==2 since 2 of the 3 columns of Ex1 are indexed.
+    /// The value of aiColumn is {2, 0}.  aiColumn[0]==2 because the
+    /// first column to be indexed (c3) has an index of 2 in Ex1.aCol[].
+    /// The second column to be indexed (c1) has an index of 0 in
+    /// Ex1.aCol[], hence Ex2.aiColumn[1]==0.
+    ///
+    /// The Index.onError field determines whether or not the indexed columns
+    /// must be unique and what to do if they are not.  When Index.onError=OnConstraintError.OE_None,
+    /// it means this is not a unique index.  Otherwise it is a unique index
+    /// and the value of Index.onError indicate the which conflict resolution
+    /// algorithm to employ whenever an attempt is made to insert a non-unique
+    /// element.
+    ///
+    ///</summary>
+    public class Index:ILinkedListNode<Index>
         {
             public string zName;
             ///
@@ -107,7 +107,7 @@ namespace Community.CsharpSqlite.Metadata
             ///<summary>
             ///String defining the affinity of each column 
             ///</summary>
-            public Index pNext;
+            public Index pNext { get; set; }
             ///
             ///<summary>
             ///The next index associated with the same table 

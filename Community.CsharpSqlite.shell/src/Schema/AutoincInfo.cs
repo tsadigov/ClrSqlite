@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Community.CsharpSqlite.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +18,9 @@ namespace Community.CsharpSqlite.Metadata
     ///<param name="normally coordinate their activities, but we do need to coordinate the">normally coordinate their activities, but we do need to coordinate the</param>
     ///<param name="loading and saving of autoincrement information.">loading and saving of autoincrement information.</param>
     ///<param name=""></param>
-    public class AutoincInfo
+    public class AutoincInfo:ILinkedListNode<AutoincInfo>
     {
-        public AutoincInfo pNext;
+        public AutoincInfo pNext { get; set; }
         ///
         ///<summary>
         ///Next info block in a list of them all 

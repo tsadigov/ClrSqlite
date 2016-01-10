@@ -209,7 +209,7 @@ namespace Community.CsharpSqlite.Metadata
             ///</summary>
             public Table pNextZombie;
 
-        public bool IsView { get { return null!=pSelect; } }
+        public bool IsView { get { return null!=pSelect; } }// pSelect!=null
 
         ///
         ///<summary>

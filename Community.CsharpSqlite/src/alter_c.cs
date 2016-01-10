@@ -114,7 +114,7 @@ namespace Community.CsharpSqlite
                         do
                         {
                             zCsr += len;
-                            len = (zCsr == zSql.Length) ? 1 : Lexer.sqlite3GetToken(zSql, zCsr, ref token);
+                            len = (zCsr == zSql.Length) ? 1 : Lexer.GetNextToken(zSql, zCsr, ref token);
                         }
                         while (token == TokenType.TK_SPACE);
                         Debug.Assert(len > 0);
@@ -176,14 +176,14 @@ namespace Community.CsharpSqlite
                 sqliteinth.UNUSED_PARAMETER(NotUsed);
                 for (zIdx = 0; zIdx < zInput.Length; zIdx += n)//z=zInput; *z; z=z+n)
                 {
-                    n = Lexer.sqlite3GetToken(zInput, zIdx, ref token);
+                    n = Lexer.GetNextToken(zInput, zIdx, ref token);
                     if (token == TokenType.TK_REFERENCES)
                     {
                         string zParent;
                         do
                         {
                             zIdx += n;
-                            n = Lexer.sqlite3GetToken(zInput, zIdx, ref token);
+                            n = Lexer.GetNextToken(zInput, zIdx, ref token);
                         }
                         while (token == TokenType.TK_SPACE);
                         zParent = zIdx + n < zInput.Length ? zInput.Substring(zIdx, n) : "";
@@ -274,7 +274,7 @@ namespace Community.CsharpSqlite
                         do
                         {
                             zCsr += len;
-                            len = (zCsr == zSql.Length) ? 1 : Lexer.sqlite3GetToken(zSql, zCsr, ref token);
+                            len = (zCsr == zSql.Length) ? 1 : Lexer.GetNextToken(zSql, zCsr, ref token);
                         }
                         while (token == TokenType.TK_SPACE);
                         Debug.Assert(len > 0);

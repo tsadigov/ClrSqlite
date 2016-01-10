@@ -52,7 +52,7 @@ namespace Community.CsharpSqlite.Utils {
             T result = pH.Insert(pKey.sub(nKey),data);
             return result;
 		}
-        public static T Insert<T>(this Hash pH, string pKey, int nKey, T data) where T : class
+        public static T Insert<T>(this Hash pH, string pKey, int nKey, T data=null) where T : class
         {
 
             ///New element added to the pH 

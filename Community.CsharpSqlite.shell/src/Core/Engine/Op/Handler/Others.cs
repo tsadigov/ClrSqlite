@@ -218,7 +218,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         Debug.Assert(pDb.BTree != null);
                         Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(vdbe.db, pOp.p1, null));
                         var pIn3 = aMem[pOp.p3];
-                        pIn3.sqlite3VdbeMemIntegerify();
+                        pIn3.Integerify();
                         ///
                         ///<summary>
                         ///See note about index shifting on  OpCode.OP_ReadCookie 
@@ -485,7 +485,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             }
                             else
                             {
-                                pIn1.sqlite3VdbeMemSetStr(z, -1, SqliteEncoding.UTF8, null);
+                                pIn1.Set(z, -1, SqliteEncoding.UTF8, null);
                                 //malloc_cs.sqlite3_free );
                             }
 #if SQLITE_TEST

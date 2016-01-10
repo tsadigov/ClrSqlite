@@ -328,195 +328,193 @@ namespace Community.CsharpSqlite
             /// in pParse and return WRC.WRC_Abort.  Return WRC.WRC_Prune on success.
             ///
             ///</summary>
-            public static WRC lookupName(Parse pParse,///
-                ///The parsing context 
-            string zDb,///
-                ///Name of the database containing table, or NULL 
-            string zTab,///
-                ///Name of table containing column, or NULL 
-            string zCol,///
-                ///Name of the column. 
-            NameContext pNC,///
-                ///The name context used to resolve the name 
-            Expr pExpr///
-                ///Make this EXPR node point to the selected column 
+            public static WRC lookupName(
+                Parse pParse,///The parsing context 
+                string zDb,///Name of the database containing table, or NULL 
+                string tableName,///Name of table containing column, or NULL 
+                string zCol,///Name of the column. 
+                NameContext nameContext,///The name context used to resolve the name 
+                Expr pExpr///Make this EXPR node point to the selected column 
             )
             {
-                int i, j;
-                ///Loop counters 
-                int cnt = 0;
-                ///Number of matching column names 
-                int cntTab = 0;
-                ///Number of matching table names 
-                Connection db = pParse.db;
-                ///The database connection 
-                SrcList_item pItem;
-                ///Use for looping over pSrcList items 
-                SrcList_item pMatch = null;
-                ///The matching pSrcList item 
-                NameContext pTopNC = pNC;
-                ///First namecontext in the list 
-                Schema pSchema = null;
-                ///Schema of the expression 
+                int cnt = 0;///Number of matching column names 
+                int cntTab = 0;///Number of matching table names 
+                Connection db = pParse.db;///The database connection 
+                
+                SrcList_item pMatch = null;///The matching pSrcList item 
+                NameContext topNameContext = nameContext;///First namecontext in the list 
+                Schema pSchema = null;///Schema of the expression 
                 int isTrigger = 0;
-                Debug.Assert(pNC != null);
-                ///the name context cannot be NULL. 
-                Debug.Assert(zCol != null);
-                ///The Z in X.Y.Z cannot be NULL 
+                Debug.Assert(nameContext != null);///the name context cannot be NULL. 
+                Debug.Assert(zCol != null);///The Z in X.Y.Z cannot be NULL 
                 Debug.Assert(!pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
                 ///<param name="Initialize the node to no">match </param>
                 pExpr.iTable = -1;
                 pExpr.pTab = null;
                 pExpr.ExprSetIrreducible();
-                ///</summary>
-                ///<param name="Start at the inner">most context and move outward until a match is found </param>
-                while (pNC != null && cnt == 0)
-                {
-                    ExprList pEList;
-                    SrcList pSrcList = pNC.pSrcList;
-                    if (pSrcList != null)
-                    {
-                        for (i = 0; i < pSrcList.Count; i++)//, pItem++ )
+                ///Start at the inner-most context and move outward until a match is found 
+
+
+                WRC result=WRC.WRC_Continue;
+                bool goto_ = false, ret = false;
+
+                nameContext.linkedList().ForEach(
+                   ( x,idx) => {
+                        ExprList pEList;
+                        SrcList pSrcList = x.pSrcList;
+                        if (null != pSrcList)
                         {
-                            pItem = pSrcList.a[i];
-                            Table pTab;
-                            int iDb;
-                            Column pCol;
-                            pTab = pItem.pTab;
-                            Debug.Assert(pTab != null && pTab.zName != null);
-                            iDb = db.indexOfBackendWithSchema( pTab.pSchema);
-                            Debug.Assert(pTab.nCol > 0);
-                            if (zTab != null)
-                            {
-                                if (pItem.zAlias != null)
-                                {
-                                    string zTabName = pItem.zAlias;
-                                    if (!zTabName.Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
-                                        continue;
-                                }
-                                else
-                                {
-                                    string zTabName = pTab.zName;
-                                    if (NEVER(zTabName == null) || !zTabName.Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        continue;
-                                    }
-                                    if (zDb != null && !db.Backends[iDb].Name.Equals(zDb, StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        continue;
-                                    }
-                                }
-                            }
-                            if (0 == (cntTab++))
-                            {
-                                pExpr.iTable = pItem.iCursor;
-                                pExpr.pTab = pTab;
-                                pSchema = pTab.pSchema;
-                                pMatch = pItem;
-                            }
-                            for (j = 0; j < pTab.nCol; j++)//, pCol++ )
-                            {
-                                pCol = pTab.aCol[j];
-                                if (pCol.zName.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    IdList pUsing;
-                                    cnt++;
-                                    pExpr.iTable = pItem.iCursor;
-                                    pExpr.pTab = pTab;
-                                    pMatch = pItem;
-                                    pSchema = pTab.pSchema;
-                                    ///<param name="Substitute the rowid (column ">1) for the INTEGER PRIMARY KEY </param>
-                                    pExpr.iColumn = (short)(j == pTab.iPKey ? -1 : j);
-                                    if (i < pSrcList.Count - 1)
-                                    {
-                                        if ((pSrcList.a[i + 1].jointype &  JoinType.JT_NATURAL) != 0)// pItem[1].jointype
-                                        {
-                                            ///If this match occurred in the left table of a natural join,
-                                            ///then skip the right table to avoid a duplicate match 
-                                            ///</summary>
-                                            //pItem++;
-                                            i++;
-                                        }
-                                        else
-                                            if ((pUsing = pSrcList.a[i + 1].pUsing) != null)//pItem[1].pUsing
-                                            {
-                                                ///If this match occurs on a column that is in the USING clause
-                                                ///of a join, skip the search of the right table of the join
-                                                ///to avoid a duplicate match there. 
-                                                int k;
-                                                for (k = 0; k < pUsing.nId; k++)
-                                                {
-                                                    if (pUsing.a[k].zName.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
-                                                    {
-                                                        //pItem++;
-                                                        i++;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                    }
-                                    break;
-                                }
-                            }
+                           pSrcList.Where(srcItem => {
+                               #region not matching                          
+                               if (null != tableName)
+                               {
+                                   var pTab = srcItem.pTab;
+                                   Debug.Assert(pTab != null && pTab.zName != null);
+
+                                   Debug.Assert(pTab.nCol > 0);
+                                   if (srcItem.zAlias != null)
+                                   {
+                                       if (!srcItem.zAlias.eq(tableName))
+                                           return false;
+                                   }
+                                   else
+                                   {
+                                       if (NEVER(pTab.zName == null) || !pTab.zName.eq(tableName))
+                                           return false;
+
+                                       var iDb = db.indexOfBackendWithSchema(pTab.pSchema);
+                                       if (zDb != null && !db.Backends[iDb].Name.eq(zDb))
+                                           return false;
+                                   }
+                               }
+                               return true;
+                               #endregion
+                           })
+                           .ForEach((srcItem, i)=> {
+                               var pTab = srcItem.pTab;
+                               if (0 == (cntTab++))
+                               {
+                                   pExpr.iTable = srcItem.iCursor;
+                                   pExpr.pTab = pTab;
+                                   pSchema = pTab.pSchema;
+                                   pMatch = srcItem;
+                               }
+
+
+
+
+
+
+
+
+
+
+                               for (var j = 0; j < pTab.nCol; j++)//, pCol++ )
+                               {
+                                   var pCol = pTab.aCol[j];
+                                   if (pCol.zName.eq(zCol))
+                                   {
+                                       IdList pUsing;
+                                       cnt++;
+                                       pExpr.iTable = srcItem.iCursor;
+                                       pExpr.pTab = pTab;
+                                       pMatch = srcItem;
+                                       pSchema = pTab.pSchema;
+                                       ///<param name="Substitute the rowid (column ">1) for the INTEGER PRIMARY KEY </param>
+                                       pExpr.iColumn = (short)(j == pTab.iPKey ? -1 : j);
+                                       if (i < pSrcList.Count - 1)
+                                       {
+                                           if ((pSrcList.a[i + 1].jointype & JoinType.JT_NATURAL) != 0)// pItem[1].jointype
+                                           {
+                                               ///If this match occurred in the left table of a natural join,
+                                               ///then skip the right table to avoid a duplicate match 
+                                               //pItem++;
+                                               i++;
+                                           }
+                                           else
+                                               if ((pUsing = pSrcList.a[i + 1].pUsing) != null)//pItem[1].pUsing
+                                           {
+                                               ///If this match occurs on a column that is in the USING clause
+                                               ///of a join, skip the search of the right table of the join
+                                               ///to avoid a duplicate match there. 
+                                               for (var k = 0; k < pUsing.nId; k++)
+                                               {
+                                                   if (pUsing.a[k].zName.eq(zCol))
+                                                   {
+                                                       //pItem++;
+                                                       i++;//TODO:ERROR: i is not by ref
+                                                       break;
+                                                   }
+                                               }
+                                           }
+                                       }
+                                       break;
+                                   }
+                               }
+
+
+
+
+
+
+
+                           });
+                           
                         }
-                    }
+
+
+                        //-----------------------------------------------
+
 #if !SQLITE_OMIT_TRIGGER
-                    ///
-                    ///<summary>
-                    ///If we have not already resolved the name, then maybe
-                    ///it is a new.* or old.* trigger argument reference
-                    ///
-                    ///</summary>
-                    if (zDb == null && zTab != null && cnt == 0 && pParse.pTriggerTab != null)
-                    {
-                        var op = pParse.eTriggerOperator;
-                        Table pTab = null;
-                        Debug.Assert(op == TokenType.TK_DELETE || op == TokenType.TK_UPDATE || op == TokenType.TK_INSERT);
-                        if (op != TokenType.TK_DELETE && "new".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
+                        ///If we have not already resolved the name, then maybe
+                        ///it is a new.* or old.* trigger argument reference
+                        if (zDb == null && tableName != null && cnt == 0 && pParse.pTriggerTab != null)
                         {
-                            pExpr.iTable = 1;
-                            pTab = pParse.pTriggerTab;
-                        }
-                        else
-                            if (op != TokenType.TK_INSERT && "old".Equals(zTab, StringComparison.InvariantCultureIgnoreCase))
+                            var op = pParse.eTriggerOperator;
+                            Table pTab = null;
+                            Debug.Assert(op == TokenType.TK_DELETE || op == TokenType.TK_UPDATE || op == TokenType.TK_INSERT);
+                            if (op != TokenType.TK_DELETE && "new".Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                pExpr.iTable = 1;
+                                pTab = pParse.pTriggerTab;
+                            }
+                            else
+                                if (op != TokenType.TK_INSERT && "old".Equals(tableName, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 pExpr.iTable = 0;
                                 pTab = pParse.pTriggerTab;
                             }
-                        if (pTab != null)
-                        {
-                            int iCol;
-                            pSchema = pTab.pSchema;
-                            cntTab++;
-                            for (iCol = 0; iCol < pTab.nCol; iCol++)
+                            if (pTab != null)
                             {
-                                Column pCol = pTab.aCol[iCol];
-                                if (pCol.zName.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
+                                int iCol;
+                                pSchema = pTab.pSchema;
+                                cntTab++;
+                                for (iCol = 0; iCol < pTab.nCol; iCol++)
                                 {
-                                    if (iCol == pTab.iPKey)
+                                    Column pCol = pTab.aCol[iCol];
+                                    if (pCol.zName.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        iCol = -1;
+                                        if (iCol == pTab.iPKey)
+                                        {
+                                            iCol = -1;
+                                        }
+                                        break;
                                     }
-                                    break;
                                 }
-                            }
-                            if (iCol >= pTab.nCol && exprc.sqlite3IsRowid(zCol))
-                            {
-                                iCol = -1;
-                                ///
-                                ///<summary>
-                                ///</summary>
-                                ///<param name="IMP: R">55124 </param>
-                            }
-                            if (iCol < pTab.nCol)
-                            {
-                                cnt++;
-                                if (iCol < 0)
+                                if (iCol >= pTab.nCol && exprc.sqlite3IsRowid(zCol))
                                 {
-                                    pExpr.affinity = sqliteinth.SQLITE_AFF_INTEGER;
+                                    iCol = -1;
+                                    ///<param name="IMP: R">55124 </param>
                                 }
-                                else
-                                    if (pExpr.iTable == 0)
+                                if (iCol < pTab.nCol)
+                                {
+                                    cnt++;
+                                    if (iCol < 0)
+                                    {
+                                        pExpr.affinity = sqliteinth.SQLITE_AFF_INTEGER;
+                                    }
+                                    else
+                                        if (pExpr.iTable == 0)
                                     {
                                         sqliteinth.testcase(iCol == 31);
                                         sqliteinth.testcase(iCol == 32);
@@ -528,71 +526,81 @@ namespace Community.CsharpSqlite
                                         sqliteinth.testcase(iCol == 32);
                                         pParse.newmask |= (iCol >= 32 ? 0xffffffff : (((u32)1) << iCol));
                                     }
-                                pExpr.iColumn = (i16)iCol;
-                                pExpr.pTab = pTab;
-                                isTrigger = 1;
-                            }
-                        }
-                    }
-#endif
-                    ///Perhaps the name is a reference to the ROWID
-                    if (cnt == 0 && cntTab == 1 && exprc.sqlite3IsRowid(zCol))
-                    {
-                        cnt = 1;
-                        pExpr.iColumn = -1;
-                        ///<param name="IMP: R">55124 </param>
-                        pExpr.affinity = sqliteinth.SQLITE_AFF_INTEGER;
-                    }
-                    ///
-                    ///<summary>
-                    ///If the input is of the form Z (not Y.Z or X.Y.Z) then the name Z
-                    ///</summary>
-                    ///<param name="might refer to an result">set alias.  This happens, for example, when</param>
-                    ///<param name="we are resolving names in the WHERE clause of the following command:">we are resolving names in the WHERE clause of the following command:</param>
-                    ///<param name=""></param>
-                    ///<param name="SELECT a+b AS x FROM table WHERE x<10;">SELECT a+b AS x FROM table WHERE x<10;</param>
-                    ///<param name=""></param>
-                    ///<param name="In cases like this, replace pExpr with a copy of the expression that">In cases like this, replace pExpr with a copy of the expression that</param>
-                    ///<param name="forms the result set entry ("a+b" in the example) and return immediately.">forms the result set entry ("a+b" in the example) and return immediately.</param>
-                    ///<param name="Note that the expression in the result set should have already been">Note that the expression in the result set should have already been</param>
-                    ///<param name="resolved by the time the WHERE clause is resolved.">resolved by the time the WHERE clause is resolved.</param>
-                    ///<param name=""></param>
-                    if (cnt == 0 && (pEList = pNC.pEList) != null && zTab == null)
-                    {
-                        for (j = 0; j < pEList.Count; j++)
-                        {
-                            string zAs = pEList.a[j].zName;
-                            if (zAs != null && zAs.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                Expr pOrig;
-                                Debug.Assert(pExpr.pLeft == null && pExpr.pRight == null);
-                                Debug.Assert(pExpr.x.pList == null);
-                                Debug.Assert(pExpr.x.pSelect == null);
-                                pOrig = pEList.a[j].pExpr;
-                                if (0 == pNC.allowAgg && pOrig.HasProperty(ExprFlags.EP_Agg))
-                                {
-                                    utilc.sqlite3ErrorMsg(pParse, "misuse of aliased aggregate %s", zAs);
-                                    return WRC.WRC_Abort;
+                                    pExpr.iColumn = (i16)iCol;
+                                    pExpr.pTab = pTab;
+                                    isTrigger = 1;
                                 }
-                                resolveAlias(pParse, pEList, j, pExpr, "");
-                                cnt = 1;
-                                pMatch = null;
-                                Debug.Assert(zTab == null && zDb == null);
-                                goto lookupname_end;
                             }
                         }
+#endif
+                        //-----------------------------------------------
+
+
+                        ///Perhaps the name is a reference to the ROWID
+                        if (cnt == 0 && cntTab == 1 && exprc.sqlite3IsRowid(zCol))
+                        {
+                            cnt = 1;
+                            pExpr.iColumn = -1;
+                            ///<param name="IMP: R">55124 </param>
+                            pExpr.affinity = sqliteinth.SQLITE_AFF_INTEGER;
+                        }
+
+
+                        //-----------------------------------------------
+
+                        ///If the input is of the form Z (not Y.Z or X.Y.Z) then the name Z
+                        ///might refer to an result-set alias.  This happens, for example, when
+                        ///we are resolving names in the WHERE clause of the following command:
+                        ///
+                        ///SELECT a+b AS x FROM table WHERE x>10;
+                        ///
+                        ///In cases like this, replace pExpr with a copy of the expression that
+                        ///forms the result set entry ("a+b" in the example) and return immediately.
+                        ///Note that the expression in the result set should have already been
+                        ///resolved by the time the WHERE clause is resolved.
+                        ///
+                        if (cnt == 0 && (pEList = nameContext.pEList) != null && tableName == null)
+                        {
+                            for (var j = 0; j < pEList.Count; j++)
+                            {
+                                string zAs = pEList.a[j].zName;
+                                if (zAs != null && zAs.Equals(zCol, StringComparison.InvariantCultureIgnoreCase))
+                                {                                    
+                                    Debug.Assert(pExpr.pLeft == null && pExpr.pRight == null);
+                                    Debug.Assert(pExpr.x.pList == null);
+                                    Debug.Assert(pExpr.x.pSelect == null);
+                                    var pOrig = pEList.a[j].pExpr;
+                                    if (0 == nameContext.allowAgg && pOrig.HasProperty(ExprFlags.EP_Agg))
+                                    {
+                                        utilc.sqlite3ErrorMsg(pParse, "misuse of aliased aggregate %s", zAs);
+                                        result = WRC.WRC_Abort;
+                                        ret = true;
+                                    }
+                                    resolveAlias(pParse, pEList, j, pExpr, "");
+                                    cnt = 1;
+                                    pMatch = null;
+                                    Debug.Assert(tableName == null && zDb == null);
+                                   goto_ = true;
+                                   return false;
+                                }
+                            }
+                        }
+
+                        //-----------------------------------------------
+
+                        ///Advance to the next name context.  The loop will exit when either
+                        ///we have a match (cnt>0) or when we run out of name contexts.
+                        //if (cnt == 0)nameContext = nameContext.pNext;
+                        return 0 == cnt;
                     }
-                    ///
-                    ///<summary>
-                    ///Advance to the next name context.  The loop will exit when either
-                    ///we have a match (cnt>0) or when we run out of name contexts.
-                    ///
-                    ///</summary>
-                    if (cnt == 0)
-                    {
-                        pNC = pNC.pNext;
-                    }
-                }
+                );
+
+                if(goto_)
+                    goto lookupname_end;
+                if (ret)
+                    return result; 
+
+
                 ///
                 ///<summary>
                 ///If X and Y are NULL (in other words if only the column name Z is
@@ -605,45 +613,38 @@ namespace Community.CsharpSqlite
                 ///<param name="Because no reference was made to outer contexts, the pNC.nRef">Because no reference was made to outer contexts, the pNC.nRef</param>
                 ///<param name="fields are not changed in any context.">fields are not changed in any context.</param>
                 ///<param name=""></param>
-                if (cnt == 0 && zTab == null && pExpr.HasProperty(ExprFlags.EP_DblQuoted))
+                if (cnt == 0 && tableName == null && pExpr.HasProperty(ExprFlags.EP_DblQuoted))
                 {
                     pExpr.Operator = TokenType.TK_STRING;
                     pExpr.pTab = null;
                     return WRC.WRC_Prune;
                 }
-                ///
-                ///<summary>
                 ///cnt==0 means there was not match.  cnt>1 means there were two or
                 ///more matches.  Either way, we have an error.
-                ///
-                ///</summary>
                 if (cnt != 1)
                 {
                     string zErr;
                     zErr = cnt == 0 ? "no such column" : "ambiguous column name";
                     if (zDb != null)
                     {
-                        utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s.%s", zErr, zDb, zTab, zCol);
+                        utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s.%s", zErr, zDb, tableName, zCol);
                     }
                     else
-                        if (zTab != null)
+                        if (tableName != null)
                         {
-                            utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s", zErr, zTab, zCol);
+                            utilc.sqlite3ErrorMsg(pParse, "%s: %s.%s", zErr, tableName, zCol);
                         }
                         else
                         {
                             utilc.sqlite3ErrorMsg(pParse, "%s: %s", zErr, zCol);
                         }
                     pParse.checkSchema = 1;
-                    pTopNC.nErr++;
+                    topNameContext.nErr++;
                 }
-                ///
-                ///<summary>
                 ///If a column from a table in pSrcList is referenced, then record
                 ///this fact in the pSrcList.a[].colUsed bitmask.  Column 0 causes
                 ///bit 0 to be set.  Column 1 sets bit 1.  And so forth.  If the
                 ///column number is greater than the number of bits in the bitmask
-                ///</summary>
                 ///<param name="then set the high">order bit of the bitmask.</param>
                 ///<param name=""></param>
                 if (pExpr.iColumn >= 0 && pMatch != null)
@@ -666,18 +667,14 @@ namespace Community.CsharpSqlite
             lookupname_end:
                 if (cnt == 1)
                 {
-                    Debug.Assert(pNC != null);
-                    sqliteinth.sqlite3AuthRead(pParse, pExpr, pSchema, pNC.pSrcList);
+                    Debug.Assert(nameContext != null);
+                    sqliteinth.sqlite3AuthRead(pParse, pExpr, pSchema, nameContext.pSrcList);
                     ///Increment the nRef value on all name contexts from TopNC up to
                     ///the point where the name matched. 
-                    for (; ; )
-                    {
-                        Debug.Assert(pTopNC != null);
-                        pTopNC.nRef++;
-                        if (pTopNC == pNC)
-                            break;
-                        pTopNC = pTopNC.pNext;
-                    }
+                    topNameContext.linkedList().ForEach(ctx=> {
+                        Debug.Assert(ctx!= null);
+                        ctx.nRef++;
+                    });
                     return WRC.WRC_Prune;
                 }
                 else
@@ -700,11 +697,9 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static WRC resolveExprStep(Walker pWalker, ref Expr pExpr)
             {
-                NameContext pNC;
-                Parse pParse;
-                pNC = pWalker.u.pNC;
+                var pNC = pWalker.u.pNC;
                 Debug.Assert(pNC != null);
-                pParse = pNC.pParse;
+                var pParse = pNC.pParse;
                 Debug.Assert(pParse == pWalker.pParse);
                 if (pExpr.ExprHasAnyProperty(ExprFlags.EP_Resolved))
                     return WRC.WRC_Prune;
@@ -753,10 +748,7 @@ break;
                             string zTable;
                             string zDb;
                             Expr pRight;
-                            ///
-                            ///<summary>
                             ///if( pSrcList==0 ) break; 
-                            ///</summary>
                             pRight = pExpr.pRight;
                             if (pRight.Operator == TokenType.TK_ID)
                             {
@@ -773,11 +765,7 @@ break;
                             }
                             return ResolveExtensions.lookupName(pParse, zDb, zTable, zColumn, pNC, pExpr);
                         }
-                    ///
-                    ///<summary>
                     ///Resolve function names
-                    ///
-                    ///</summary>
                     case TokenType.TK_CONST_FUNC:
                     case TokenType.TK_FUNCTION:
                         {
@@ -793,18 +781,16 @@ break;
                             ///True if is an aggregate function 
                             int auth;
                             ///Authorization to use the function 
-                            int nId;
-                            ///Number of characters in function name 
-                            string zId;
-                            ///The function name. 
+                            
+                            
                             FuncDef pDef;
                             ///Information about the function 
                             SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;
                             // ENC( pParse.db );   /* The database encoding */
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
                             Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
-                            zId = pExpr.u.zToken;
-                            nId = StringExtensions.Strlen30(zId);
+                            var zId = pExpr.u.zToken;///The function name. 
+                            var nId = StringExtensions.Strlen30(zId);///Number of characters in function name 
                             pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);
                             if (pDef == null)
                             {
@@ -908,11 +894,7 @@ return WRC.WRC_Prune;
                         }
 #endif
                 }
-                return (pParse.nErr != 0///
-                    ///<summary>
-                    ///|| pParse.db.mallocFailed != 0 
-                    ///</summary>
-                ) ? WRC.WRC_Abort : WRC.WRC_Continue;
+                return (pParse.nErr != 0/*|| pParse.db.mallocFailed != 0 */) ? WRC.WRC_Abort : WRC.WRC_Continue;
             }
 
 
@@ -1519,39 +1501,26 @@ return WRC.WRC_Prune;
             /// if errors is returned.
             ///
             ///</summary>
-            public static SqlResult sqlite3ResolveExprNames(NameContext pNC,///
-                ///<summary>
-                ///Namespace to resolve expressions in. 
-                ///</summary>
-            ref Expr pExpr///
-                ///<summary>
-                ///The expression to be analyzed. 
-                ///</summary>
+            public static SqlResult sqlite3ResolveExprNames(
+                NameContext pNC,///Namespace to resolve expressions in. 
+                ref Expr pExpr///The expression to be analyzed. 
             )
             {
-                u8 savedHasAgg;
-                Walker w = new Walker();
-                if (pExpr == null)
+                if (null == pExpr)
                     return 0;
-#if SQLITE_MAX_EXPR_DEPTH
-																																																																		{
-Parse pParse = pNC.pParse;
-if( exprc.sqlite3ExprCheckHeight(pParse, pExpr.nHeight+pNC.pParse.nHeight) ){
-return 1;
-}
-pParse.nHeight += pExpr.nHeight;
-}
-#endif
-                savedHasAgg = pNC.hasAgg;
+
+                var savedHasAgg = pNC.hasAgg;
                 pNC.hasAgg = 0;
-                w.xExprCallback = ResolveExtensions.resolveExprStep;
-                w.xSelectCallback = resolveSelectStep;
-                w.pParse = pNC.pParse;
-                w.u.pNC = pNC;
+                Walker w = new Walker()
+                {
+                    xExprCallback = ResolveExtensions.resolveExprStep,
+                    xSelectCallback = resolveSelectStep,
+                    pParse = pNC.pParse,
+                    u = new Walker.uw() { pNC = pNC }
+                };
+
                 w.sqlite3WalkExpr(ref pExpr);
-#if SQLITE_MAX_EXPR_DEPTH
-																																																																		pNC.pParse.nHeight -= pExpr.nHeight;
-#endif
+
                 if (pNC.nErr > 0 || w.pParse.nErr > 0)
                 {
                     pExpr.ExprSetProperty(ExprFlags.EP_Error);

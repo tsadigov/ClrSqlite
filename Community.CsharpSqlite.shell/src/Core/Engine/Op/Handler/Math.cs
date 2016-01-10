@@ -244,7 +244,7 @@ MemSetTypeFlag(pOut, MEM.MEM_Int);
                         ///in1 
                         var pIn1 = aMem[pOp.p1];
                         cpu.vdbe.memAboutToChange(pIn1);
-                        pIn1.sqlite3VdbeMemIntegerify();
+                        pIn1.Integerify();
                         pIn1.u.AsInteger += pOp.p2;
                         break;
                     }

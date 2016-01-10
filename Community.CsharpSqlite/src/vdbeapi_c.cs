@@ -166,7 +166,7 @@ return ( p == null || p.expired ) ? 1 : 0;
                 Sqlite3.mutex.Enter();
                 for (i = 0; i < p.nVar; i++)
                 {
-                    p.aVar[i].sqlite3VdbeMemRelease();
+                    p.aVar[i].Release();
                     p.aVar[i].flags = MemFlags.MEM_Null;
                 }
                 if (p.isPrepareV2 && p.expmask != 0)
@@ -1098,7 +1098,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                 }
                 i--;
                 pVar = p.aVar[i];
-                pVar.sqlite3VdbeMemRelease();
+                pVar.Release();
                 pVar.flags = MemFlags.MEM_Null;
                 utilc.sqlite3Error(p.db, SqlResult.SQLITE_OK, 0);
                 ///
@@ -1224,7 +1224,7 @@ pStmt, N, (const void*()(Mem))vdbeapi.sqlite3_value_text16, COLNAME_COLUMN);
                     if (zData != null)
                     {
                         pVar = p.aVar[i - 1];
-                        rc = pVar.sqlite3VdbeMemSetStr(zData, nData, encoding, xDel);
+                        rc = pVar.Set(zData, nData, encoding, xDel);
                         if (rc == SqlResult.SQLITE_OK && encoding != 0)
                         {
                             rc = vdbemem_cs.sqlite3VdbeChangeEncoding(pVar, sqliteinth.ENC(p.db));

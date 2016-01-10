@@ -8,6 +8,10 @@ namespace Community.CsharpSqlite.Utils
 {
     public static partial class StringExtensions
     {
+        public static StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
+        public static bool eq(this String s1,String s2) {
+            return comparer.Equals(s1,s2);
+        }
         public static string pad(this String str, int length)
         {
             var left = (length - str.Length) / 2;

@@ -1307,7 +1307,7 @@ pOp.cnt = 0;
 																																																																																																															        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
 #endif
                     Debug.Assert(i < pTab.nCol);
-                    vdbemem_cs.sqlite3ValueFromExpr(this.sqlite3VdbeDb(), pCol.pDflt, enc, pCol.affinity, ref pValue);
+                    vdbemem_cs.sqlite3ValueFromExpr(this.sqlite3VdbeDb(), pCol.DefaultValue, enc, pCol.affinity, ref pValue);
                     if (pValue != null)
                     {
                         this.sqlite3VdbeChangeP4(-1, pValue, P4Usage.P4_MEM);
@@ -1472,25 +1472,19 @@ pOp.cnt = 0;
                 }
             }
             public SqlResult sqlite3VdbeSetColName(
-            int idx,///Index of column zName applies to 
-            ColName var,///One of the COLNAME_* constants 
-            string zName,///Pointer to buffer containing name 
-            dxDel xDel///Memory management strategy for zName 
+                int idx,///Index of column zName applies to 
+                ColName var,///One of the COLNAME_* constants 
+                string zName,///Pointer to buffer containing name 
+                dxDel xDel///Memory management strategy for zName 
             )
             {
-                SqlResult rc;
-                Mem pColName;
                 Debug.Assert(idx < this.nResColumn);
                 Debug.Assert((int)var < Vdbe.COLNAME_N);
-                //if ( p.db.mallocFailed != 0 )
-                //{
-                //  Debug.Assert( null == zName || xDel != SQLITE_DYNAMIC );
-                //  return SQLITE_NOMEM;
-                //}
+                
                 Debug.Assert(this.aColName != null);
-                pColName = this.aColName[idx + (int)var * this.nResColumn];
-                rc = pColName.sqlite3VdbeMemSetStr(zName, -1, SqliteEncoding.UTF8, xDel);
-                Debug.Assert(rc != 0 || null == zName || (pColName.flags & MemFlags.MEM_Term) != 0);
+                var colName = this.aColName[idx + (int)var * this.nResColumn];
+                var rc = colName.Set(zName, -1, SqliteEncoding.UTF8, xDel);
+                Debug.Assert(rc != 0 || null == zName || (colName.flags & MemFlags.MEM_Term) != 0);
                 return rc;
             }
             public SqlResult sqlite3VdbeCloseStatement(int eOp)
@@ -3290,7 +3284,7 @@ start = sqlite3Hwtime();
                                             ///Extract the value of R from register P3. 
                                             ///</summary>
 
-                                            pIn3.sqlite3VdbeMemIntegerify();
+                                            pIn3.Integerify();
                                             R = pIn3.u.AsInteger;
                                             ///
                                             ///<summary>
@@ -3519,7 +3513,7 @@ start = sqlite3Hwtime();
                                                     }
                                                     Debug.Assert(pMem.memIsValid());
                                                     Sqlite3.REGISTER_TRACE(this, pOp.p3, pMem);
-                                                    pMem.sqlite3VdbeMemIntegerify();
+                                                    pMem.Integerify();
                                                     Debug.Assert((pMem.flags & MemFlags.MEM_Int) != 0);
                                                     ///
                                                     ///<summary>
@@ -4179,7 +4173,7 @@ start = sqlite3Hwtime();
                                             //{
                                             //  goto no_mem;
                                             //}
-                                            pRt.sqlite3VdbeMemRelease();
+                                            pRt.Release();
                                             pRt.flags = MemFlags.MEM_Frame;
                                             pRt.u.pFrame = pFrame;
                                             pFrame.v = this;
@@ -4348,9 +4342,9 @@ start = sqlite3Hwtime();
                                             _pIn1 = aMem[pOp.p1];
                                         }
                                         Debug.Assert(_pIn1.memIsValid());
-                                        _pIn1.sqlite3VdbeMemIntegerify();
+                                        _pIn1.Integerify();
                                         pIn2 = aMem[pOp.p2];
-                                        pIn2.sqlite3VdbeMemIntegerify();
+                                        pIn2.Integerify();
                                         if (_pIn1.u.AsInteger < pIn2.u.AsInteger)
                                         {
                                             _pIn1.u.AsInteger = pIn2.u.AsInteger;
@@ -4424,7 +4418,7 @@ start = sqlite3Hwtime();
                                             malloc_cs.sqlite3SetString(ref this.zErrMsg, db, vdbeapi.sqlite3_value_text(ctx.s));
                                             rc = ctx.isError;
                                         }
-                                        ctx.s.sqlite3VdbeMemRelease();
+                                        ctx.s.Release();
                                         break;
                                     }
                                 ///
@@ -5583,7 +5577,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                             clumnOffsets[i] = 0;
                         }
                     }
-                    sMem.sqlite3VdbeMemRelease();
+                    sMem.Release();
                     sMem.flags = MemFlags.MEM_Null;
                     ///If we have read more header data than was contained in the header,
                     ///or if the end of the last field appears to be past the end of the

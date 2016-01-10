@@ -249,7 +249,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             var pIn2 = cpu.aMem[p2];
                             Debug.Assert(pIn2.memIsValid());
                             Debug.Assert((pIn2.flags & MemFlags.MEM_Int) != 0);
-                            pIn2.sqlite3VdbeMemIntegerify();
+                            pIn2.Integerify();
                             p2 = (int)pIn2.u.AsInteger;
                             ///The p2 value always comes from a prior  OpCode.OP_CreateTable opcode and
                             ///that opcode will always set the p2 value to 2 or more or else fail.

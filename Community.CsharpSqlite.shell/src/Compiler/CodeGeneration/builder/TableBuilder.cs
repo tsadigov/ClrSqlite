@@ -570,67 +570,56 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
             }
 
 
-            ///<summary>
-            /// Remove the memory data structures associated with the given
-            /// Table.  No changes are made to disk by this routine.
-            ///
-            /// This routine just deletes the data structure.  It does not unlink
-            /// the table data structure from the hash table.  But it does destroy
-            /// memory structures of the indices and foreign keys associated with
-            /// the table.
-            ///
-            ///</summary>
-            public static void sqlite3DeleteTable(Connection db, ref Table pTable)
-            {
-                Debug.Assert(null == pTable || pTable.nRef > 0);
-                ///Do not delete the table until the reference count reaches zero. 
-                if (null == pTable)
-                    return;
-                if ((// ( !db || db->pnBytesFreed == 0 ) && 
-                (--pTable.nRef) > 0))
-                    return;
-                ///Delete all indices associated with this table. 
-                foreach (var pIndex in pTable.pIndex.path(x => x.pNext))
+        ///<summary>
+        /// Remove the memory data structures associated with the given
+        /// Table.  No changes are made to disk by this routine.
+        ///
+        /// This routine just deletes the data structure.  It does not unlink
+        /// the table data structure from the hash table.  But it does destroy
+        /// memory structures of the indices and foreign keys associated with
+        /// the table.
+        ///
+        ///</summary>
+        public static void sqlite3DeleteTable(Connection db, ref Table pTable)
+        {
+            Debug.Assert(null == pTable || pTable.nRef > 0);
+            ///Do not delete the table until the reference count reaches zero. 
+            if (null == pTable)
+                return;
+            if ((// ( !db || db->pnBytesFreed == 0 ) && 
+            (--pTable.nRef) > 0))
+                return;
+            ///Delete all indices associated with this table. 
+            var table = pTable;
+            table.pIndex.linkedList().ForEach(
+                pIndex =>
                 {
-                    Debug.Assert(pIndex.pSchema == pTable.pSchema);
+                    Debug.Assert(pIndex.pSchema == table.pSchema);
                     //if( null==db || db.pnBytesFreed==0 ){
                     string zName = pIndex.zName;
-                    //
-#if !NDEBUG || SQLITE_COVERAGE_TEST
-																																																																																																												        //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
-        //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
-        //  );
-        Index pOld = sqlite3HashInsert(
-      ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30( zName ), (Index)null
-        );
-        Debug.Assert( db == null || sqlite3SchemaMutexHeld( db, 0, pIndex.pSchema ) );
-        Debug.Assert( pOld == pIndex || pOld == null );
-#else
-                    //  TESTONLY ( Index pOld = ) sqlite3HashInsert(
-                    //ref pIndex.pSchema.idxHash, zName, StringExtensions.sqlite3Strlen30(zName), 0
-                    //  );
-                    HashExtensions.Insert( pIndex.pSchema.Indexes, zName, StringExtensions.Strlen30(zName), (Index)null);
-#endif
+                    HashExtensions.Insert(pIndex.pSchema.Indexes, zName, StringExtensions.Strlen30(zName), (Index)null);
                     //}
                     var index = pIndex;
                     IndexBuilder.freeIndex(db, ref index);
                 }
-                ///Delete any foreign keys attached to this table. 
-                fkeyc.sqlite3FkDelete(db, pTable);
-                ///Delete the Table structure itself.
-                build.sqliteDeleteColumnNames(db, pTable);
-                db.DbFree(ref pTable.zName);
-                db.DbFree(ref pTable.zColAff);
-                SelectMethods.SelectDestructor(db, ref pTable.pSelect);
+           );
+
+            ///Delete any foreign keys attached to this table. 
+            db.DeleteForeignKeys( pTable);
+            ///Delete the Table structure itself.
+            build.DeleteColumnNames(db, pTable);
+            db.DbFree(ref pTable.zName);
+            db.DbFree(ref pTable.zColAff);
+            SelectMethods.SelectDestructor(db, ref pTable.pSelect);
 #if !SQLITE_OMIT_CHECK
-                exprc.Delete(db, ref pTable.pCheck);
+            exprc.Delete(db, ref pTable.pCheck);
 #endif
 #if !SQLITE_OMIT_VIRTUALTABLE
-                VTableMethodsExtensions.sqlite3VtabClear(db, pTable);
+            VTableMethodsExtensions.sqlite3VtabClear(db, pTable);
 #endif
-                pTable = null;
-                //      sqlite3DbFree( db, ref pTable );
-            }
+            pTable = null;
+            //      sqlite3DbFree( db, ref pTable );
+        }
 
 
 

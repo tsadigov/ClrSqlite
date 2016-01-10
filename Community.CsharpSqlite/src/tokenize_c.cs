@@ -131,7 +131,7 @@ namespace Community.CsharpSqlite
             /// Return the length of the token that begins at z[iOffset + 0].
             /// Store the token type in *tokenType before returning.
             ///</summary>
-            public static int sqlite3GetToken(string z, int iOffset, ref TokenType tokenType)
+            public static int GetNextToken(string z, int iOffset, ref TokenType tokenType)
             {
                 int i;
                 byte c = 0;
@@ -158,18 +158,12 @@ namespace Community.CsharpSqlite
                         {
                             if (z.Length > iOffset + 1 && z[iOffset + 1] == '-')
                             {
-                                ///
-                                ///<summary>
-                                ///</summary>
                                 ///<param name="IMP: R"> syntax diagram for comments </param>
 
                                 for (i = 2; z.Length > iOffset + i && (c = (byte)z[iOffset + i]) != 0 && c != '\n'; i++)
                                 {
                                 }
                                 tokenType = TokenType.TK_SPACE;
-                                ///
-                                ///<summary>
-                                ///</summary>
                                 ///<param name="IMP: R">25134 </param>
 
                                 return i;
@@ -577,10 +571,10 @@ namespace Community.CsharpSqlite
                 return 1;
             }
 
-            public static Token GetToken(string z, int iOffset)
+            public static Token GetNextToken(string z, int iOffset)
             {
                 TokenType tokenType = 0;
-                int length = sqlite3GetToken(z, iOffset, ref tokenType);
+                int length = GetNextToken(z, iOffset, ref tokenType);
                 var token = new Token()
                 {
                     Start = iOffset,
@@ -600,331 +594,11 @@ namespace Community.CsharpSqlite
             ///error message.
             ///
             ///</summary>
+            ///
+
+
 
         }
 
     }
-
-
-
-
-        public partial class Sqlite3
-        {
-        /*
-        public const int TK_SEMI = 1;
-
-            public const int TK_EXPLAIN = 2;
-
-            public const int TK_QUERY = 3;
-
-            public const int TK_PLAN = 4;
-
-            public const int TK_BEGIN = 5;
-
-            public const int TK_TRANSACTION = 6;
-
-            public const int TK_DEFERRED = 7;
-
-            public const int TK_IMMEDIATE = 8;
-
-            public const int TK_EXCLUSIVE = 9;
-
-            public const int TK_COMMIT = 10;
-
-            public const int TK_END = 11;
-
-            public const int TK_ROLLBACK = 12;
-
-            public const int TK_SAVEPOINT = 13;
-
-            public const int TK_RELEASE = 14;
-
-            public const int TK_TO = 15;
-
-            public const int TK_TABLE = 16;
-
-            public const int TK_CREATE = 17;
-
-            public const int TK_IF = 18;
-
-            public const int TK_NOT = 19;
-
-            public const int TK_EXISTS = 20;
-
-            public const int TK_TEMP = 21;
-
-            public const int TK_LP = 22;
-
-            public const int TK_RP = 23;
-
-            public const int TK_AS = 24;
-
-            public const int TK_COMMA = 25;
-
-            public const int TK_ID = 26;
-
-            public const int TK_INDEXED = 27;
-
-            public const int TK_ABORT = 28;
-
-            public const int TK_ACTION = 29;
-
-            public const int TK_AFTER = 30;
-
-            public const int TK_ANALYZE = 31;
-
-            public const int TK_ASC = 32;
-
-            public const int TK_ATTACH = 33;
-
-            public const int TK_BEFORE = 34;
-
-            public const int TK_BY = 35;
-
-            public const int TK_CASCADE = 36;
-
-            public const int TK_CAST = 37;
-
-            public const int TK_COLUMNKW = 38;
-
-            public const int TK_CONFLICT = 39;
-
-            public const int TK_DATABASE = 40;
-
-            public const int TK_DESC = 41;
-
-            public const int TK_DETACH = 42;
-
-            public const int TK_EACH = 43;
-
-            public const int TK_FAIL = 44;
-
-            public const int TK_FOR = 45;
-
-            public const int TK_IGNORE = 46;
-
-            public const int TK_INITIALLY = 47;
-
-            public const int TK_INSTEAD = 48;
-
-            public const int TK_LIKE_KW = 49;
-
-            public const int TK_MATCH = 50;
-
-            public const int TK_NO = 51;
-
-            public const int TK_KEY = 52;
-
-            public const int TK_OF = 53;
-
-            public const int TK_OFFSET = 54;
-
-            public const int TK_PRAGMA = 55;
-
-            public const int TK_RAISE = 56;
-
-            public const int TK_REPLACE = 57;
-
-            public const int TK_RESTRICT = 58;
-
-            public const int TK_ROW = 59;
-
-            public const int TK_TRIGGER = 60;
-
-            public const int TK_VACUUM = 61;
-
-            public const int TK_VIEW = 62;
-
-            public const int TK_VIRTUAL = 63;
-
-            public const int TK_REINDEX = 64;
-
-            public const int TK_RENAME = 65;
-
-            public const int TK_CTIME_KW = 66;
-
-            public const int TK_ANY = 67;
-
-            public const int TK_OR = 68;
-
-            public const int TK_AND = 69;
-
-            public const int TK_IS = 70;
-
-            public const int TK_BETWEEN = 71;
-
-            public const int TK_IN = 72;
-
-            public const int TK_ISNULL = 73;
-
-            public const int TK_NOTNULL = 74;
-
-            public const int TK_NE = 75;
-
-            public const int TK_EQ = 76;
-
-            public const int TK_GT = 77;
-
-            public const int TK_LE = 78;
-
-            public const int TK_LT = 79;
-
-            public const int TK_GE = 80;
-
-            public const int TK_ESCAPE = 81;
-
-            public const int TK_BITAND = 82;
-
-            public const int TK_BITOR = 83;
-
-            public const int TK_LSHIFT = 84;
-
-            public const int TK_RSHIFT = 85;
-
-            public const int TK_PLUS = 86;
-
-            public const int TK_MINUS = 87;
-
-            public const int TK_STAR = 88;
-
-            public const int TK_SLASH = 89;
-
-            public const int TK_REM = 90;
-
-            public const int TK_CONCAT = 91;
-
-            public const int TK_COLLATE = 92;
-
-            public const int TK_BITNOT = 93;
-
-            public const int TK_STRING = 94;
-
-            public const int TK_JOIN_KW = 95;
-
-            public const int TK_CONSTRAINT = 96;
-
-            public const int TK_DEFAULT = 97;
-
-            public const int TK_NULL = 98;
-
-            public const int TK_PRIMARY = 99;
-
-            public const int TK_UNIQUE = 100;
-
-            public const int TK_CHECK = 101;
-
-            public const int TK_REFERENCES = 102;
-
-            public const int TK_AUTOINCR = 103;
-
-            public const int TK_ON = 104;
-
-            public const int TK_INSERT = 105;
-
-            public const int TK_DELETE = 106;
-
-            public const int TK_UPDATE = 107;
-
-            public const int TK_SET = 108;
-
-            public const int TK_DEFERRABLE = 109;
-
-            public const int TK_FOREIGN = 110;
-
-            public const int TK_DROP = 111;
-
-            public const int TK_UNION = 112;
-
-            public const int TK_ALL = 113;
-
-            public const int TK_EXCEPT = 114;
-
-            public const int TK_INTERSECT = 115;
-
-            public const int TK_SELECT = 116;
-
-            public const int TK_DISTINCT = 117;
-
-            public const int TK_DOT = 118;
-
-            public const int TK_FROM = 119;
-
-            public const int TK_JOIN = 120;
-
-            public const int TK_USING = 121;
-
-            public const int TK_ORDER = 122;
-
-            public const int TK_GROUP = 123;
-
-            public const int TK_HAVING = 124;
-
-            public const int TK_LIMIT = 125;
-
-            public const int TK_WHERE = 126;
-
-            public const int TK_INTO = 127;
-
-            public const int TK_VALUES = 128;
-
-            public const int TK_INTEGER = 129;
-
-            public const int TK_FLOAT = 130;
-
-            public const int TK_BLOB = 131;
-
-            public const int TK_REGISTER = 132;
-
-            public const int TK_VARIABLE = 133;
-
-            public const int TK_CASE = 134;
-
-            public const int TK_WHEN = 135;
-
-            public const int TK_THEN = 136;
-
-            public const int TK_ELSE = 137;
-
-            public const int TK_INDEX = 138;
-
-            public const int TK_ALTER = 139;
-
-            public const int TK_ADD = 140;
-
-            public const int TK_TO_TEXT = 141;
-
-            public const int TK_TO_BLOB = 142;
-
-            public const int TK_TO_NUMERIC = 143;
-
-            public const int TK_TO_INT = 144;
-
-            public const int TK_TO_REAL = 145;
-
-            public const int TK_ISNOT = 146;
-
-            public const int TK_END_OF_FILE = 147;
-
-            public const int TK_ILLEGAL = 148;
-
-            public const int TK_SPACE = 149;
-
-            public const int TK_UNCLOSED_STRING = 150;
-
-            public const int TK_FUNCTION = 151;
-
-            public const int TK_COLUMN = 152;
-
-            public const int TK_AGG_FUNCTION = 153;
-
-            public const int TK_AGG_COLUMN = 154;
-
-            public const int TK_CONST_FUNC = 155;
-
-            public const int TK_UMINUS = 156;
-
-            public const int TK_UPLUS = 157;
-            */
-
-        }
 }

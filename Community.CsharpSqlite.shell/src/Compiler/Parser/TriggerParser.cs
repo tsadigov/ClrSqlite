@@ -221,7 +221,7 @@ namespace Community.CsharpSqlite.Parsing
             }
 
             ///Table that the trigger fires off of 
-            var pTab = pParse.sqlite3SrcListLookup(pTableName);
+            var pTab = pParse.GetFirstTableInTheList(pTableName);
             if (db.init.busy == 0 && pName2.Length == 0 && pTab != null && pTab.pSchema == db.Backends[1].pSchema)
             {
                 iDb = 1;
@@ -236,7 +236,7 @@ namespace Community.CsharpSqlite.Parsing
             {
                 goto trigger_cleanup;
             }
-            pTab = pParse.sqlite3SrcListLookup(pTableName);
+            pTab = pParse.GetFirstTableInTheList(pTableName);
             if (pTab == null)
             {
                 ///The table does not exist. 

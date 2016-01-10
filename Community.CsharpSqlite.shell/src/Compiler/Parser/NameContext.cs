@@ -39,7 +39,7 @@ namespace Community.CsharpSqlite.Compiler.Parser
         /// subqueries looking for a match.
         ///
         ///</summary>
-        public class NameContext
+        public class NameContext:ILinkedListNode<NameContext>
         {
             public Sqlite3.Parse pParse;
             ///
@@ -91,7 +91,7 @@ namespace Community.CsharpSqlite.Compiler.Parser
             ///<summary>
             ///Information about aggregates at this level 
             ///</summary>
-            public NameContext pNext;
+            public NameContext pNext { get; set; }
             ///
             ///<summary>
             ///Next outer name context.  NULL for outermost 

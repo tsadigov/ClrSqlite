@@ -549,8 +549,8 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
                         var pCol = x.Copy();
                         pCol.zColl = null;
                         pCol.zType = null;
-                        pCol.pDflt = null;
-                        pCol.zDflt = null;
+                        pCol.DefaultValue = null;
+                        pCol.DefaultValueSource = null;
                         return pCol;
                     }).ToArray()
                 };
@@ -600,7 +600,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
 				var zTab = pNew.zName.Substring(16);///Table name 
                 // zTab = &pNew->zName[16]; /* Skip the "sqlite_altertab_" prefix on the name */
                 var pCol = pNew.aCol[pNew.nCol - 1];
-                var pDflt = pCol.pDflt;
+                var pDflt = pCol.DefaultValue;
                 var pTab = TableBuilder.sqlite3FindTable(db, zDb, zTab);///Table being altered 
 				Debug.Assert(pTab != null);
 #if !SQLITE_OMIT_AUTHORIZATION
@@ -2749,11 +2749,6 @@ goto attach_end;
 					///Changes list if ON UPDATE CASCADE 
 					Select pSelect=null;
 					///If RESTRICT, "SELECT RAISE(...)" 
-					int i;
-					///
-					///<summary>
-					///Iterator variable 
-					///</summary>
 					Expr pWhen=null;
 					///
 					///<summary>
@@ -2762,60 +2757,35 @@ goto attach_end;
 					if(this.locateFkeyIndex(pTab,pFKey,out pIdx,out aiCol)!=0)
 						return null;
 					Debug.Assert(aiCol!=null||pFKey.nCol==1);
-					for(i=0;i<pFKey.nCol;i++) {
+					for(var i=0;i<pFKey.nCol;i++) {
 						Token tOld=new Token("old",3);
-						///
-						///<summary>
 						///Literal "old" token 
-						///</summary>
 						Token tNew=new Token("new",3);
-						///
-						///<summary>
 						///Literal "new" token 
-						///</summary>
 						Token tFromCol=new Token();
-						///
-						///<summary>
 						///Name of column in child table 
-						///</summary>
 						Token tToCol=new Token();
-						///
-						///<summary>
 						///Name of column in parent table 
-						///</summary>
 						int iFromCol;
-						///
-						///<summary>
 						///Idx of column in child table 
-						///</summary>
 						Expr pEq;
-						///
-						///<summary>
 						///tFromCol = OLD.tToCol 
-						///</summary>
 						iFromCol=aiCol!=null?aiCol[i]:pFKey.aCol[0].iFrom;
 						Debug.Assert(iFromCol>=0);
 						tToCol.zRestSql=pIdx!=null?pTab.aCol[pIdx.aiColumn[i]].zName:"oid";
 						tFromCol.zRestSql=pFKey.pFrom.aCol[iFromCol].zName;
 						tToCol.Length=StringExtensions.Strlen30(tToCol.zRestSql);
 						tFromCol.Length=StringExtensions.Strlen30(tFromCol.zRestSql);
-						///
-						///<summary>
 						///Create the expression "OLD.zToCol = zFromCol". It is important
 						///that the "OLD.zToCol" term is on the LHS of the = operator, so
 						///that the affinity and collation sequence associated with the
 						///parent table are used for the comparison. 
-						///</summary>
 						pEq=this.sqlite3PExpr(TokenType.TK_EQ,this.sqlite3PExpr(TokenType.TK_DOT,this.sqlite3PExpr(TokenType.TK_ID,null,null,tOld),this.sqlite3PExpr(TokenType.TK_ID,null,null,tToCol),0),this.sqlite3PExpr(TokenType.TK_ID,null,null,tFromCol),0);
 						pWhere=exprc.sqlite3ExprAnd(db,pWhere,pEq);
-						///
-						///<summary>
 						///For ON UPDATE, construct the next term of the WHEN clause.
 						///The final WHEN clause will be like this:
 						///
 						///WHEN NOT(old.col1 IS new.col1 AND ... AND old.colN IS new.colN)
-						///
-						///</summary>
 						if(pChanges!=null) {
 							pEq=this.sqlite3PExpr(TokenType.TK_IS,this.sqlite3PExpr(TokenType.TK_DOT,this.sqlite3PExpr(TokenType.TK_ID,null,null,tOld),this.sqlite3PExpr(TokenType.TK_ID,null,null,tToCol),0),this.sqlite3PExpr(TokenType.TK_DOT,this.sqlite3PExpr(TokenType.TK_ID,null,null,tNew),this.sqlite3PExpr(TokenType.TK_ID,null,null,tToCol),0),0);
 							pWhen=exprc.sqlite3ExprAnd(db,pWhen,pEq);
@@ -2827,7 +2797,7 @@ goto attach_end;
 							}
 							else
 								if(action==OnConstraintError.OE_SetDflt) {
-									Expr pDflt=pFKey.pFrom.aCol[iFromCol].pDflt;
+									Expr pDflt=pFKey.pFrom.aCol[iFromCol].DefaultValue;
 									if(pDflt!=null) {
 										pNew=exprc.sqlite3ExprDup(db,pDflt,0);
 									}
@@ -2962,7 +2932,7 @@ goto attach_end;
                     Debug.Assert(i >= 0);
 
                     //pParse->sLastToken.z = &zSql[i];
-                    i += (this.sLastToken = Lexer.GetToken(zSql, i)).Length;
+                    i += (this.sLastToken = Lexer.GetNextToken(zSql, i)).Length;
                     //Log.WriteLine("token :" + this.sLastToken);
                     if (i > mxSqlLen)
                     {
@@ -3184,201 +3154,68 @@ pParse.nTableLock = 0;
 			public void sqlite3Insert(SrcList pTabList,ExprList pList,int null_4,IdList pColumn,OnConstraintError onError) {
 				this.sqlite3Insert(pTabList,pList,null,pColumn,onError);
 			}
-			public void sqlite3Insert(///
-			///<summary>
-			///Parser context 
-			///</summary>
-			SrcList pTabList,///
-			///<summary>
-			///Name of table into which we are inserting 
-			///</summary>
-			ExprList pList,///
-			///<summary>
-			///List of values to be inserted 
-			///</summary>
-			Select pSelect,///
-			///<summary>
-			///A SELECT statement to use as the data source 
-			///</summary>
-			IdList pColumn,///
-			///<summary>
-			///Column names corresponding to IDLIST. 
-			///</summary>
-			OnConstraintError onError///
-			///<summary>
-			///How to handle constraint errors 
-			///</summary>
+			public void sqlite3Insert(
+			    SrcList pTabList,///Name of table into which we are inserting 
+			    ExprList pList,///List of values to be inserted 
+			    Select pSelect,///A SELECT statement to use as the data source 
+			    IdList pColumn,///Column names corresponding to IDLIST. 
+			    OnConstraintError onError///How to handle constraint errors 
 			) {
-				Connection db;
-				///
-				///<summary>
-				///The main database structure 
-				///</summary>
-				Table pTab;
-				///
-				///<summary>
-				///The table to insert into.  aka TABLE 
-				///</summary>
-				string zTab;
-				///
-				///<summary>
-				///Name of the table into which we are inserting 
-				///</summary>
-				string zDb;
-				///
-				///<summary>
-				///Name of the database holding this table 
-				///</summary>
 				int i=0;
 				int j=0;
-				int idx=0;
-				///
-				///<summary>
-				///Loop counters 
-				///</summary>
-				Vdbe v;
-				///
-				///<summary>
-				///Generate code into this virtual machine 
-				///</summary>
-				Index pIdx;
-				///
-				///<summary>
-				///For looping over indices of the table 
-				///</summary>
+				
 				int nColumn;
-				///
-				///<summary>
 				///Number of columns in the data 
-				///</summary>
 				int nHidden=0;
-				///
-				///<summary>
 				///Number of hidden columns if TABLE is virtual 
-				///</summary>
 				int baseCur=0;
-				///
-				///<summary>
 				///VDBE VdbeCursor number for pTab 
-				///</summary>
 				int keyColumn=-1;
-				///
-				///<summary>
 				///Column that is the INTEGER PRIMARY KEY 
-				///</summary>
 				int endOfLoop=0;
-				///
-				///<summary>
 				///Label for the end of the insertion loop 
-				///</summary>
 				bool useTempTable=false;
-				///
-				///<summary>
 				///Store SELECT results in intermediate table 
-				///</summary>
 				int srcTab=0;
-				///
-				///<summary>
 				///Data comes from this temporary cursor if >=0 
-				///</summary>
 				int addrInsTop=0;
-				///
-				///<summary>
 				///Jump to label "D" 
-				///</summary>
 				int addrCont=0;
-				///
-				///<summary>
 				///Top of insert loop. Label "C" in templates 3 and 4 
-				///</summary>
 				int addrSelect=0;
-				///
-				///<summary>
 				///Address of coroutine that implements the SELECT 
-				///</summary>
 				SelectDest dest;
-				///
-				///<summary>
 				///Destination for SELECT on rhs of INSERT 
-				///</summary>
-				int iDb;
-				///
-				///<summary>
-				///Index of database holding TABLE 
-				///</summary>
-				DbBackend pDb;
-				///
-				///<summary>
-				///The database containing table being inserted into 
-				///</summary>
+				
+				
 				bool appendFlag=false;
-				///
-				///<summary>
 				///True if the insert is likely to be an append 
-				///</summary>
 				///
-				///<summary>
 				///Register allocations 
-				///</summary>
 				int regFromSelect=0;
-				///
-				///<summary>
 				///Base register for data coming from SELECT 
-				///</summary>
 				int regAutoinc=0;
-				///
-				///<summary>
 				///Register holding the AUTOINCREMENT counter 
-				///</summary>
 				int regRowCount=0;
-				///
-				///<summary>
 				///Memory cell used for the row counter 
-				///</summary>
 				int regIns;
-				///
-				///<summary>
 				///Block of regs holding rowid+data being inserted 
-				///</summary>
 				int regRowid;
-				///
-				///<summary>
 				///registers holding insert rowid 
-				///</summary>
 				int regData;
-				///
-				///<summary>
 				///register holding first column to insert 
-				///</summary>
 				int regEof=0;
-				///
-				///<summary>
 				///Register recording end of SELECT data 
-				///</summary>
 				int[] aRegIdx=null;
-				///
-				///<summary>
 				///One register allocated to each index 
-				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
-				bool isView=false;
-				///
-				///<summary>
-				///True if attempting to insert into a view 
-				///</summary>
-				Trigger pTrigger;
-				///
-				///<summary>
-				///List of triggers on pTab, if required 
-				///</summary>
+				
+				
 				TriggerType tmask=0;
-				///
-				///<summary>
 				///Mask of trigger times 
-				///</summary>
 				#endif
-				db=this.db;
-				dest=new SelectDest();
+				var db=this.db;///The main database structure 
+				dest = new SelectDest();
 				// memset( &dest, 0, sizeof( dest ) );
 				if(this.nErr!=0///
 				///<summary>
@@ -3387,84 +3224,65 @@ pParse.nTableLock = 0;
 				) {
 					goto insert_cleanup;
 				}
-				///
-				///<summary>
 				///Locate the table into which we will be inserting new information.
-				///
-				///</summary>
 				Debug.Assert(pTabList.Count==1);
-				zTab=pTabList.a[0].zName;
-				if(NEVER(zTab==null))
+				var tableName=pTabList.a[0].zName;///Name of the table into which we are inserting 
+				if (NEVER(tableName==null))
 					goto insert_cleanup;
-				pTab=this.sqlite3SrcListLookup(pTabList);
-				if(pTab==null) {
+				var refTable=this.GetFirstTableInTheList(pTabList);///The table to insert into.  aka TABLE 
+				if (refTable==null) {
 					goto insert_cleanup;
 				}
-				iDb=db.indexOfBackendWithSchema(pTab.pSchema);
-				Debug.Assert(iDb<db.BackendCount);
-				pDb=db.Backends[iDb];
-				zDb=pDb.Name;
-				#if !SQLITE_OMIT_AUTHORIZATION
+
+				var iDb=db.indexOfBackendWithSchema(refTable.pSchema);///Index of database holding TABLE 				
+                                                                      
+                Debug.Assert(iDb<db.BackendCount);
+				var refDb=db.Backends[iDb];///The database containing table being inserted into 
+				var dbName =refDb.Name;///Name of the database holding this table 
+#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					if( sqlite3AuthCheck(pParse, SQLITE_INSERT, pTab.zName, 0, zDb) ){
 goto insert_cleanup;
 }
 #endif
-				///
-				///<summary>
-				///Figure out if we have any triggers and if the table being
-				///inserted into is a view
-				///</summary>
-				#if !SQLITE_OMIT_TRIGGER
-				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_INSERT,null,out tmask);
-				isView=pTab.pSelect!=null;
-				#else
+                ///Figure out if we have any triggers and if the table being
+                ///inserted into is a view
+#if !SQLITE_OMIT_TRIGGER
+                var pTrigger = TriggerParser.sqlite3TriggersExist(this,refTable,TokenType.TK_INSERT,null,out tmask);///True if attempting to insert into a view                 
+                var isView =refTable.IsView;///List of triggers on pTab, if required 
+#else
 																																																																																																					      Trigger pTrigger = null;  // define pTrigger 0
       int tmask = 0;            // define tmask 0
       bool isView = false;
 #endif
-				#if SQLITE_OMIT_VIEW
+#if SQLITE_OMIT_VIEW
 																																																																																																					// undef isView
 isView = false;
 #endif
-				#if !SQLITE_OMIT_TRIGGER
-				Debug.Assert((pTrigger!=null&&tmask!=0)||(pTrigger==null&&tmask==0));
+#if !SQLITE_OMIT_TRIGGER
+                Debug.Assert((pTrigger!=null&&tmask!=0)||(pTrigger==null&&tmask==0));
 				#endif
 				#if !SQLITE_OMIT_VIEW
-				///
-				///<summary>
 				///If pTab is really a view, make sure it has been initialized.
-				///</summary>
-				///<param name="ViewGetColumnNames() is a no">op if pTab is not a view (or virtual</param>
-				///<param name="module table).">module table).</param>
-				///<param name=""></param>
-				if(build.sqlite3ViewGetColumnNames(this,pTab)!=-0) {
+				///ViewGetColumnNames() is a no-op if pTab is not a view (or virtual
+				///module table).">module table).
+				if(build.sqlite3ViewGetColumnNames(this,refTable)!=-0) {
 					goto insert_cleanup;
 				}
 				#endif
-				///
-				///<summary>
 				///Ensure that:
-				///</summary>
-				///<param name="(a) the table is not read">only, </param>
-				///<param name="(b) that if it is a view then ON INSERT triggers exist">(b) that if it is a view then ON INSERT triggers exist</param>
-				///<param name=""></param>
-				if(this.sqlite3IsReadOnly(pTab,tmask)) {
+				///(a) the table is not read-only, 
+				///(b) that if it is a view then ON INSERT triggers exist">(b) that if it is a view then ON INSERT triggers exist
+				if(this.sqlite3IsReadOnly(refTable,tmask)) {
 					goto insert_cleanup;
 				}
-				///
-				///<summary>
 				///Allocate a VDBE
-				///
-				///</summary>
-				v=this.sqlite3GetVdbe();
-				if(v==null)
+				var v=this.sqlite3GetVdbe();///Generate code into this virtual machine 
+				if (v==null)
 					goto insert_cleanup;
 				if(this.nested==0)
 					v.sqlite3VdbeCountChanges();
-				build.sqlite3BeginWriteOperation(this,(pSelect!=null||pTrigger!=null)?1:0,iDb);
+				build.sqlite3BeginWriteOperation(this,(null != pSelect||null != pTrigger)?1:0,iDb);
 				#if !SQLITE_OMIT_XFER_OPT
-				///
-				///<summary>
 				///If the statement is of the form
 				///
 				///INSERT INTO <table1> SELECT * FROM <table2>;
@@ -3473,60 +3291,45 @@ isView = false;
 				///very fast and which reduce fragmentation of indices.
 				///
 				///This is the 2nd template.
-				///</summary>
-				if(pColumn==null&&xferOptimization(this,pTab,pSelect,onError,iDb)!=0) {
+				if(pColumn==null&&xferOptimization(this,refTable,pSelect,onError,iDb)!=0) {
 					Debug.Assert(null==pTrigger);
 					Debug.Assert(pList==null);
 					goto insert_end;
 				}
 				#endif
-				///
-				///<summary>
 				///If this is an AUTOINCREMENT table, look up the sequence number in the
 				///sqlite_sequence table and store it in memory cell regAutoinc.
-				///</summary>
-				regAutoinc=this.autoIncBegin(iDb,pTab);
-				///
-				///<summary>
+				regAutoinc=this.autoIncBegin(iDb,refTable);
 				///Figure out how many columns of data are supplied.  If the data
-				///</summary>
-				///<param name="is coming from a SELECT statement, then generate a co">routine that</param>
-				///<param name="produces a single row of the SELECT on each invocation.  The">produces a single row of the SELECT on each invocation.  The</param>
-				///<param name="co">routine is the common header to the 3rd and 4th templates.</param>
-				///<param name=""></param>
+				///is coming from a SELECT statement, then generate a co-routine that
+				///produces a single row of the SELECT on each invocation.  The-produces a single row of the SELECT on each invocation.  The
+				///co">routine is the common header to the 3rd and 4th templates.
 				if(pSelect!=null) {
-					///
-					///<summary>
 					///Data is coming from a SELECT.  Generate code to implement that SELECT
-					///</summary>
-					///<param name="as a co">routine.  The code is common to both the 3rd and 4th</param>
-					///<param name="templates:">templates:</param>
-					///<param name=""></param>
-					///<param name="EOF <"> 0</param>
-					///<param name="X <"> A</param>
-					///<param name="goto B">goto B</param>
-					///<param name="A: setup for the SELECT">A: setup for the SELECT</param>
-					///<param name="loop over the tables in the SELECT">loop over the tables in the SELECT</param>
-					///<param name="load value into register R..R+n">load value into register R..R+n</param>
-					///<param name="yield X">yield X</param>
-					///<param name="end loop">end loop</param>
-					///<param name="cleanup after the SELECT">cleanup after the SELECT</param>
-					///<param name="EOF <"> 1</param>
-					///<param name="yield X">yield X</param>
-					///<param name="halt">error</param>
-					///<param name=""></param>
-					///<param name="On each invocation of the co">routine, it puts a single row of the</param>
-					///<param name="SELECT result into registers dest.iMem...dest.iMem+dest.nMem">1.</param>
-					///<param name="(These output registers are allocated by sqlite3Select().)  When">(These output registers are allocated by sqlite3Select().)  When</param>
-					///<param name="the SELECT completes, it sets the EOF flag stored in regEof.">the SELECT completes, it sets the EOF flag stored in regEof.</param>
-					///<param name=""></param>
+					///as a co">routine.  The code is common to both the 3rd and 4th</param>
+					///templates:">templates:</param>
+					///"></param>
+					///EOF <"> 0</param>
+					///X <"> A</param>
+					///goto B">goto B</param>
+					///A: setup for the SELECT">A: setup for the SELECT</param>
+					///loop over the tables in the SELECT">loop over the tables in the SELECT</param>
+					///load value into register R..R+n">load value into register R..R+n</param>
+					///yield X">yield X</param>
+					///end loop">end loop</param>
+					///cleanup after the SELECT">cleanup after the SELECT</param>
+					///EOF <"> 1</param>
+					///yield X">yield X</param>
+					///halt">error</param>
+					///"></param>
+					///On each invocation of the co">routine, it puts a single row of the</param>
+					///SELECT result into registers dest.iMem...dest.iMem+dest.nMem">1.</param>
+					///(These output registers are allocated by sqlite3Select().)  When">(These output registers are allocated by sqlite3Select().)  When</param>
+					///the SELECT completes, it sets the EOF flag stored in regEof.">the SELECT completes, it sets the EOF flag stored in regEof.</param>
 					var rc=(SqlResult)0;
                     int j1;
 					regEof=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regEof);
-					///
-					///<summary>
-					///</summary>
 					///<param name="EOF <"> 0 </param>
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "SELECT eof flag" );
@@ -3538,10 +3341,7 @@ isView = false;
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "Jump over SELECT coroutine" );
 #endif
-					///
-					///<summary>
 					///Resolve the expressions in the SELECT statement and execute it. 
-					///</summary>
 					rc=Select.sqlite3Select(this,pSelect,ref dest);
 					Debug.Assert(this.nErr==0||rc!=0);
 					if(rc!=0||NEVER(this.nErr!=0)///
@@ -3552,24 +3352,15 @@ isView = false;
 						goto insert_cleanup;
 					}
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,regEof);
-					///
-					///<summary>
-					///</summary>
 					///<param name="EOF <"> 1 </param>
 					v.sqlite3VdbeAddOp1(OpCode.OP_Yield,dest.iParm);
-					///
-					///<summary>
 					///yield X 
-					///</summary>
                     v.sqlite3VdbeAddOp2(OpCode.OP_Halt, (int)SqlResult.SQLITE_INTERNAL, (int)OnConstraintError.OE_Abort);
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "End of SELECT coroutine" );
 #endif
 					v.sqlite3VdbeJumpHere(j1);
-					///
-					///<summary>
 					///label B: 
-					///</summary>
 					regFromSelect=dest.iMem;
 					Debug.Assert(pSelect.ResultingFieldList!=null);
 					nColumn=pSelect.ResultingFieldList.Count;
@@ -3586,12 +3377,10 @@ isView = false;
 					///temp table in the case of row triggers.
 					///
 					///</summary>
-					if(pTrigger!=null||this.readsTable(addrSelect,iDb,pTab)) {
+					if(pTrigger!=null||this.readsTable(addrSelect,iDb,refTable)) {
 						useTempTable=true;
 					}
 					if(useTempTable) {
-						///
-						///<summary>
 						///Invoke the coroutine to extract information from the SELECT
 						///and add it to a transient table srcTab.  The code generated
 						///here is from the 4th template:
@@ -3602,28 +3391,14 @@ isView = false;
 						///insert row from R..R+n into temp table
 						///goto L
 						///M: ...
-						///
-						///</summary>
 						int regRec;
-						///
-						///<summary>
 						///Register to hold packed record 
-						///</summary>
 						int regTempRowid;
-						///
-						///<summary>
 						///Register to hold temp table ROWID 
-						///</summary>
 						int addrTop;
-						///
-						///<summary>
 						///Label "L" 
-						///</summary>
 						int addrIf;
-						///
-						///<summary>
 						///Address of jump to M 
-						///</summary>
 						srcTab=this.nTab++;
 						regRec=this.allocTempReg();
 						regTempRowid=this.allocTempReg();
@@ -3640,14 +3415,9 @@ isView = false;
 					}
 				}
 				else {
-					///
-					///<summary>
 					///This is the case if the data for the INSERT is coming from a VALUES
 					///clause
-					///
-					///</summary>
-					NameContext sNC;
-					sNC=new NameContext();
+					var sNC=new NameContext();
 					// memset( &sNC, 0, sNC ).Length;
 					sNC.pParse=this;
 					srcTab=-1;
@@ -3659,27 +3429,21 @@ isView = false;
 						}
 					}
 				}
-				///
-				///<summary>
 				///Make sure the number of columns in the source data matches the number
 				///of columns to be inserted into the table.
-				///
-				///</summary>
-				if(pTab.IsVirtual()) {
-					for(i=0;i<pTab.nCol;i++) {
-						nHidden+=(pTab.aCol[i].IsHiddenColumn()?1:0);
+				if(refTable.IsVirtual()) {
+					for(i=0;i<refTable.nCol;i++) {
+						nHidden+=(refTable.aCol[i].IsHiddenColumn()?1:0);
 					}
 				}
-				if(pColumn==null&&nColumn!=0&&nColumn!=(pTab.nCol-nHidden)) {
-					utilc.sqlite3ErrorMsg(this,"table %S has %d columns but %d values were supplied",pTabList,0,pTab.nCol-nHidden,nColumn);
+				if(pColumn==null&&nColumn!=0&&nColumn!=(refTable.nCol-nHidden)) {
+					utilc.sqlite3ErrorMsg(this,"table %S has %d columns but %d values were supplied",pTabList,0,refTable.nCol-nHidden,nColumn);
 					goto insert_cleanup;
 				}
 				if(pColumn!=null&&nColumn!=pColumn.nId) {
 					utilc.sqlite3ErrorMsg(this,"%d values for %d columns",nColumn,pColumn.nId);
 					goto insert_cleanup;
 				}
-				///
-				///<summary>
 				///If the INSERT statement included an IDLIST term, then make sure
 				///all elements of the IDLIST really are columns of the table and
 				///remember the column indices.
@@ -3690,23 +3454,21 @@ isView = false;
 				///the index of the primary key as it appears in IDLIST, not as
 				///is appears in the original table.  (The index of the primary
 				///key in the original table is pTab.iPKey.)
-				///
-				///</summary>
 				if(pColumn!=null) {
 					for(i=0;i<pColumn.nId;i++) {
 						pColumn.a[i].idx=-1;
 					}
 					for(i=0;i<pColumn.nId;i++) {
-						for(j=0;j<pTab.nCol;j++) {
-							if(pColumn.a[i].zName.Equals(pTab.aCol[j].zName,StringComparison.InvariantCultureIgnoreCase)) {
+						for(j=0;j<refTable.nCol;j++) {
+							if(pColumn.a[i].zName.Equals(refTable.aCol[j].zName,StringComparison.InvariantCultureIgnoreCase)) {
 								pColumn.a[i].idx=j;
-								if(j==pTab.iPKey) {
+								if(j==refTable.iPKey) {
 									keyColumn=i;
 								}
 								break;
 							}
 						}
-						if(j>=pTab.nCol) {
+						if(j>=refTable.nCol) {
 							if(exprc.sqlite3IsRowid(pColumn.a[i].zName)) {
 								keyColumn=i;
 							}
@@ -3718,33 +3480,22 @@ isView = false;
 						}
 					}
 				}
-				///
-				///<summary>
 				///If there is no IDLIST term but the table has an integer primary
 				///key, the set the keyColumn variable to the primary key column index
 				///in the original table definition.
-				///
-				///</summary>
 				if(pColumn==null&&nColumn>0) {
-					keyColumn=pTab.iPKey;
+					keyColumn=refTable.iPKey;
 				}
-				///
-				///<summary>
 				///Initialize the count of rows to be inserted
-				///
-				///</summary>
 				if((db.flags&SqliteFlags.SQLITE_CountRows)!=0) {
 					regRowCount=++this.UsedCellCount;
 					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,regRowCount);
 				}
-				///
-				///<summary>
 				///If this is not a view, open the table and and all indices 
-				///</summary>
 				if(!isView) {
 					int nIdx;
 					baseCur=this.nTab;
-                    nIdx = this.sqlite3OpenTableAndIndices(pTab, baseCur, OpCode.OP_OpenWrite);
+                    nIdx = this.sqlite3OpenTableAndIndices(refTable, baseCur, OpCode.OP_OpenWrite);
 					aRegIdx=new int[nIdx+1];
 					// sqlite3DbMallocRaw( db, sizeof( int ) * ( nIdx + 1 ) );
 					if(aRegIdx==null) {
@@ -3754,13 +3505,8 @@ isView = false;
 						aRegIdx[i]=++this.UsedCellCount;
 					}
 				}
-				///
-				///<summary>
 				///This is the top of the main insertion loop 
-				///</summary>
 				if(useTempTable) {
-					///
-					///<summary>
 					///This block codes the top of loop only.  The complete loop is the
 					///following pseudocode (template 4):
 					///
@@ -3769,8 +3515,6 @@ isView = false;
 					///transfer values form intermediate table into <table>
 					///end loop
 					///D: ...
-					///
-					///</summary>
 					addrInsTop=v.sqlite3VdbeAddOp1(OpCode.OP_Rewind,srcTab);
 					addrCont=v.sqlite3VdbeCurrentAddr();
 				}
@@ -3791,37 +3535,25 @@ isView = false;
 						addrCont=v.sqlite3VdbeAddOp1(OpCode.OP_Yield,dest.iParm);
 						addrInsTop=v.sqlite3VdbeAddOp1(OpCode.OP_If,regEof);
 					}
-				///
-				///<summary>
 				///Allocate registers for holding the rowid of the new row,
 				///the content of the new row, and the assemblied row record.
-				///
-				///</summary>
 				regRowid=regIns=this.UsedCellCount+1;
-				this.UsedCellCount+=pTab.nCol+1;
-				if(pTab.IsVirtual()) {
+				this.UsedCellCount+=refTable.nCol+1;
+				if(refTable.IsVirtual()) {
 					regRowid++;
 					this.UsedCellCount++;
 				}
 				regData=regRowid+1;
-				///
-				///<summary>
 				///Run the BEFORE and INSTEAD OF triggers, if there are any
-				///
-				///</summary>
 				endOfLoop=v.sqlite3VdbeMakeLabel();
 				#if !SQLITE_OMIT_TRIGGER
 				if((tmask&TriggerType.TRIGGER_BEFORE)!=0) {
-					int regCols=this.sqlite3GetTempRange(pTab.nCol+1);
-					///
-					///<summary>
+					int regCols=this.sqlite3GetTempRange(refTable.nCol+1);
 					///build the NEW.* reference row.  Note that if there is an INTEGER
 					///PRIMARY KEY into which a NULL is being inserted, that NULL will be
 					///translated into a unique ID for the row.  But on a BEFORE trigger,
 					///we do not know what the unique ID will be (because the insert has
-					///</summary>
 					///<param name="not happened yet) so we substitute a rowid of ">1</param>
-					///<param name=""></param>
 					if(keyColumn<0) {
 						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,-1,regCols);
 					}
@@ -3849,13 +3581,13 @@ isView = false;
 					///this block would have to account for hidden column.
 					///
 					///</summary>
-					Debug.Assert(!pTab.IsVirtual());
+					Debug.Assert(!refTable.IsVirtual());
 					///
 					///<summary>
 					///Create the new column data
 					///
 					///</summary>
-					for(i=0;i<pTab.nCol;i++) {
+					for(i=0;i<refTable.nCol;i++) {
 						if(pColumn==null) {
 							j=i;
 						}
@@ -3866,7 +3598,7 @@ isView = false;
 							}
 						}
 						if((!useTempTable&&null==pList)||(pColumn!=null&&j>=pColumn.nId)) {
-							this.sqlite3ExprCode(pTab.aCol[i].pDflt,regCols+i+1);
+							this.sqlite3ExprCode(refTable.aCol[i].DefaultValue,regCols+i+1);
 						}
 						else
 							if(useTempTable) {
@@ -3883,12 +3615,12 @@ isView = false;
 					///If this is a real table, attempt conversions as required by the
 					///table column affinities.
 					if(!isView) {
-                        v.sqlite3VdbeAddOp2(OpCode.OP_Affinity, regCols + 1, pTab.nCol);
-						v.sqlite3TableAffinityStr(pTab);
+                        v.sqlite3VdbeAddOp2(OpCode.OP_Affinity, regCols + 1, refTable.nCol);
+						v.sqlite3TableAffinityStr(refTable);
 					}
                     ///Fire BEFORE or INSTEAD OF triggers 
-                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,pTab,regCols-pTab.nCol-1,onError,endOfLoop);
-					this.sqlite3ReleaseTempRange(regCols,pTab.nCol+1);
+                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_BEFORE,refTable,regCols-refTable.nCol-1,onError,endOfLoop);
+					this.sqlite3ReleaseTempRange(regCols,refTable.nCol+1);
 				}
 				#endif
 				///
@@ -3899,7 +3631,7 @@ isView = false;
 				///case the record number is the same as that column.
 				///</summary>
 				if(!isView) {
-					if(pTab.IsVirtual()) {
+					if(refTable.IsVirtual()) {
 						///
 						///<summary>
 						///The row that the VUpdate opcode will delete: none 
@@ -3918,7 +3650,7 @@ isView = false;
 								VdbeOp pOp;
 								this.sqlite3ExprCode(pList.a[keyColumn].pExpr,regRowid);
 								pOp=v.sqlite3VdbeGetOp(-1);
-								if(Sqlite3.ALWAYS(pOp!=null)&&pOp.OpCode==OpCode.OP_Null&&!pTab.IsVirtual()) {
+								if(Sqlite3.ALWAYS(pOp!=null)&&pOp.OpCode==OpCode.OP_Null&&!refTable.IsVirtual()) {
 									appendFlag=true;
 									pOp.OpCode=OpCode.OP_NewRowid;
 									pOp.p1=baseCur;
@@ -3934,7 +3666,7 @@ isView = false;
 						///</summary>
 						if(!appendFlag) {
 							int j1;
-							if(!pTab.IsVirtual()) {
+							if(!refTable.IsVirtual()) {
 								j1=v.sqlite3VdbeAddOp1(OpCode.OP_NotNull,regRowid);
 								v.sqlite3VdbeAddOp3( OpCode.OP_NewRowid,baseCur,regRowid,regAutoinc);
 								v.sqlite3VdbeJumpHere(j1);
@@ -3947,7 +3679,7 @@ isView = false;
 						}
 					}
 					else
-						if(pTab.IsVirtual()) {
+						if(refTable.IsVirtual()) {
                             v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, regRowid);
 						}
 						else {
@@ -3962,9 +3694,9 @@ isView = false;
 					///
 					///</summary>
 					nHidden=0;
-					for(i=0;i<pTab.nCol;i++) {
+					for(i=0;i<refTable.nCol;i++) {
 						int iRegStore=regRowid+1+i;
-						if(i==pTab.iPKey) {
+						if(i==refTable.iPKey) {
 							///
 							///<summary>
 							///The value of the INTEGER PRIMARY KEY column is always a NULL.
@@ -3976,9 +3708,9 @@ isView = false;
 							continue;
 						}
 						if(pColumn==null) {
-                            if (pTab.aCol[i].IsHiddenColumn())
+                            if (refTable.aCol[i].IsHiddenColumn())
                             {
-								Debug.Assert(pTab.IsVirtual());
+								Debug.Assert(refTable.IsVirtual());
 								j=-1;
 								nHidden++;
 							}
@@ -3993,7 +3725,7 @@ isView = false;
 							}
 						}
 						if(j<0||nColumn==0||(pColumn!=null&&j>=pColumn.nId)) {
-							this.sqlite3ExprCode(pTab.aCol[i].pDflt,iRegStore);
+							this.sqlite3ExprCode(refTable.aCol[i].DefaultValue,iRegStore);
 						}
 						else
 							if(useTempTable) {
@@ -4007,17 +3739,13 @@ isView = false;
 									this.sqlite3ExprCode(pList.a[j].pExpr,iRegStore);
 								}
 					}
-					///
-					///<summary>
 					///Generate code to check constraints and generate index keys and
 					///do the insertion.
-					///
-					///</summary>
 					#if !SQLITE_OMIT_VIRTUALTABLE
-					if(pTab.IsVirtual()) {
-                        VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
-						this.sqlite3VtabMakeWritable(pTab);
-                        v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 1, pTab.nCol + 2, regIns, pVTab,  P4Usage.P4_VTAB);
+					if(refTable.IsVirtual()) {
+                        VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, refTable);
+						this.sqlite3VtabMakeWritable(refTable);
+                        v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 1, refTable.nCol + 2, regIns, pVTab,  P4Usage.P4_VTAB);
 						v.sqlite3VdbeChangeP5((byte)(onError==OnConstraintError.OE_Default?OnConstraintError.OE_Abort:onError));
 						build.sqlite3MayAbort(this);
 					}
@@ -4025,20 +3753,13 @@ isView = false;
 					#endif
 					 {
 						int isReplace=0;
-						///
-						///<summary>
 						///Set to true if constraints may cause a replace 
-						///</summary>
-						this.sqlite3GenerateConstraintChecks(pTab,baseCur,regIns,aRegIdx,keyColumn>=0?1:0,false,onError,endOfLoop,out isReplace);
-						this.sqlite3FkCheck(pTab,0,regIns);
-						this.sqlite3CompleteInsertion(pTab,baseCur,regIns,aRegIdx,false,appendFlag,isReplace==0);
+						this.sqlite3GenerateConstraintChecks(refTable,baseCur,regIns,aRegIdx,keyColumn>=0?1:0,false,onError,endOfLoop,out isReplace);
+						this.sqlite3FkCheck(refTable,0,regIns);
+						this.sqlite3CompleteInsertion(refTable,baseCur,regIns,aRegIdx,false,appendFlag,isReplace==0);
 					}
 				}
-				///
-				///<summary>
 				///Update the count of rows that are inserted
-				///
-				///</summary>
                 if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0)
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,regRowCount,1);
@@ -4046,14 +3767,11 @@ isView = false;
 				#if !SQLITE_OMIT_TRIGGER
 				if(pTrigger!=null) {
                     ///Code AFTER triggers 
-                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_AFTER,pTab,regData-2-pTab.nCol,onError,endOfLoop);
+                    TriggerBuilder.sqlite3CodeRowTrigger(this,pTrigger,TokenType.TK_INSERT,null,TriggerType.TRIGGER_AFTER,refTable,regData-2-refTable.nCol,onError,endOfLoop);
 				}
 				#endif
-				///
-				///<summary>
 				///The bottom of the main insertion loop, if the data source
 				///is a SELECT statement.
-				///</summary>
 				v.sqlite3VdbeResolveLabel(endOfLoop);
 				if(useTempTable) {
 					v.sqlite3VdbeAddOp2( OpCode.OP_Next,srcTab,addrCont);
@@ -4065,34 +3783,28 @@ isView = false;
 						v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,addrCont);
 						v.sqlite3VdbeJumpHere(addrInsTop);
 					}
-				if(!pTab.IsVirtual()&&!isView) {
-					///
-					///<summary>
-					///Close all tables opened 
-					///</summary>
-					v.sqlite3VdbeAddOp1(OpCode.OP_Close,baseCur);
-					for(idx=1,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,idx++) {
-						v.sqlite3VdbeAddOp1(OpCode.OP_Close,idx+baseCur);
-					}
-				}
+                if (!refTable.IsVirtual() && !isView)
+                {
+                    ///Close all tables opened 
+                    v.sqlite3VdbeAddOp1(OpCode.OP_Close, baseCur);
+                    ///For looping over indices of the table 
+                    refTable.pIndex.linkedList().ForEach(
+                        (pIdx, ii) =>
+                        {
+                            v.sqlite3VdbeAddOp1(OpCode.OP_Close, ii + 1 + baseCur);
+                        }
+                    );
+                }
 				insert_end:
-				///
-				///<summary>
 				///Update the sqlite_sequence table by storing the content of the
 				///maximum rowid counter values recorded while inserting into
 				///autoincrement tables.
-				///
-				///</summary>
 				if(this.nested==0&&this.pTriggerTab==null) {
 					this.sqlite3AutoincrementEnd();
 				}
-				///
-				///<summary>
 				///Return the number of rows inserted. If this routine is
 				///generating code because of a call to build.sqlite3NestedParse(), do not
 				///invoke the callback function.
-				///
-				///</summary>
                 if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && 0 == this.nested && null == this.pTriggerTab)
                 {
 					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,regRowCount,1);
@@ -4325,7 +4037,7 @@ isView = false;
 						if(onError==OnConstraintError.OE_Default) {
 							onError=OnConstraintError.OE_Abort;
 						}
-					if(onError==OnConstraintError.OE_Replace&&pTab.aCol[i].pDflt==null) {
+					if(onError==OnConstraintError.OE_Replace&&pTab.aCol[i].DefaultValue==null) {
 						onError=OnConstraintError.OE_Abort;
 					}
 					Debug.Assert(onError==OnConstraintError.OE_Rollback||onError==OnConstraintError.OE_Abort||onError==OnConstraintError.OE_Fail||onError==OnConstraintError.OE_Ignore||onError==OnConstraintError.OE_Replace);
@@ -4349,7 +4061,7 @@ isView = false;
 					    default: {
 						    Debug.Assert(onError==OnConstraintError.OE_Replace);
 						    j1=v.sqlite3VdbeAddOp1(OpCode.OP_NotNull,regData+i);
-						    this.sqlite3ExprCode(pTab.aCol[i].pDflt,regData+i);
+						    this.sqlite3ExprCode(pTab.aCol[i].DefaultValue,regData+i);
 						    v.sqlite3VdbeJumpHere(j1);
 						    break;
 					}
@@ -4718,59 +4430,40 @@ isView = false;
 				}
 				return i-1;
 			}
-			public int autoIncBegin(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			int iDb,///
-			///<summary>
-			///Index of the database holding pTab 
-			///</summary>
-			Table pTab///
-			///<summary>
-			///The table we are writing to 
-			///</summary>
+
+			public int autoIncBegin(
+			    int iDb,///Index of the database holding pTab 
+			    Table pTab///The table we are writing to 
 			) {
 				int memId=0;
-				///
-				///<summary>
 				///Register holding maximum rowid 
-				///</summary>
 				if((pTab.tabFlags&TableFlags.TF_Autoincrement)!=0) {
 					Parse pToplevel=sqliteinth.sqlite3ParseToplevel(this);
-					AutoincInfo pInfo;
-					pInfo=pToplevel.pAinc;
-					while(pInfo!=null&&pInfo.pTab!=pTab) {
-						pInfo=pInfo.pNext;
-					}
+					var pInfo=pToplevel.pAinc.linkedList()
+                        .FirstOrDefault(p=> p.pTab != pTab);
+					
 					if(pInfo==null) {
-						pInfo=new AutoincInfo();
+                        pInfo = new AutoincInfo() {
+                            pTab = pTab,
+                            iDb = iDb
+                        };
 						//sqlite3DbMallocRaw(pParse.db, sizeof(*pInfo));
 						//if( pInfo==0 ) return 0;
 						pInfo.pNext=pToplevel.pAinc;
 						pToplevel.pAinc=pInfo;
-						pInfo.pTab=pTab;
-						pInfo.iDb=iDb;
+						
 						pToplevel.UsedCellCount++;
-						///
-						///<summary>
 						///Register to hold name of table 
-						///</summary>
 						pInfo.regCtr=++pToplevel.UsedCellCount;
-						///
-						///<summary>
 						///Max rowid register 
-						///</summary>
 						pToplevel.UsedCellCount++;
-						///
-						///<summary>
 						///Rowid in sqlite_sequence 
-						///</summary>
 					}
 					memId=pInfo.regCtr;
 				}
 				return memId;
 			}
+
 			public bool readsTable(int iStartAddr,int iDb,Table pTab) {
 				Vdbe v=this.sqlite3GetVdbe();
 				int i;
@@ -5012,12 +4705,8 @@ isView = false;
 					goto update_cleanup;
 				}
 				Debug.Assert(pTabList.Count==1);
-				///
-				///<summary>
 				///Locate the table which we want to update.
-				///
-				///</summary>
-				pTab=this.sqlite3SrcListLookup(pTabList);
+				pTab=this.GetFirstTableInTheList(pTabList);
 				if(pTab==null)
 					goto update_cleanup;
 				iDb= this.db.indexOfBackendWithSchema(pTab.pSchema);
@@ -5636,17 +5325,19 @@ aXRef[j] = -1;
 				v.sqlite3VdbeAddOp2( OpCode.OP_Next,ephemTab,addr+1);
 				v.sqlite3VdbeJumpHere(addr);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Close, ephemTab, 0);
-				///
-				///<summary>
 				///Cleanup 
-				///</summary>
 				SelectMethods.SelectDestructor(db,ref pSelect);
 			}
-			public Table sqlite3SrcListLookup(SrcList pSrc) {
-				SrcList_item pItem=pSrc.a[0];
-				Table pTab;
+
+            /// <summary>
+            /// sqlite3SrcListLookup
+            /// </summary>
+            /// <param name="pSrc"></param>
+            /// <returns></returns>
+			public Table GetFirstTableInTheList(SrcList pSrc) {
+				SrcList_item pItem=pSrc.a[0];				
 				Debug.Assert(pItem!=null&&pSrc.Count==1);
-				pTab=TableBuilder.sqlite3LocateTable(this, pItem.zName, pItem.zDatabase);
+				var pTab=TableBuilder.sqlite3LocateTable(this, pItem.zName, pItem.zDatabase);
 				TableBuilder.sqlite3DeleteTable(this.db,ref pItem.pTab);
 				pItem.pTab=pTab;
 				if(pTab!=null) {
@@ -5847,7 +5538,7 @@ aXRef[j] = -1;
 				///an SrcList* parameter instead of just a Table* parameter.
 				///
 				///</summary>
-				pTab=this.sqlite3SrcListLookup(pTabList);
+				pTab=this.GetFirstTableInTheList(pTabList);
 				if(pTab==null)
 					goto delete_from_cleanup;
 				///

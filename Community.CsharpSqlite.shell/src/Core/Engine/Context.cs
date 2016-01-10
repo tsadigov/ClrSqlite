@@ -119,7 +119,7 @@ namespace Community.CsharpSqlite.Engine
         dxDel xDel//void (*xDel)(void)     /* Destructor function */
         )
         {
-            if (this.s.sqlite3VdbeMemSetStr(z, o, n, enc, xDel) == SqlResult.SQLITE_TOOBIG)
+            if (this.s.Set(z, o, n, enc, xDel) == SqlResult.SQLITE_TOOBIG)
             {
                 this.sqlite3_result_error_toobig();
             }
@@ -148,7 +148,7 @@ namespace Community.CsharpSqlite.Engine
         dxDel xDel//void (*xDel)(void)     /* Destructor function */
         )
         {
-            if (this.s.sqlite3VdbeMemSetStr(z, n, enc, xDel) == SqlResult.SQLITE_TOOBIG)
+            if (this.s.Set(z, n, enc, xDel) == SqlResult.SQLITE_TOOBIG)
             {
                 this.sqlite3_result_error_toobig();
             }
