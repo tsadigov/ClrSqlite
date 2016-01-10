@@ -432,7 +432,6 @@
     <Compile Include="src\Accessories\Utils\StreAccum.cs" />
     <Compile Include="src\Compiler\Ast\Walker.cs" />
     <Compile Include="src\Accessories\Utils\StringExtensions.cs" />
-    <Compile Include="src\Accessories\Utils\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

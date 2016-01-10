@@ -8,7 +8,13 @@ namespace Community.CsharpSqlite.Utils
 {
     public static partial class StringExtensions
     {
-
+        public static string pad(this String str, int length)
+        {
+            var left = (length - str.Length) / 2;
+            var right = length - left - str.Length;
+            String s = new String(' ', left) + str + new String(' ', right);
+            return s;
+        }
         private static _Custom.SQLite3UpperToLower UpperToLower
         {
             get

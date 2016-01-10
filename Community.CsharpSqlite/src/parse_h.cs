@@ -3004,13 +3004,7 @@ goto attach_end;
     };
             
 
-            static string pad(String str, int length)
-            {
-                var left = (length - str.Length) / 2;
-                var right = length - left - str.Length;
-                String s = new String(' ', left) + str + new String(' ', right);
-                return s;
-            }
+            
 
             static void print(Token token)
             {
@@ -3026,12 +3020,12 @@ goto attach_end;
                 var clr = Console.ForegroundColor;
                 Console.ForegroundColor = colors.First(x => x.Item1.Contains(tk)).Item2;
                 var left = Console.CursorLeft;
-                Console.Write(pad(tkn.ToString(), length).ToLower());
+                Console.Write(tkn.ToString().pad( length).ToLower());
                 Console.CursorLeft = left;
                 Console.CursorTop += 2;
                 Console.CursorLeft = left;
                 //Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.Write(pad(tkString, length).ToLower());
+                Console.Write(tkString.pad( length).ToLower());
                 Console.CursorTop -= 2;
                 Console.ForegroundColor = clr;
             }
