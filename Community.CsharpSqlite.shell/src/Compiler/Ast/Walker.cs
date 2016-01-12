@@ -37,71 +37,75 @@ namespace Community.CsharpSqlite.Ast {
 			///Parser context.  
 			///</summary>
 			public struct uw {
-				///<summary>
-				///Extra data for callback 
-				///</summary>
-				public NameContext pNC;
-				///<summary>
-				///Naming context 
-				///</summary>
-				public int i;
-			///<summary>
-			///Integer value 
-			///</summary>
-			}
-			public uw u;
-			public///<summary>
-			/// 2008 August 16
-			///
-			/// The author disclaims copyright to this source code.  In place of
-			/// a legal notice, here is a blessing:
-			///
-			///    May you do good and not evil.
-			///    May you find forgiveness for yourself and forgive others.
-			///    May you share freely, never taking more than you give.
-			///
-			///
-			/// This file contains routines used for walking the parser tree for
-			/// an SQL statement.
-			///
-			///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
-			///  C#-SQLite is an independent reimplementation of the SQLite software library
-			///
-			///  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
-			///
-			///
-			///
-			///</summary>
-			//#include "sqliteInt.h"
-			//#include <stdlib.h>
-			//#include <string.h>
-			///<summary>
-			/// Walk an expression tree.  Invoke the callback once for each node
-			/// of the expression, while decending.  (In other words, the callback
-			/// is invoked before visiting children.)
-			///
-			/// The return value from the callback should be one of the WRC_
-			/// constants to specify how to proceed with the walk.
-			///
-			///    WRC.WRC_Continue      Continue descending down the tree.
-			///
-			///    WRC.WRC_Prune         Do not descend into child nodes.  But allow
-			///                      the walk to continue with sibling nodes.
-			///
-			///    WRC.WRC_Abort         Do no more callbacks.  Unwind the stack and
-			///                      return the top-level walk call.
-			///
-			/// The return value from this routine is WRC.WRC_Abort to abandon the tree walk
-			/// and WRC.WRC_Continue to continue.
-			///
-			///</summary>
-			WRC sqlite3WalkExpr(ref Expr pExpr) {
+            ///<summary>
+            ///Extra data for callback 
+            ///</summary>
+
+            ///<summary>
+            ///Naming context 
+            ///</summary>
+            public NameContext pNC;
+
+            ///<summary>
+            ///Integer value 
+            ///</summary>
+            public int i;
+        }
+        public uw u;
+
+        ///<summary>
+        /// 2008 August 16
+        ///
+        /// The author disclaims copyright to this source code.  In place of
+        /// a legal notice, here is a blessing:
+        ///
+        ///    May you do good and not evil.
+        ///    May you find forgiveness for yourself and forgive others.
+        ///    May you share freely, never taking more than you give.
+        ///
+        ///
+        /// This file contains routines used for walking the parser tree for
+        /// an SQL statement.
+        ///
+        ///  Included in SQLite3 port to C#-SQLite;  2008 Noah B Hart
+        ///  C#-SQLite is an independent reimplementation of the SQLite software library
+        ///
+        ///  SQLITE_SOURCE_ID: 2010-08-23 18:52:01 42537b60566f288167f1b5864a5435986838e3a3
+        ///
+        ///
+        ///
+        ///</summary>
+        //#include "sqliteInt.h"
+        //#include <stdlib.h>
+        //#include <string.h>
+        ///<summary>
+        /// Walk an expression tree.  Invoke the callback once for each node
+        /// of the expression, while decending.  (In other words, the callback
+        /// is invoked before visiting children.)
+        ///
+        /// The return value from the callback should be one of the WRC_
+        /// constants to specify how to proceed with the walk.
+        ///
+        ///    WRC.WRC_Continue      Continue descending down the tree.
+        ///
+        ///    WRC.WRC_Prune         Do not descend into child nodes.  But allow
+        ///                      the walk to continue with sibling nodes.
+        ///
+        ///    WRC.WRC_Abort         Do no more callbacks.  Unwind the stack and
+        ///                      return the top-level walk call.
+        ///
+        /// The return value from this routine is WRC.WRC_Abort to abandon the tree walk
+        /// and WRC.WRC_Continue to continue.
+        ///
+        ///</summary>
+        public WRC sqlite3WalkExpr(ref Expr pExpr) {
 				WRC rc;
 				if(pExpr==null)
                     return WRC.WRC_Continue;
 				sqliteinth.testcase(pExpr.HasProperty(ExprFlags.EP_TokenOnly));
 				sqliteinth.testcase(pExpr.HasProperty(ExprFlags.EP_Reduced));
-				rc=this.xExprCallback(this,ref pExpr);
+
+            rc =this.xExprCallback(this,pExpr);
                 if (rc == WRC.WRC_Continue && !pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
                 {
 					if(this.sqlite3WalkExpr(ref pExpr.pLeft)!=0)

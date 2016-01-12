@@ -34,34 +34,29 @@ namespace Community.CsharpSqlite.Metadata
         ///</summary>
         public class Column
         {
-            ///
             ///<summary>
             ///Name of this column 
             ///</summary>
 
             public string zName;
 
-            ///
             ///<summary>
             ///Default value of this column 
             ///</summary>
 
             public Expr DefaultValue;
             
-            ///
             ///<summary>
             ///Original text of the default value 
             ///</summary>
             public string DefaultValueSource;
 
-            ///
             ///<summary>
             ///Data type for this column 
             ///</summary>
 
             public string zType;
             
-            ///
             ///<summary>
             ///Collating sequence.  If NULL, use the default 
             ///</summary>
@@ -73,14 +68,12 @@ namespace Community.CsharpSqlite.Metadata
             ///</summary>
             public u8 notNull;
 
-            ///
             ///<summary>
             ///True if this column is part of the PRIMARY KEY 
             ///</summary>
 
             public u8 isPrimKey;
             
-            ///
             ///<summary>
             ///One of the SQLITE_AFF_... values 
             ///</summary>
@@ -147,25 +140,25 @@ namespace Community.CsharpSqlite.Metadata
         ///</summary>
         public class CollSeq
         {
-            public string zName;
-            ///
             ///<summary>
+            ///"Name of the collating sequence, UTF-8 encoded
             ///</summary>
-            ///<param name="Name of the collating sequence, UTF">8 encoded </param>
-            public SqliteEncoding enc;
-            ///
+            public string zName;
+
             ///<summary>
             ///Text encoding handled by xCmp() 
             ///</summary>
-            public CollationType type;
-            ///
+            public SqliteEncoding enc;
+
             ///<summary>
             ///One of the CollationType.... values below 
             ///</summary>
-            public object pUser;
+            public CollationType type;
             ///<summary>
             ///First argument to xCmp()
             ///</summary>
+            public object pUser;
+            
             public dxCompare xCmp;
             //)(void*,int, const void*, int, const void);
             public dxDelCollSeq xDel;

@@ -630,14 +630,13 @@ p.zName,  P4Usage.P4_STATIC );
             /// column.
             ///
             ///</summary>
-            public static void sqlite3AddColumn(Parse pParse, Token pName)
+            public static void parse_AddColumn(Parse pParse, Token pName)
             {
-                Table p;
                 int i;
                 string z;
-                Column pCol;
                 Connection db = pParse.db;
-                if ((p = pParse.pNewTable) == null)
+                var p = pParse.pNewTable;
+                if (p == null)
                     return;
 #if SQLITE_MAX_COLUMN || !SQLITE_MAX_COLUMN
                 if (p.nCol + 1 > db.aLimit[Globals.SQLITE_LIMIT_COLUMN])
@@ -668,7 +667,7 @@ p.zName,  P4Usage.P4_STATIC );
                     //}
                     Array.Resize(ref p.aCol, p.nCol + 8);
                 }
-                pCol = p.aCol[p.nCol] = new Column()
+                var pCol = p.aCol[p.nCol] = new Column()
                 {
 
                     //memset(pCol, 0, sizeof(p.aCol[0]));
@@ -778,12 +777,10 @@ p.zName,  P4Usage.P4_STATIC );
             ///</summary>
             public static void sqlite3AddColumnType(Parse pParse, Token pType)
             {
-                Table p;
-                Column pCol;
-                p = pParse.pNewTable;
-                if (p == null || Sqlite3.NEVER(p.nCol < 1))
+                var parse = pParse.pNewTable;
+                if (parse == null || Sqlite3.NEVER(parse.nCol < 1))
                     return;
-                pCol = p.aCol[p.nCol - 1];
+                var pCol = parse.aCol[parse.nCol - 1];//last
                 Debug.Assert(pCol.zType == null);
                 pCol.zType = build.Token2Name(pParse.db, pType);
                 pCol.affinity = sqlite3AffinityType(pCol.zType);
@@ -1854,35 +1851,20 @@ goto exit_drop_index;
             }
             public static IdList sqlite3IdListAppend(Connection db, IdList pList, Token pToken)
             {
-                int i = 0;
-                if (pList == null)
-                {
-                    pList = new IdList();
-                    //sqlite3DbMallocZero(db, sizeof(IdList));
-                    if (pList == null)
-                        return null;
-                    pList.nAlloc = 0;
-                }
-                pList.a = (IdList_item[])sqlite3ArrayAllocate(db, pList.a, -1,//sizeof(pList.a[0]),
-                5, ref pList.nId, ref pList.nAlloc, ref i);
-                if (i < 0)
-                {
-                    build.sqlite3IdListDelete(db, ref pList);
-                    return null;
-                }
-                pList.a[i].zName = build.Token2Name(db, pToken);
+                if (pList == null)pList = new IdList();
+                pList.Add(new IdList_item() { zName= build.Token2Name(db, pToken)  });
                 return pList;
             }
             ///<summary>
             /// Delete an IdList.
             ///
             ///</summary>
-            public static void sqlite3IdListDelete(Connection db, ref IdList pList)
+            public static void sqlite3IdListDelete(Connection db, ref IdList pList)//TODO:delete
             {
                 int i;
                 if (pList == null)
                     return;
-                for (i = 0; i < pList.nId; i++)
+                for (i = 0; i < pList.Count; i++)
                 {
                     db.DbFree(ref pList.a[i].zName);
                 }
@@ -1899,7 +1881,7 @@ goto exit_drop_index;
                 int i;
                 if (pList == null)
                     return -1;
-                for (i = 0; i < pList.nId; i++)
+                for (i = 0; i < pList.Count; i++)
                 {
                     if (pList.a[i].zName.Equals(zName, StringComparison.InvariantCultureIgnoreCase))
                         return i;

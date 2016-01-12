@@ -160,16 +160,16 @@ namespace Community.CsharpSqlite.Metadata
             ///</summary>
             public Expr pCheck;
 
-            
+
 
 #endif
 #if !SQLITE_OMIT_ALTERTABLE
-            public int addColOffset;
-
-            ///
-            ///<summary>
-            ///Offset in CREATE TABLE stmt to add a new column 
-            ///</summary>
+        ///<summary>
+        ///used when altering columns to regenerate only this part
+        ///Offset in CREATE TABLE stmt to add a new column 
+        ///</summary>
+        public int addColOffset;
+        
 
 #endif
 #if !SQLITE_OMIT_VIRTUALTABLE

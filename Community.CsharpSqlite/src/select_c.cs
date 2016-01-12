@@ -384,7 +384,7 @@ namespace Community.CsharpSqlite.Ast {
                     if (pRight.pUsing != null)
                     {
                         IdList pList = pRight.pUsing;
-                        for (j = 0; j < pList.nId; j++)
+                        for (j = 0; j < pList.Count; j++)
                         {
                             string zName;
                             ///Name of the term in the USING clause 
@@ -3052,7 +3052,7 @@ break;
             /// subquery in the parser tree.
             ///
             ///</summary>
-            public static WRC exprWalkNoop(Walker NotUsed, ref Expr NotUsed2)
+            public static WRC exprWalkNoop(Walker NotUsed,  Expr NotUsed2)
             {
                 sqliteinth.UNUSED_PARAMETER2(NotUsed, NotUsed2);
                 return WRC.WRC_Continue;

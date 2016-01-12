@@ -634,35 +634,22 @@ namespace Community.CsharpSqlite.Ast
                 }
                 return pNew;
             }
-            public static IdList sqlite3IdListDup(Connection db, IdList p)
+        public static IdList sqlite3IdListDup(Connection db, IdList p)
+        {
+            if (p == null)
+                return null;
+
+            return new IdList()
             {
-                IdList pNew;
-                int i;
-                if (p == null)
-                    return null;
-                pNew = new IdList();
-                //sqlite3DbMallocRaw(db, sizeof(*pNew) );
-                if (pNew == null)
-                    return null;
-                pNew.nId = pNew.nAlloc = p.nId;
-                pNew.a = new IdList_item[p.nId];
-                //sqlite3DbMallocRaw(db, p.nId*sizeof(p.a[0]) );
-                if (pNew.a == null)
-                {
-                    db.DbFree(ref pNew);
-                    return null;
-                }
-                for (i = 0; i < p.nId; i++)
-                {
-                    pNew.a[i] = new IdList_item();
-                    IdList_item pNewItem = pNew.a[i];
-                    IdList_item pOldItem = p.a[i];
-                    pNewItem.zName = pOldItem.zName;
-                    // sqlite3DbStrDup(db, pOldItem.zName);
-                    pNewItem.idx = pOldItem.idx;
-                }
-                return pNew;
-            }
+                a = p.a.Select(
+                    old => new IdList_item()
+                    {
+                        zName = old.zName,
+                        idx = old.idx
+                    }
+                    ).ToList()
+            };
+        }
             public static Select sqlite3SelectDup(Connection db, Select p, int flags)
             {
                 Select pNew;
@@ -767,7 +754,7 @@ return null;
             ///
             ///
             ///</summary>
-            public static WRC exprNodeIsConstant(Walker pWalker, ref Expr pExpr)
+            public static WRC exprNodeIsConstant(Walker pWalker,  Expr pExpr)
             {
                 ///
                 ///<summary>
@@ -1290,7 +1277,7 @@ return null;
             /// expression.
             ///
             ///</summary>
-            public static WRC evalConstExpr(Walker pWalker, ref Expr pExpr)
+            public static WRC evalConstExpr(Walker pWalker, Expr pExpr)
             {
                 Parse pParse = pWalker.pParse;
                 switch (pExpr.Operator)
@@ -1532,7 +1519,7 @@ return null;
             /// for additional information.
             ///
             ///</summary>
-            static WRC analyzeAggregate(Walker pWalker, ref Expr pExpr)
+            static WRC analyzeAggregate(Walker pWalker,  Expr pExpr)
             {
                 int i;
                 NameContext pNC = pWalker.u.pNC;

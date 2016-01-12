@@ -400,14 +400,7 @@ namespace Community.CsharpSqlite
                                    pMatch = srcItem;
                                }
 
-
-
-
-
-
-
-
-
+                               //////////////////////////////////
 
                                for (var j = 0; j < pTab.nCol; j++)//, pCol++ )
                                {
@@ -437,7 +430,7 @@ namespace Community.CsharpSqlite
                                                ///If this match occurs on a column that is in the USING clause
                                                ///of a join, skip the search of the right table of the join
                                                ///to avoid a duplicate match there. 
-                                               for (var k = 0; k < pUsing.nId; k++)
+                                               for (var k = 0; k < pUsing.Count; k++)
                                                {
                                                    if (pUsing.a[k].zName.eq(zCol))
                                                    {
@@ -451,11 +444,7 @@ namespace Community.CsharpSqlite
                                        break;
                                    }
                                }
-
-
-
-
-
+                               //////////////////////////////////////
 
 
                            });
@@ -695,7 +684,7 @@ namespace Community.CsharpSqlite
             /// to TokenType.TK_AGG_FUNCTION.
             ///
             ///</summary>
-            public static WRC resolveExprStep(Walker pWalker, ref Expr pExpr)
+            public static WRC resolveExprStep(Walker pWalker, Expr pExpr)
             {
                 var pNC = pWalker.u.pNC;
                 Debug.Assert(pNC != null);
@@ -783,15 +772,14 @@ break;
                             ///Authorization to use the function 
                             
                             
-                            FuncDef pDef;
-                            ///Information about the function 
+                            
                             SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;
                             // ENC( pParse.db );   /* The database encoding */
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
                             Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
                             var zId = pExpr.u.zToken;///The function name. 
                             var nId = StringExtensions.Strlen30(zId);///Number of characters in function name 
-                            pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);
+                            var pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);///Information about the function 
                             if (pDef == null)
                             {
                                 pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, -1, enc, 0);
@@ -905,14 +893,11 @@ return WRC.WRC_Prune;
             /// Generate an ORDER BY or GROUP BY term out-of-range error.
             ///
             ///</summary>
-            public static void resolveOutOfRangeError(Parse pParse,///
-                ///The error context into which to write the error 
-            string zType,///
-                ///"ORDER" or "GROUP" 
-            int i,///
-                ///The index (1">based) of the term out of range </param>
-            int mx///
-                ///Largest permissible value of i 
+            public static void resolveOutOfRangeError(
+                Parse pParse,///The error context into which to write the error 
+                string zType,///"ORDER" or "GROUP" 
+                int i,///The index (1">based) of the term out of range </param>
+                int mx///Largest permissible value of i 
             )
             {
                 utilc.sqlite3ErrorMsg(pParse, "%r %s BY term out of range - should be " + "between 1 and %d", i, zType, mx);

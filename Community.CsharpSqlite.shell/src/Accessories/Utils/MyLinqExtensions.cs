@@ -78,7 +78,7 @@ namespace Community.CsharpSqlite.Utils
                 }
             }
         }
-        public static Str sub(this String buffer)
+        public static Str AsStr(this String buffer)
         {
             return new Str(buffer, buffer.Strlen30());
         }

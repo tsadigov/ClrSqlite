@@ -3440,8 +3440,8 @@ isView = false;
 					utilc.sqlite3ErrorMsg(this,"table %S has %d columns but %d values were supplied",pTabList,0,refTable.nCol-nHidden,nColumn);
 					goto insert_cleanup;
 				}
-				if(pColumn!=null&&nColumn!=pColumn.nId) {
-					utilc.sqlite3ErrorMsg(this,"%d values for %d columns",nColumn,pColumn.nId);
+				if(pColumn!=null&&nColumn!=pColumn.Count) {
+					utilc.sqlite3ErrorMsg(this,"%d values for %d columns",nColumn,pColumn.Count);
 					goto insert_cleanup;
 				}
 				///If the INSERT statement included an IDLIST term, then make sure
@@ -3455,10 +3455,10 @@ isView = false;
 				///is appears in the original table.  (The index of the primary
 				///key in the original table is pTab.iPKey.)
 				if(pColumn!=null) {
-					for(i=0;i<pColumn.nId;i++) {
+					for(i=0;i<pColumn.Count;i++) {
 						pColumn.a[i].idx=-1;
 					}
-					for(i=0;i<pColumn.nId;i++) {
+					for(i=0;i<pColumn.Count;i++) {
 						for(j=0;j<refTable.nCol;j++) {
 							if(pColumn.a[i].zName.Equals(refTable.aCol[j].zName,StringComparison.InvariantCultureIgnoreCase)) {
 								pColumn.a[i].idx=j;
@@ -3592,12 +3592,12 @@ isView = false;
 							j=i;
 						}
 						else {
-							for(j=0;j<pColumn.nId;j++) {
+							for(j=0;j<pColumn.Count;j++) {
 								if(pColumn.a[j].idx==i)
 									break;
 							}
 						}
-						if((!useTempTable&&null==pList)||(pColumn!=null&&j>=pColumn.nId)) {
+						if((!useTempTable&&null==pList)||(pColumn!=null&&j>=pColumn.Count)) {
 							this.sqlite3ExprCode(refTable.aCol[i].DefaultValue,regCols+i+1);
 						}
 						else
@@ -3719,12 +3719,12 @@ isView = false;
 							}
 						}
 						else {
-							for(j=0;j<pColumn.nId;j++) {
+							for(j=0;j<pColumn.Count;j++) {
 								if(pColumn.a[j].idx==i)
 									break;
 							}
 						}
-						if(j<0||nColumn==0||(pColumn!=null&&j>=pColumn.nId)) {
+						if(j<0||nColumn==0||(pColumn!=null&&j>=pColumn.Count)) {
 							this.sqlite3ExprCode(refTable.aCol[i].DefaultValue,iRegStore);
 						}
 						else

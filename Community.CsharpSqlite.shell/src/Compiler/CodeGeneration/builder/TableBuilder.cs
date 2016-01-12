@@ -18,27 +18,24 @@ namespace Community.CsharpSqlite.builder
     using Metadata;
     public static class TableBuilder
         {
+        private const int CREATE_TABLE_LENGTH = 13;
 
-            ///<summary>
-            /// Unlink the given table from the hash tables and the delete the
-            /// table structure with all its indices and foreign keys.
-            ///
-            ///</summary>
-            public static void sqlite3UnlinkAndDeleteTable(Connection db, int iDb, string zTabName)//OPCODE:OP_DropTable
+        ///<summary>
+        /// Unlink the given table from the hash tables and the delete the
+        /// table structure with all its indices and foreign keys.
+        ///
+        ///</summary>
+        public static void sqlite3UnlinkAndDeleteTable(Connection db, int iDb, string zTabName)//OPCODE:OP_DropTable
             {
-                Table p;
-                DbBackend pDb;
                 Debug.Assert(db != null);
                 Debug.Assert(iDb >= 0 && iDb < db.BackendCount);
                 Debug.Assert(zTabName != null);
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                 sqliteinth.testcase(zTabName.Length == 0);
-                ///
-                ///<summary>
                 ///</summary>
                 ///<param name="Zero">length table names are allowed </param>
-                pDb = db.Backends[iDb];
-                p = HashExtensions.Insert( pDb.pSchema.Tables, zTabName, StringExtensions.Strlen30(zTabName), (Table)null);
+                var pDb = db.Backends[iDb];
+                var p = HashExtensions.Insert( pDb.pSchema.Tables, zTabName, StringExtensions.Strlen30(zTabName), (Table)null);
                 TableBuilder.sqlite3DeleteTable(db, ref p);
                 db.flags |= SqliteFlags.SQLITE_InternChanges;
             }
@@ -775,7 +772,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 var pNewTable = pParse.pNewTable;
                 if (pNewTable == null)
                     return;
-                Connection db = pParse.db;
+                var db = pParse.db;
                 Debug.Assert(!db.init.IsBusy || pSelect == null);
 #if !SQLITE_OMIT_CHECK
                 ///Resolve names in all CHECK constraint expressions.
@@ -794,7 +791,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                             }
                         }
                     };
-
+                
                     ///Name context for pParse.pNewTable 
                     var sNC = new NameContext()
                     {
@@ -807,6 +804,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     {
                         return;
                     }
+                
                 }
 #endif
                 ///If the db.init.busy is 1 it means we are reading the SQL off the
@@ -925,11 +923,10 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 }
                 ///Add the table to the in-memory representation of the database.
                 if (db.init.busy != 0)
-                {
-                    Table pOld;
-                    Schema pSchema = pNewTable.pSchema;
+                {                    
+                    var pSchema = pNewTable.pSchema;
                     Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                    pOld = pSchema.Tables.Insert(pNewTable.zName.sub(), pNewTable);
+                    var pOld = pSchema.Tables.Insert(pNewTable.zName.AsStr(), pNewTable);
                     if (pOld != null)
                     {
                         Debug.Assert(pNewTable == pOld);
@@ -944,20 +941,19 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     if (pNewTable.pSelect == null)
                     {
                         string zName = pParse.sNameToken.zRestSql;
-                        int nName;
                         Debug.Assert(pSelect == null && pCons != null && pEnd != null);
                         if (pCons.zRestSql == null)
                         {
                             pCons = pEnd;
                         }
-                        nName = zName.Length - pCons.zRestSql.Length;
-                        pNewTable.addColOffset = 13 + nName;
+                        var nName = zName.Length - pCons.zRestSql.Length;
+                        pNewTable.addColOffset = CREATE_TABLE_LENGTH + nName;
                         // sqlite3Utf8CharLen(zName, nName);
                     }
 #endif
                 }
             }
-            
+
         }
 
 

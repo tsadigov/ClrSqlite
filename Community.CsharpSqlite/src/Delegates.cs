@@ -263,7 +263,7 @@ namespace Community.CsharpSqlite
 		public delegate int dxColumn_I (sqlite3_stmt pStmt, int i);
 
 		// Walker Methods
-		public delegate WRC dxExprCallback (Walker W, ref Expr E);
+		public delegate WRC dxExprCallback (Walker W, Expr E);
 
 		///
 ///<summary>

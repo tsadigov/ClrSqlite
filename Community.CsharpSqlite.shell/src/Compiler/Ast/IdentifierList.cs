@@ -13,6 +13,7 @@ using u32 = System.UInt32;
 using u64 = System.UInt64;
 using unsigned = System.UInt64;
 using Pgno = System.UInt32;
+using Community.CsharpSqlite.Utils;
 
 #if !SQLITE_MAX_VARIABLE_NUMBER
 using ynVar = System.Int16;
@@ -55,15 +56,8 @@ namespace Community.CsharpSqlite
 
         //TODO: List<IdList_item>
 
-        public class IdList 
-        {
-            public IdList_item[] a;
-            public int nId;
-            ///<summary>
-            ///Number of identifiers on the list
-            ///</summary>
-            public int nAlloc;
-            ///
+        public class IdList :MyCollection<IdList_item>
+        {   
             ///<summary>
             ///Number of entries allocated for a[] below 
             ///</summary>
@@ -74,7 +68,7 @@ namespace Community.CsharpSqlite
                 else
                 {
                     IdList cp = (IdList)MemberwiseClone();
-                    a.CopyTo(cp.a, 0);
+                    a=new List<IdList_item>(cp.a);
                     return cp;
                 }
             }

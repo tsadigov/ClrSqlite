@@ -60,7 +60,7 @@ namespace Community.CsharpSqlite.Ast
                 return WRC.WRC_Continue;
             sqliteinth.testcase(pExpr.HasProperty(ExprFlags.EP_TokenOnly));
             sqliteinth.testcase(pExpr.HasProperty(ExprFlags.EP_Reduced));
-            rc = (WRC)pWalker.xExprCallback(pWalker, ref pExpr);
+            rc = (WRC)pWalker.xExprCallback(pWalker, pExpr);
             if (rc == WRC.WRC_Continue && !pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
             {
                 if (sqlite3WalkExpr(pWalker, ref pExpr.pLeft) != 0)

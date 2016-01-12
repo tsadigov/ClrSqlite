@@ -9131,7 +9131,7 @@ return yy_default[stateno];
 			///</summary>
 			//#line 179 "parse.y"
 			{
-				build.sqlite3AddColumn(pParse,yymsp[0].minor.yy0Token);
+				build.parse_AddColumn(pParse,yymsp[0].minor.yy0Token);
 				yygotominor.yy0Token=yymsp[0].minor.yy0Token;
 			}
 			//#line 2247 "parse.c"
