@@ -1318,7 +1318,7 @@ enc = SqliteEncoding.UTF16BE;
 			///is being overridden/deleted but there are no active VMs, allow the
 			///operation to continue but invalidate all precompiled statements.
 			///</summary>
-            p = FuncDefTraverse.sqlite3FindFunction(db, zFunctionName, nName, nArg, enc, 0);
+            p = FuncDefTraverse.FindFunction(db, zFunctionName, nName, nArg, enc, 0);
 			if(p!=null&&p.iPrefEnc==enc&&p.nArg==nArg) {
 				if(db.activeVdbeCnt!=0) {
 					utilc.sqlite3Error(db, SqlResult.SQLITE_BUSY, "unable to delete/modify user-function due to active statements");
@@ -1329,7 +1329,7 @@ enc = SqliteEncoding.UTF16BE;
                     vdbeaux.sqlite3ExpirePreparedStatements(db);
 				}
 			}
-            p = FuncDefTraverse.sqlite3FindFunction(db, zFunctionName, nName, nArg, enc, 1);
+            p = FuncDefTraverse.FindFunction(db, zFunctionName, nName, nArg, enc, 1);
 			Debug.Assert(p!=null///
 			///<summary>
 			///|| db.mallocFailed != 0 
@@ -1435,7 +1435,7 @@ return rc;
 			int nName=StringExtensions.Strlen30(zName);
             SqlResult rc;
 			db.mutex.Enter();
-            if (FuncDefTraverse.sqlite3FindFunction(db, zName, nName, nArg, SqliteEncoding.UTF8, 0) == null)
+            if (FuncDefTraverse.FindFunction(db, zName, nName, nArg, SqliteEncoding.UTF8, 0) == null)
             {
                 sqlite3CreateFunc(db, zName, nArg, SqliteEncoding.UTF8, 0, (dxFunc)vdbeapi.sqlite3InvalidFunction, null, null, null);
 			}

@@ -17,13 +17,10 @@ namespace Community.CsharpSqlite.builder
         /// -1 if the named db cannot be found.
         ///
         ///</summary>
-        public static int sqlite3FindDbName(this Connection db, string zName)
+        public static int FindDbIdxByName(this Connection db, string zName)
         {
             int i = -1;
-            ///
-            ///<summary>
             ///Database number 
-            ///</summary>
             if (zName != null)
             {
                 DbBackend pDb;
@@ -49,7 +46,7 @@ namespace Community.CsharpSqlite.builder
         public static int FindDbIdxByToken(this Connection db, Token pName)
         {            
             var zName = build.Token2Name(db, pName);
-            var i = db.sqlite3FindDbName(zName);
+            var i = db.FindDbIdxByName(zName);
             db.DbFree(ref zName);
             return i;
         }

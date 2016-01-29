@@ -8,7 +8,7 @@ using u16=System.UInt16;
 using u32=System.UInt32;
 using sqlite3_int64=System.Int64;
 
-using Parse=Community.CsharpSqlite.Sqlite3.Parse;
+using ParseState=Community.CsharpSqlite.Sqlite3.ParseState;
 
 
 namespace Community.CsharpSqlite
@@ -196,7 +196,7 @@ namespace Community.CsharpSqlite
                     return 0;
                 if ((this.prereqRight & notReady) != 0)
                     return 0;
-                aff = pSrc.pTab.aCol[this.u.leftColumn].affinity;
+                aff = pSrc.TableReference.aCol[this.u.leftColumn].affinity;
                 if (!this.pExpr.sqlite3IndexAffinityOk(aff))
                     return 0;
                 return 1;
@@ -273,7 +273,7 @@ namespace Community.CsharpSqlite
         ///</summary>
         public class WhereClause
         {
-            public Parse pParse;
+            public ParseState pParse;
             ///
             ///<summary>
             ///The parser context 
@@ -363,7 +363,7 @@ namespace Community.CsharpSqlite
                 ///<summary>
                 ///The WhereClause to be initialized 
                 ///</summary>
-            Parse pParse,///
+            ParseState pParse,///
                 ///<summary>
                 ///The parsing context 
                 ///</summary>
@@ -493,7 +493,7 @@ namespace Community.CsharpSqlite
                             CollSeq pColl;
                             char idxaff;
                             int j;
-                            Parse pParse = this.pParse;
+                            ParseState pParse = this.pParse;
                             idxaff = pIdx.pTable.aCol[iColumn].affinity;
                             if (!pX.sqlite3IndexAffinityOk(idxaff))
                                 continue;
@@ -507,12 +507,12 @@ namespace Community.CsharpSqlite
                             Debug.Assert(pX.pLeft != null);
                             pColl = pParse.sqlite3BinaryCompareCollSeq(pX.pLeft, pX.pRight);
                             Debug.Assert(pColl != null || pParse.nErr != 0);
-                            for (j = 0; pIdx.aiColumn[j] != iColumn; j++)
+                            for (j = 0; pIdx.ColumnIdx[j] != iColumn; j++)
                             {
                                 if (Sqlite3.NEVER(j >= pIdx.nColumn))
                                     return null;
                             }
-                            if (pColl != null && !pColl.zName.Equals(pIdx.azColl[j], StringComparison.InvariantCultureIgnoreCase))
+                            if (pColl != null && !pColl.zName.Equals(pIdx.Collations[j], StringComparison.InvariantCultureIgnoreCase))
                                 continue;
                         }
                         return pTerm;

@@ -340,7 +340,7 @@ namespace Community.CsharpSqlite
                 default:
                     {
                         r1 = this.sqlite3ExprCodeTemp(pExpr, ref regFree1);
-                        v.sqlite3VdbeAddOp3(OpCode.OP_If, r1, dest, jumpIfNull != 0 ? 1 : 0);
+                        v.AddOpp3(OpCode.OP_If, r1, dest, jumpIfNull != 0 ? 1 : 0);
                         sqliteinth.testcase(regFree1 == 0);
                         sqliteinth.testcase(jumpIfNull == 0);
                         break;
@@ -514,7 +514,7 @@ namespace Community.CsharpSqlite
                 default:
                     {
                         r1 = this.sqlite3ExprCodeTemp(pExpr, ref regFree1);
-                        v.sqlite3VdbeAddOp3(OpCode.OP_IfNot, r1, dest, jumpIfNull != 0 ? 1 : 0);
+                        v.AddOpp3(OpCode.OP_IfNot, r1, dest, jumpIfNull != 0 ? 1 : 0);
                         sqliteinth.testcase(regFree1 == 0);
                         sqliteinth.testcase(jumpIfNull == 0);
                         break;
@@ -536,7 +536,7 @@ namespace Community.CsharpSqlite
             var p4 = this.sqlite3BinaryCompareCollSeq(pLeft, pRight);
             var p5 = pLeft.binaryCompareP5(pRight, jumpIfNull);
             var addr = this.pVdbe.sqlite3VdbeAddOp4(opcode, in2, dest, in1, p4, P4Usage.P4_COLLSEQ);
-            this.pVdbe.sqlite3VdbeChangeP5((u8)p5);
+            this.pVdbe.ChangeP5((u8)p5);
             return addr;
         }
 
@@ -576,7 +576,7 @@ namespace Community.CsharpSqlite
                 if (pColl != null)
                     break;
                 op = p.Operator;
-                if (p.pTab != null && (op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER || op == TokenType.TK_TRIGGER))
+                if (p.TableReference != null && (op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER || op == TokenType.TK_TRIGGER))
                 {
                     ///<param name="op==TokenType.TK_REGISTER && p">>pTab!=0 happens when pExpr was originally</param>
                     ///<param name="a TokenType.TK_COLUMN but was previously evaluated and cached in a register ">a TokenType.TK_COLUMN but was previously evaluated and cached in a register </param>
@@ -585,7 +585,7 @@ namespace Community.CsharpSqlite
                     if (j >= 0)
                     {
                         Connection db = this.db;
-                        zColl = p.pTab.aCol[j].zColl;
+                        zColl = p.TableReference.aCol[j].Collation;
                         pColl = db.sqlite3FindCollSeq(sqliteinth.ENC(db), zColl, 0);
                         pExpr.CollatingSequence = pColl;
                     }
@@ -626,7 +626,7 @@ namespace Community.CsharpSqlite
         public void codegenAddParseSchemaOp(int iDb, string zWhere)
         {
             int j;
-            int addr = pVdbe.sqlite3VdbeAddOp3(OpCode.OP_ParseSchema, iDb, 0, 0);
+            int addr = pVdbe.AddOpp3(OpCode.OP_ParseSchema, iDb, 0, 0);
             pVdbe.sqlite3VdbeChangeP4(addr, zWhere, P4Usage.P4_DYNAMIC);
             for (j = 0; j < this.db.BackendCount; j++)
                 vdbeaux.markUsed(pVdbe, j);
@@ -650,8 +650,8 @@ namespace Community.CsharpSqlite
                 v.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, r1, BTreeProp.FILE_FORMAT);      //r1=cookie[FILE_FORMAT]
                 vdbeaux.markUsed(v, iDb);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Integer, minFormat, r2);                            //r2=minFormat
-                var j1 = v.sqlite3VdbeAddOp3(OpCode.OP_Ge, r2, 0, r1);                               //if(r2>r1)
-                v.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, r2);  //  cookie[FileFormat]=r2
+                var j1 = v.AddOpp3(OpCode.OP_Ge, r2, 0, r1);                               //if(r2>r1)
+                v.AddOpp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, r2);  //  cookie[FileFormat]=r2
                 v.sqlite3VdbeJumpHere(j1);
 
                 this.deallocTempReg(r1, r2);
@@ -734,7 +734,7 @@ namespace Community.CsharpSqlite
                     if (aRegIdx != null && aRegIdx[i - 1] == 0)
                         return;
                     var r1 = this.codegenGenerateIndexKey(pIdx, iCur, 0, false);
-                    this.pVdbe.sqlite3VdbeAddOp3(OpCode.OP_IdxDelete, iCur + i, r1, pIdx.nColumn + 1);
+                    this.pVdbe.AddOpp3(OpCode.OP_IdxDelete, iCur + i, r1, pIdx.nColumn + 1);
                 }
             );
 
@@ -755,11 +755,11 @@ namespace Community.CsharpSqlite
             v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iCur, regBase + nCol);
             for (var j = 0; j < nCol; j++)
             {
-                int idx = pIdx.aiColumn[j];
+                int idx = pIdx.ColumnIdx[j];
                 if (idx == pTab.iPKey)                
                     v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regBase + nCol, regBase + j);                
                 else {
-                    v.sqlite3VdbeAddOp3(OpCode.OP_Column, iCur, idx, regBase + j);
+                    v.AddOpp3(OpCode.OP_Column, iCur, idx, regBase + j);
                     v.codegenColumnDefault(pTab, idx, -1);
                 }
             }
@@ -773,7 +773,7 @@ namespace Community.CsharpSqlite
                 else {
                     zAff = v.sqlite3IndexAffinityStr(pIdx);
                 }
-                v.sqlite3VdbeAddOp3(OpCode.OP_MakeRecord, regBase, nCol + 1, regOut);
+                v.AddOpp3(OpCode.OP_MakeRecord, regBase, nCol + 1, regOut);
                 v.sqlite3VdbeChangeP4(-1, zAff, P4Usage.P4_TRANSIENT);
             }
             this.sqlite3ReleaseTempRange(regBase, nCol + 1);

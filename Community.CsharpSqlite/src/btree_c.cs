@@ -768,8 +768,7 @@ static u16 cellSize( MemPage pPage, int iCell )
             ///</summary>
             public static void pageReinit(DbPage pData)
             {
-                MemPage pPage;
-                pPage = PagerMethods.sqlite3PagerGetExtra(pData);
+                var pPage = PagerMethods.sqlite3PagerGetExtra(pData);
                 Debug.Assert(pData.sqlite3PagerPageRefcount() > 0);
                 if (pPage.isInit != false)
                 {
@@ -777,15 +776,12 @@ static u16 cellSize( MemPage pPage, int iCell )
                     pPage.isInit = false;
                     if (pData.sqlite3PagerPageRefcount() > 1)
                     {
-                        ///
-                        ///<summary>
                         ///pPage might not be a btree page;  it might be an overflow page
                         ///or ptrmap page or a free page.  In those cases, the following
                         ///call to btreeInitPage() will likely return SQLITE_CORRUPT.
                         ///But no harm is done by this.  And it is very important that
                         ///btreeInitPage() be called on every btree page so we make
-                        ///</summary>
-                        ///<param name="the call for every page that comes in for re">initing. </param>
+                        ///the call for every page that comes in for re-initing. 
                         pPage.btreeInitPage();
                     }
                 }

@@ -36,7 +36,7 @@ namespace Community.CsharpSqlite.Engine
     using System;
     
     using System.Collections.Generic;
-    using Parse = Sqlite3.Parse;
+    using ParseState = Sqlite3.ParseState;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
@@ -1428,7 +1428,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<summary>
                 ///The VDBE 
                 ///</summary>
-            Parse pParse///
+            ParseState pParse///
                 ///<summary>
                 ///Parsing context 
                 ///</summary>

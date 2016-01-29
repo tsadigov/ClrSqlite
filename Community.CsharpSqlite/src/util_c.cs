@@ -16,7 +16,7 @@ namespace Community
         using Metadata;
         using System.Globalization;
         using System.Collections.Generic;
-        using Parse = Sqlite3.Parse;
+        using ParseState = Sqlite3.ParseState;
         using Community.CsharpSqlite.Os;
         using Ast;
 
@@ -139,7 +139,7 @@ dummy += (uint)x;
         /// (sqlite3_step() etc.).
         ///
         ///</summary>
-        public static void sqlite3ErrorMsg(Parse pParse, string zFormat, params object[] ap)
+        public static void sqlite3ErrorMsg(ParseState pParse, string zFormat, params object[] ap)
         {
             string zMsg;
             Connection db = pParse.db;

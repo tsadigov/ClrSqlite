@@ -7,7 +7,7 @@ namespace Community.CsharpSqlite
 
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Ast;
-    using Parse = Sqlite3.Parse;
+    using ParseState = Sqlite3.ParseState;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Utils;
@@ -533,7 +533,7 @@ namespace Community.CsharpSqlite
                 Table pTab;
                 Module pMod;
                 string zMod;
-                pTab = TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, zTab);
+                pTab = TableBuilder.FindByName(db, db.Backends[iDb].Name, zTab);
                 Debug.Assert(pTab != null && (pTab.tabFlags & TableFlags.TF_Virtual) != 0 && null == pTab.pVTable);
                 ///
                 ///<summary>
@@ -580,7 +580,7 @@ namespace Community.CsharpSqlite
             ///</summary>
             static SqlResult sqlite3_declare_vtab(Connection db, string zCreateTable)
             {
-                Parse pParse;
+                ParseState pParse;
                 var rc = SqlResult.SQLITE_OK;
                 Table pTab;
                 string zErr = "";
@@ -592,7 +592,7 @@ namespace Community.CsharpSqlite
                     return sqliteinth.SQLITE_MISUSE_BKPT();
                 }
                 Debug.Assert((pTab.tabFlags & TableFlags.TF_Virtual) != 0);
-                pParse = new Parse();
+                pParse = new ParseState();
                 //sqlite3StackAllocZero(db, sizeof(*pParse));
                 //if ( pParse == null )
                 //{
@@ -647,7 +647,7 @@ namespace Community.CsharpSqlite
             {
                 var rc = SqlResult.SQLITE_OK;
                 Table pTab;
-                pTab = TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, zTab);
+                pTab = TableBuilder.FindByName(db, db.Backends[iDb].Name, zTab);
                 if (Sqlite3.ALWAYS(pTab != null && pTab.pVTable != null))
                 {
                     VTable p = vtabDisconnectAll(db, pTab);
@@ -931,7 +931,7 @@ namespace Community.CsharpSqlite
                     return pDef;
                 if (pExpr.Operator != TokenType.TK_COLUMN)
                     return pDef;
-                pTab = pExpr.pTab;
+                pTab = pExpr.TableReference;
                 if (Sqlite3.NEVER(pTab == null))
                     return pDef;
                 if ((pTab.tabFlags & TableFlags.TF_Virtual) == 0)

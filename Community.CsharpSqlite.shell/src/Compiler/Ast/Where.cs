@@ -19,7 +19,7 @@ using ynVar=System.Int16;
 using ynVar = System.Int32; 
 #endif
 namespace Community.CsharpSqlite.Ast {
-    using Parse = Sqlite3.Parse;
+    using ParseState = Sqlite3.ParseState;
     using Metadata;
     using Engine;
     using Community.CsharpSqlite.Ast;
@@ -161,7 +161,7 @@ namespace Community.CsharpSqlite.Ast {
 		///
 		///</summary>
 		public class WhereInfo {
-			public Sqlite3.Parse pParse;
+			public Sqlite3.ParseState pParse;
 			///
 			///<summary>
 			///Parsing and code generating context 
@@ -229,7 +229,7 @@ namespace Community.CsharpSqlite.Ast {
 			///Information about each nest loop in the WHERE 
 			///</summary>
 			public void sqlite3WhereEnd() {
-				Parse pParse=this.pParse;
+				ParseState pParse=this.pParse;
 				Vdbe v=pParse.pVdbe;
 				int i;
 				WhereLevel pLevel;
@@ -246,7 +246,7 @@ namespace Community.CsharpSqlite.Ast {
 					v.sqlite3VdbeResolveLabel(pLevel.addrCont);
 					if(pLevel.op!=OpCode.OP_Noop) {
 						v.sqlite3VdbeAddOp2(pLevel.op,pLevel.p1,pLevel.p2);
-						v.sqlite3VdbeChangeP5(pLevel.p5);
+						v.ChangeP5(pLevel.p5);
 					}
 					if((pLevel.plan.wsFlags&wherec.WHERE_IN_ABLE)!=0&&pLevel.u._in.nIn>0) {
 						InLoop pIn;
@@ -264,13 +264,13 @@ namespace Community.CsharpSqlite.Ast {
 					v.sqlite3VdbeResolveLabel(pLevel.addrBrk);
 					if(pLevel.iLeftJoin!=0) {
 						int addr;
-						addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,pLevel.iLeftJoin);
+						addr=v.AddOpp1(OpCode.OP_IfPos,pLevel.iLeftJoin);
 						Debug.Assert((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)==0||(pLevel.plan.wsFlags&wherec.WHERE_INDEXED)!=0);
 						if((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)==0) {
-							v.sqlite3VdbeAddOp1(OpCode.OP_NullRow,pTabList.a[i].iCursor);
+							v.AddOpp1(OpCode.OP_NullRow,pTabList.a[i].iCursor);
 						}
 						if(pLevel.iIdxCur>=0) {
-							v.sqlite3VdbeAddOp1(OpCode.OP_NullRow,pLevel.iIdxCur);
+							v.AddOpp1(OpCode.OP_NullRow,pLevel.iIdxCur);
 						}
 						if(pLevel.op==OpCode.OP_Return) {
 							v.sqlite3VdbeAddOp2(OpCode.OP_Gosub,pLevel.p1,pLevel.addrFirst);
@@ -298,15 +298,15 @@ namespace Community.CsharpSqlite.Ast {
 				 {
 					pLevel=this.a[i];
 					SrcList_item pTabItem=pTabList.a[pLevel.iFrom];
-					Table pTab=pTabItem.pTab;
+					Table pTab=pTabItem.TableReference;
 					Debug.Assert(pTab!=null);
 					if((pTab.tabFlags&TableFlags.TF_Ephemeral)==0&&pTab.pSelect==null&&(this.wctrlFlags&wherec.WHERE_OMIT_CLOSE)==0) {
 						u32 ws=pLevel.plan.wsFlags;
 						if(0==this.okOnePass&&(ws&wherec.WHERE_IDX_ONLY)==0) {
-							v.sqlite3VdbeAddOp1(OpCode.OP_Close,pTabItem.iCursor);
+							v.AddOpp1(OpCode.OP_Close,pTabItem.iCursor);
 						}
 						if((ws&wherec.WHERE_INDEXED)!=0&&(ws&wherec.WHERE_TEMP_INDEX)==0) {
-							v.sqlite3VdbeAddOp1(OpCode.OP_Close,pLevel.iIdxCur);
+							v.AddOpp1(OpCode.OP_Close,pLevel.iIdxCur);
 						}
 					}
 					///
@@ -340,7 +340,7 @@ namespace Community.CsharpSqlite.Ast {
 								continue;
 							if(pOp.OpCode==OpCode.OP_Column) {
 								for(j=0;j<pIdx.nColumn;j++) {
-									if(pOp.p2==pIdx.aiColumn[j]) {
+									if(pOp.p2==pIdx.ColumnIdx[j]) {
 										pOp.p2=j;
 										pOp.p1=pLevel.iIdxCur;
 										break;
@@ -422,7 +422,7 @@ namespace Community.CsharpSqlite.Ast {
 				///<summary>
 				///A WHERE clause term 
 				///</summary>
-				Parse pParse;
+				ParseState pParse;
 				///
 				///<summary>
 				///Parsing context 
@@ -566,7 +566,7 @@ namespace Community.CsharpSqlite.Ast {
 						iRowidReg=pParse.codeEqualityTerm(pTerm,pLevel,iReleaseReg);
 						addrNxt=pLevel.addrNxt;
 						v.sqlite3VdbeAddOp2( OpCode.OP_MustBeInt,iRowidReg,addrNxt);
-                        v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iCur, addrNxt, iRowidReg);
+                        v.AddOpp3(OpCode.OP_NotExists, iCur, addrNxt, iRowidReg);
 						pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
 						#if SQLITE_DEBUG
 																																																																																																																																																				          VdbeComment( v, "pk" );
@@ -639,7 +639,7 @@ namespace Community.CsharpSqlite.Ast {
 								Debug.Assert(pX!=null);
 								Debug.Assert(pStart.leftCursor==iCur);
 								r1=pParse.sqlite3ExprCodeTemp(pX.pRight,ref rTemp);
-								v.sqlite3VdbeAddOp3(aMoveOp[pX.op-(int)TokenType.TK_GT],iCur,addrBrk,r1);
+								v.AddOpp3(aMoveOp[pX.op-(int)TokenType.TK_GT],iCur,addrBrk,r1);
 								#if SQLITE_DEBUG
 																																																																																																																																																																																																												            VdbeComment( v, "pk" );
 #endif
@@ -684,8 +684,8 @@ namespace Community.CsharpSqlite.Ast {
 								iRowidReg=iReleaseReg=pParse.allocTempReg();
                                 v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iCur, iRowidReg);
 								pParse.sqlite3ExprCacheStore(iCur,-1,iRowidReg);
-								v.sqlite3VdbeAddOp3(testOp,memEndValue,addrBrk,iRowidReg);
-                                v.sqlite3VdbeChangeP5(sqliteinth.SQLITE_AFF_NUMERIC | sqliteinth.SQLITE_JUMPIFNULL);
+								v.AddOpp3(testOp,memEndValue,addrBrk,iRowidReg);
+                                v.ChangeP5(sqliteinth.SQLITE_AFF_NUMERIC | sqliteinth.SQLITE_JUMPIFNULL);
 							}
 						}
 						else
@@ -858,7 +858,7 @@ namespace Community.CsharpSqlite.Ast {
 								///</summary>
 								pIdx=pLevel.plan.u.pIdx;
 								iIdxCur=pLevel.iIdxCur;
-								k=pIdx.aiColumn[nEq];
+								k=pIdx.ColumnIdx[nEq];
 								///
 								///<summary>
 								///Column for inequality constraints 
@@ -1032,7 +1032,7 @@ namespace Community.CsharpSqlite.Ast {
                                 sqliteinth.testcase(op == OpCode.OP_IdxLT);
 								if(op!=OpCode.OP_Noop) {
 									v.sqlite3VdbeAddOp4Int(op,iIdxCur,addrNxt,regBase,nConstraint);
-									v.sqlite3VdbeChangeP5((u8)(endEq!=bRev?1:0));
+									v.ChangeP5((u8)(endEq!=bRev?1:0));
 								}
 								///
 								///<summary>
@@ -1045,7 +1045,7 @@ namespace Community.CsharpSqlite.Ast {
 								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_BTM_LIMIT);
 								sqliteinth.testcase(pLevel.plan.wsFlags&wherec.WHERE_TOP_LIMIT);
 								if((pLevel.plan.wsFlags&(wherec.WHERE_BTM_LIMIT|wherec.WHERE_TOP_LIMIT))!=0) {
-									v.sqlite3VdbeAddOp3( OpCode.OP_Column,iIdxCur,nEq,r1);
+									v.AddOpp3( OpCode.OP_Column,iIdxCur,nEq,r1);
                                     v.sqlite3VdbeAddOp2(OpCode.OP_IsNull, r1, addrCont);
 								}
 								pParse.deallocTempReg(r1);
@@ -1252,7 +1252,7 @@ namespace Community.CsharpSqlite.Ast {
 												if((wctrlFlags&wherec.WHERE_DUPLICATES_OK)==0) {
 													int iSet=((ii==pOrWc.nTerm-1)?-1:ii);
 													int r;
-													r=pParse.sqlite3ExprCodeGetColumn(pTabItem.pTab,-1,iCur,regRowid);
+													r=pParse.sqlite3ExprCodeGetColumn(pTabItem.TableReference,-1,iCur,regRowid);
 													v.sqlite3VdbeAddOp4Int( OpCode.OP_RowSetTest,regRowset,v.sqlite3VdbeCurrentAddr()+2,r,iSet);
 												}
 												v.sqlite3VdbeAddOp2(OpCode.OP_Gosub,regReturn,iLoopBody);

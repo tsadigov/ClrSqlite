@@ -94,7 +94,7 @@ namespace Community.CsharpSqlite
                 rc = initData.rc;
                 goto error_out;
             }
-            var pTab = TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, zMasterName);
+            var pTab = TableBuilder.FindByName(db, db.Backends[iDb].Name, zMasterName);
             if (Sqlite3.ALWAYS(pTab))
             {
                 pTab.tabFlags |= TableFlags.TF_Readonly;
@@ -330,7 +330,7 @@ db.xAuth = 0;
         /// Otherwise, the schema is loaded. An error code is returned.
         ///
         ///</summary>
-        public static SqlResult sqlite3ReadSchema(this Sqlite3.Parse pParse)
+        public static SqlResult sqlite3ReadSchema(this Sqlite3.ParseState pParse)
         {
             SqlResult rc = SqlResult.SQLITE_OK;
             Connection db = pParse.db;
@@ -352,7 +352,7 @@ db.xAuth = 0;
         /// make no changes to pParse->rc.
         ///
         ///</summary>
-        static void schemaIsValid(Sqlite3.Parse pParse)
+        static void schemaIsValid(Sqlite3.ParseState pParse)
         {
             Connection db = pParse.db;
             int iDb;
@@ -477,7 +477,7 @@ db.xAuth = 0;
             ppStmt = null;
             pzTail = null;
             ///Allocate the parsing context 
-            var pParse = new Sqlite3.Parse();
+            var pParse = new Sqlite3.ParseState();
             //sqlite3StackAllocZero(db, sizeof(*pParse));
             //if ( pParse == null )
             //{

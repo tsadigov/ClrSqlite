@@ -18,7 +18,7 @@ using System.Diagnostics;
 namespace Community.CsharpSqlite.Ast
 {
     using sqlite3_value = Engine.Mem;
-    using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+    using ParseState = Community.CsharpSqlite.Sqlite3.ParseState;
     using Community.CsharpSqlite.Ast;
     using Metadata;
     using Community.CsharpSqlite.Utils;    
@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite.Ast
                 ///<param name="Index of the OR">term to be analyzed </param>
             )
             {
-                Parse pParse = pWC.pParse;
+                ParseState pParse = pWC.pParse;
                 ///Parser context 
                 Connection db = pParse.db;
                 ///Data_base connection 
@@ -314,12 +314,12 @@ namespace Community.CsharpSqlite.Ast
                             Debug.Assert(pOrTerm.eOperator == wherec.WO_EQ);
                             Debug.Assert(pOrTerm.leftCursor == iCursor);
                             Debug.Assert(pOrTerm.u.leftColumn == iColumn);
-                            pDup = exprc.sqlite3ExprDup(db, pOrTerm.pExpr.pRight, 0);
+                            pDup = exprc.Duplicate(db, pOrTerm.pExpr.pRight, 0);
                             pList = pList.Append( pDup);
                             pLeft = pOrTerm.pExpr.pLeft;
                         }
                         Debug.Assert(pLeft != null);
-                        pDup = exprc.sqlite3ExprDup(db, pLeft, 0);
+                        pDup = exprc.Duplicate(db, pLeft, 0);
                         pNew = pParse.sqlite3PExpr(TokenType.TK_IN, pDup, null, null);
                         if (pNew != null)
                         {
@@ -376,7 +376,7 @@ namespace Community.CsharpSqlite.Ast
                 bool noCase = false;
                 
                 ///<param name="Top">level operator.  pExpr.op </param>
-                Parse pParse = pWC.pParse;
+                ParseState pParse = pWC.pParse;
                 ///Parsing context 
                 Connection db = pParse.db;
                 ///Data_base connection 
@@ -443,7 +443,7 @@ namespace Community.CsharpSqlite.Ast
                         if (pTerm.leftCursor >= 0)
                         {
                             int idxNew;
-                            pDup = exprc.sqlite3ExprDup(db, pExpr, 0);
+                            pDup = exprc.Duplicate(db, pExpr, 0);
                             //if ( db.mallocFailed != 0 )
                             //{
                             //  exprc.sqlite3ExprDelete( db, ref pDup );
@@ -503,7 +503,7 @@ namespace Community.CsharpSqlite.Ast
                         {
                             Expr pNewExpr;
                             int idxNew;
-                            pNewExpr = pParse.sqlite3PExpr(ops[i], exprc.sqlite3ExprDup(db, pExpr.pLeft, 0), exprc.sqlite3ExprDup(db, pList.a[i].pExpr, 0), null);
+                            pNewExpr = pParse.sqlite3PExpr(ops[i], exprc.Duplicate(db, pExpr.pLeft, 0), exprc.Duplicate(db, pList.a[i].pExpr, 0), null);
                             idxNew = pWC.whereClauseInsert(pNewExpr, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                             sqliteinth.testcase(idxNew == 0);
                             this.exprAnalyze(pWC, idxNew);
@@ -547,7 +547,7 @@ namespace Community.CsharpSqlite.Ast
                     CollSeq pColl;
                     ///Collating sequence to use 
                     pLeft = pExpr.x.pList.a[1].pExpr;
-                    pStr2 = exprc.sqlite3ExprDup(db, pStr1, 0);
+                    pStr2 = exprc.Duplicate(db, pStr1, 0);
                     ////if ( 0 == db.mallocFailed )
                     {
                         int c, pC;
@@ -570,11 +570,11 @@ namespace Community.CsharpSqlite.Ast
                         // pC = c + 1;
                     }
                     pColl = db.sqlite3FindCollSeq( SqliteEncoding.UTF8, noCase ? "NOCASE" : "BINARY", 0);
-                    pNewExpr1 = pParse.sqlite3PExpr(TokenType.TK_GE, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr1, 0);
+                    pNewExpr1 = pParse.sqlite3PExpr(TokenType.TK_GE, exprc.Duplicate(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr1, 0);
                     idxNew1 = pWC.whereClauseInsert(pNewExpr1, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                     sqliteinth.testcase(idxNew1 == 0);
                     this.exprAnalyze(pWC, idxNew1);
-                    pNewExpr2 = pParse.sqlite3PExpr(TokenType.TK_LT, exprc.sqlite3ExprDup(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr2, null);
+                    pNewExpr2 = pParse.sqlite3PExpr(TokenType.TK_LT, exprc.Duplicate(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr2, null);
                     idxNew2 = pWC.whereClauseInsert(pNewExpr2, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                     sqliteinth.testcase(idxNew2 == 0);
                     this.exprAnalyze(pWC, idxNew2);
@@ -606,7 +606,7 @@ namespace Community.CsharpSqlite.Ast
                     if ((prereqExpr & prereqColumn) == 0)
                     {
                         Expr pNewExpr;
-                        pNewExpr = pParse.sqlite3PExpr(TokenType.TK_MATCH, null, exprc.sqlite3ExprDup(db, pRight, 0), null);
+                        pNewExpr = pParse.sqlite3PExpr(TokenType.TK_MATCH, null, exprc.Duplicate(db, pRight, 0), null);
                         idxNew = pWC.whereClauseInsert(pNewExpr, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                         sqliteinth.testcase(idxNew == 0);
                         pNewTerm = pWC.a[idxNew];

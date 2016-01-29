@@ -166,7 +166,7 @@ namespace Community.CsharpSqlite {
 		/// Invalidate temp storage, either when the temp storage is changed
 		/// from default, or when 'file' and the temp_store_directory has changed
 		///</summary>
-		static SqlResult invalidateTempStorage(Parse pParse) {
+		static SqlResult invalidateTempStorage(ParseState pParse) {
 			Connection db=pParse.db;
 			if(db.Backends[1].BTree!=null) {
 				if(0==db.autoCommit||db.Backends[1].BTree.sqlite3BtreeIsInReadTrans()) {
@@ -186,7 +186,7 @@ namespace Community.CsharpSqlite {
 		/// as needing reloading.  This must be done when using the SQLITE_TEMP_STORE
 		/// or DEFAULT_TEMP_STORE pragmas.
 		///</summary>
-		static SqlResult changeTempStorage(Parse pParse,string zStorageType) {
+		static SqlResult changeTempStorage(ParseState pParse,string zStorageType) {
 			int ts=getTempStore(zStorageType);
 			Connection db=pParse.db;
 			if(db.temp_store==ts)
@@ -201,7 +201,7 @@ namespace Community.CsharpSqlite {
 		///<summary>
 		/// Generate code to return a single integer value.
 		///</summary>
-		static void returnSingleInt(Parse pParse,string zLabel,i64 value) {
+		static void returnSingleInt(ParseState pParse,string zLabel,i64 value) {
 			var v=pParse.sqlite3GetVdbe();
 			int mem=++pParse.UsedCellCount;
 			//i64* pI64 = sqlite3DbMallocRaw( pParse->db, sizeof( value ) );
@@ -217,7 +217,7 @@ namespace Community.CsharpSqlite {
 		}
 		#if !SQLITE_OMIT_FLAG_PRAGMAS
 		
-		static int flagPragma(Parse pParse,string zLeft,string zRight) {
+		static int flagPragma(ParseState pParse,string zLeft,string zRight) {
 			sPragmaType[] aPragma=new sPragmaType[] {
 				new sPragmaType("full_column_names",SqliteFlags.SQLITE_FullColNames),
 				new sPragmaType("short_column_names",SqliteFlags.SQLITE_ShortColNames),
@@ -403,10 +403,10 @@ new sPragmaType( "vdbe_trace",               SQLITE_VdbeTrace     ),
 			new EncName(null,0)
 		};
 		// OVERLOADS, so I don't need to rewrite parse.c
-		public static void sqlite3Pragma(Parse pParse,Token pId1,Token pId2,int null_4,int minusFlag) {
+		public static void sqlite3Pragma(ParseState pParse,Token pId1,Token pId2,int null_4,int minusFlag) {
 			sqlite3Pragma(pParse,pId1,pId2,null,minusFlag);
 		}
-		public static void sqlite3Pragma(Parse pParse,Token pId1,///
+		public static void sqlite3Pragma(ParseState pParse,Token pId1,///
 		///<summary>
 		///First part of [database.]id field 
 		///</summary>
@@ -617,7 +617,7 @@ goto pragma_out;
 								v.sqlite3VdbeAddOp2( OpCode.OP_Pagecount,iDb,iReg);
 							}
 							else {
-								v.sqlite3VdbeAddOp3( OpCode.OP_MaxPgcnt,iDb,iReg,Converter.sqlite3Atoi(zRight));
+								v.AddOpp3( OpCode.OP_MaxPgcnt,iDb,iReg,Converter.sqlite3Atoi(zRight));
 							}
 							v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,iReg,1);
 							v.sqlite3VdbeSetNumCols(1);
@@ -754,7 +754,7 @@ goto pragma_out;
 										for(ii=db.BackendCount-1;ii>=0;ii--) {
 											if(db.Backends[ii].BTree!=null&&(ii==iDb||pId2.Length==0)) {
                                                 Engine.vdbeaux.markUsed(v, ii);
-                                                v.sqlite3VdbeAddOp3(OpCode.OP_JournalMode, ii, 1, (int)eMode);
+                                                v.AddOpp3(OpCode.OP_JournalMode, ii, 1, (int)eMode);
 											}
 										}
 										v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,1,1);
@@ -892,8 +892,8 @@ goto pragma_out;
 													}
 													build.sqlite3BeginWriteOperation(pParse,0,iDb);
 													v.sqlite3VdbeAddOp2(OpCode.OP_Integer,iLimit,1);
-													addr=v.sqlite3VdbeAddOp1(OpCode.OP_IncrVacuum,iDb);
-													v.sqlite3VdbeAddOp1(OpCode.OP_ResultRow,1);
+													addr=v.AddOpp1(OpCode.OP_IncrVacuum,iDb);
+													v.AddOpp1(OpCode.OP_ResultRow,1);
 													v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,1,-1);
 													v.sqlite3VdbeAddOp2( OpCode.OP_IfPos,1,addr);
 													v.sqlite3VdbeJumpHere(addr);
@@ -1116,7 +1116,7 @@ else
 																			Table pTab;
 																			if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																				goto pragma_out;
-																			pTab= db.sqlite3FindTable( zDb, zRight);
+																			pTab= db.FindByName( zDb, zRight);
 																			if(pTab!=null) {
 																				int i;
 																				int nHidden=0;
@@ -1158,7 +1158,7 @@ else
 																				Table pTab;
 																				if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																					goto pragma_out;
-																				pIdx=IndexBuilder.sqlite3FindIndex(db,zRight,zDb);
+																				pIdx=IndexBuilder.FindByName(db,zRight,zDb);
 																				if(pIdx!=null) {
 																					int i;
 																					pTab=pIdx.pTable;
@@ -1168,7 +1168,7 @@ else
                                                                                     v.sqlite3VdbeSetColName(1, ColName.NAME, "cid", SQLITE_STATIC);
                                                                                     v.sqlite3VdbeSetColName(2, ColName.NAME, "name", SQLITE_STATIC);
 																					for(i=0;i<pIdx.nColumn;i++) {
-																						int cnum=pIdx.aiColumn[i];
+																						int cnum=pIdx.ColumnIdx[i];
 																						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,i,1);
 																						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,cnum,2);
 																						Debug.Assert(pTab.nCol>cnum);
@@ -1183,7 +1183,7 @@ else
 																					Table pTab;
 																					if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																						goto pragma_out;
-																					pTab=TableBuilder.sqlite3FindTable(db, zDb, zRight);
+																					pTab=TableBuilder.FindByName(db, zDb, zRight);
 																					if(pTab!=null) {
 																						v=pParse.sqlite3GetVdbe();
 																						pIdx=pTab.pIndex;
@@ -1250,7 +1250,7 @@ else
 																								Table pTab;
 																								if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																									goto pragma_out;
-																								pTab=TableBuilder.sqlite3FindTable(db, zDb, zRight);
+																								pTab=TableBuilder.FindByName(db, zDb, zRight);
 																								if(pTab!=null) {
 																									v=pParse.sqlite3GetVdbe();
 																									pFK=pTab.pFKey;
@@ -1393,7 +1393,7 @@ else
 																											if(sqliteinth.OMIT_TEMPDB!=0&&i==1)
 																												continue;
 																											build.sqlite3CodeVerifySchema(pParse,i);
-																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,1);
+																											addr=v.AddOpp1(OpCode.OP_IfPos,1);
 																											///
 																											///<summary>
 																											///Halt if out of errors 
@@ -1430,12 +1430,12 @@ else
 																											}
 																											
 																											///Do the b-tree integrity checks 
-																											v.sqlite3VdbeAddOp3( OpCode.OP_IntegrityCk,2,cnt,1);
-																											v.sqlite3VdbeChangeP5((u8)i);
-																											addr=v.sqlite3VdbeAddOp1(OpCode.OP_IsNull,2);
+																											v.AddOpp3( OpCode.OP_IntegrityCk,2,cnt,1);
+																											v.ChangeP5((u8)i);
+																											addr=v.AddOpp1(OpCode.OP_IsNull,2);
 																											v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,3,0,io.sqlite3MPrintf(db,"*** in database %s ***\n",db.Backends[i].Name), P4Usage.P4_DYNAMIC);
-                                                                                                            v.sqlite3VdbeAddOp3(OpCode.OP_Move, 2, 4, 1);
-																											v.sqlite3VdbeAddOp3(OpCode.OP_Concat,4,3,2);
+                                                                                                            v.AddOpp3(OpCode.OP_Move, 2, 4, 1);
+																											v.AddOpp3(OpCode.OP_Concat,4,3,2);
 																											v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,2,1);
 																											v.sqlite3VdbeJumpHere(addr);
 																											
@@ -1450,7 +1450,7 @@ else
 																												int loopTop;
 																												if(pTab.pIndex==null)
 																													continue;
-																												addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,1);
+																												addr=v.AddOpp1(OpCode.OP_IfPos,1);
 																												///
 																												///<summary>
 																												///Stop if out of errors 
@@ -1545,7 +1545,7 @@ else
 																														new VdbeOpList(OpCode.OP_Concat,3,2,2),
 																														new VdbeOpList(OpCode.OP_ResultRow,2,1,0),
 																													};
-																													addr=v.sqlite3VdbeAddOp1(OpCode.OP_IfPos,1);
+																													addr=v.AddOpp1(OpCode.OP_IfPos,1);
 																													v.sqlite3VdbeAddOp2(OpCode.OP_Halt,0,0);
 																													v.sqlite3VdbeJumpHere(addr);
 																													addr=v.sqlite3VdbeAddOpList(Sqlite3.ArraySize(cntIdx),cntIdx);

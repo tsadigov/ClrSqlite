@@ -68,7 +68,7 @@ namespace Community.CsharpSqlite
                 this.zEnd = pEnd.zRestSql.Substring(pEnd.Length);
             }
 
-            public void spanExpr(Sqlite3.Parse pParse, TokenType op, Token pValue)
+            public void spanExpr(Sqlite3.ParseState pParse, TokenType op, Token pValue)
             {
                 //Log.WriteLine(String.Empty);
                 //Log.WriteHeader("spanExpr");
@@ -89,7 +89,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///The parsing context.  Errors accumulate here 
             ///</summary>
-            Sqlite3.Parse pParse, 
+            Sqlite3.ParseState pParse, 
                                   
 
             ///<summary>
@@ -121,7 +121,7 @@ namespace Community.CsharpSqlite
                 ///Write the new expression node here 
                 ///</summary>
 
-            Sqlite3.Parse pParse, ///
+            Sqlite3.ParseState pParse, ///
                 ///<summary>
                 ///Parsing context to record errors 
                 ///</summary>
@@ -150,7 +150,7 @@ namespace Community.CsharpSqlite
                 ///Write the new expression node here 
                 ///</summary>
 
-            Sqlite3.Parse pParse, ///
+            Sqlite3.ParseState pParse, ///
                 ///<summary>
                 ///Parsing context to record errors 
                 ///</summary>
@@ -182,7 +182,7 @@ namespace Community.CsharpSqlite
                 ///Write the new expression node here 
                 ///</summary>
 
-            Sqlite3.Parse pParse, ///
+            Sqlite3.ParseState pParse, ///
                 ///<summary>
                 ///Parsing context to record errors 
                 ///</summary>
@@ -644,7 +644,13 @@ public int iValue;            /* Non-negative integer value if ExprFlags.EP_IntV
             ///<summary>
             ///Used by TokenType.TK_AGG_COLUMN and TokenType.TK_AGG_FUNCTION 
             ///</summary>
-            public Table pTab;
+            public Table TableReference;
+
+            public Column ColumnReference {
+                get {
+                    return TableReference.aCol[iColumn < 0 ? TableReference.iPKey :iColumn];
+                }
+            }
             ///
             ///<summary>
             ///Table for TokenType.TK_COLUMN expressions. 
@@ -680,7 +686,7 @@ set { _op = value; }
                 iAgg = cf.iAgg;
                 iRightJoinTable = cf.iRightJoinTable;
                 flags2 = cf.flags2;
-                pTab = cf.pTab == null ? null : cf.pTab;
+                TableReference = cf.TableReference == null ? null : cf.TableReference;
 #if SQLITE_TEST || SQLITE_MAX_EXPR_DEPTH
                 nHeight = cf.nHeight;
                 pZombieTab = cf.pZombieTab;
@@ -725,7 +731,7 @@ set { _op = value; }
                 cp.flags2 = flags2;
                 cp.Operator2 = Operator2;
                 cp.pAggInfo = pAggInfo;
-                cp.pTab = pTab;
+                cp.TableReference = TableReference;
 #if SQLITE_MAX_EXPR_DEPTH
                 cp.nHeight = nHeight;
                 cp.pZombieTab = pZombieTab;
@@ -930,15 +936,15 @@ set { _op = value; }
                 }
                 return nByte.ROUND8();
             }
-            public int exprIsConst(int initFlag)
+            public bool exprIsConst(int initFlag)
             {
                 Walker w = new Walker();
                 w.u.i = initFlag;
                 w.xExprCallback = exprc.exprNodeIsConstant;
                 w.xSelectCallback = exprc.selectNodeIsConstant;
                 Expr _this = this;
-                w.sqlite3WalkExpr(ref _this);
-                return w.u.i;
+                w.WalkExpression(ref _this);
+                return 0!=w.u.i;
             }
             public///<summary>
                 /// Walk an expression tree.  Return 1 if the expression is constant
@@ -949,7 +955,7 @@ set { _op = value; }
                 /// a constant.
                 ///
                 ///</summary>
-            int sqlite3ExprIsConstant()
+            bool sqlite3ExprIsConstant()
             {
                 return this.exprIsConst(1);
             }
@@ -960,21 +966,21 @@ set { _op = value; }
                 /// an ON or USING clause.
                 ///
                 ///</summary>
-            int sqlite3ExprIsConstantNotJoin()
+            bool sqlite3ExprIsConstantNotJoin()
             {
                 return this.exprIsConst(3);
             }
-            public///<summary>
-                /// Walk an expression tree.  Return 1 if the expression is constant
-                /// or a function call with constant arguments.  Return and 0 if there
-                /// are any variables.
-                ///
-                /// For the purposes of this function, a double-quoted string (ex: "abc")
-                /// is considered a variable but a single-quoted string (ex: 'abc') is
-                /// a constant.
-                ///
-                ///</summary>
-            int sqlite3ExprIsConstantOrFunction()
+            ///<summary>
+            /// Walk an expression tree.  Return 1 if the expression is constant
+            /// or a function call with constant arguments.  Return and 0 if there
+            /// are any variables.
+            ///
+            /// For the purposes of this function, a double-quoted string (ex: "abc")
+            /// is considered a variable but a single-quoted string (ex: 'abc') is
+            /// a constant.
+            ///
+            ///</summary>
+            public bool IsConstantOrFunction()
             {
                 return this.exprIsConst(2);
             }
@@ -1081,7 +1087,7 @@ set { _op = value; }
             bool isAppropriateForFactoring()
             {
                 Expr expr = this;
-                if (expr.sqlite3ExprIsConstantNotJoin() == 0)
+                if (expr.sqlite3ExprIsConstantNotJoin() == false)
                 {
                     return false;
                     ///Only constant expressions are appropriate for factoring 
@@ -1149,7 +1155,7 @@ set { _op = value; }
                     return build.sqlite3AffinityType(this.u.zToken);
                 }
 #endif
-                if ((op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER) && this.pTab != null)
+                if ((op == TokenType.TK_AGG_COLUMN || op == TokenType.TK_COLUMN || op == TokenType.TK_REGISTER) && this.TableReference != null)
                 {
                     ///
                     ///<summary>
@@ -1159,8 +1165,8 @@ set { _op = value; }
                     int j = this.iColumn;
                     if (j < 0)
                         return sqliteinth.SQLITE_AFF_INTEGER;
-                    Debug.Assert(this.pTab != null && j < this.pTab.nCol);
-                    return this.pTab.aCol[j].affinity;
+                    Debug.Assert(this.TableReference != null && j < this.TableReference.nCol);
+                    return this.TableReference.aCol[j].affinity;
                 }
                 return this.affinity;
             }
@@ -1336,7 +1342,7 @@ set { _op = value; }
                                     ;
                                 if (j < pTabList.Count)
                                 {
-                                    pTab = pTabList[j].pTab;
+                                    pTab = pTabList[j].TableReference;
                                     pS = pTabList[j].pSelect;
                                 }
                                 else
@@ -1389,9 +1395,9 @@ set { _op = value; }
                                     ///<param name=""></param>
                                     NameContext sNC = new NameContext();
                                     Expr expr = pS.ResultingFieldList[iCol].pExpr;
-                                    sNC.pSrcList = pS.pSrc;
+                                    sNC.pSrcList = pS.FromSource;
                                     sNC.pNext = pNC;
-                                    sNC.pParse = pNC.pParse;
+                                    sNC.ParseState = pNC.ParseState;
                                     zType = expr.columnType(sNC, ref zOriginDb, ref zOriginTab, ref zOriginCol);
                                 }
                             }
@@ -1417,10 +1423,10 @@ set { _op = value; }
                                         zOriginCol = pTab.aCol[iCol].zName;
                                     }
                                     zOriginTab = pTab.zName;
-                                    if (pNC.pParse != null)
+                                    if (pNC.ParseState != null)
                                     {
-                                        int iDb = pNC.pParse.db.indexOfBackendWithSchema( pTab.pSchema);
-                                        zOriginDb = pNC.pParse.db.Backends[iDb].Name;
+                                        int iDb = pNC.ParseState.db.indexOfBackendWithSchema( pTab.pSchema);
+                                        zOriginDb = pNC.ParseState.db.Backends[iDb].Name;
                                     }
                                 }
                             break;
@@ -1439,9 +1445,9 @@ set { _op = value; }
                             Select pS = pExpr.x.pSelect;
                             Expr expr = pS.ResultingFieldList[0].pExpr;
                             Debug.Assert(pExpr.HasProperty(ExprFlags.EP_xIsSelect));
-                            sNC.pSrcList = pS.pSrc;
+                            sNC.pSrcList = pS.FromSource;
                             sNC.pNext = pNC;
-                            sNC.pParse = pNC.pParse;
+                            sNC.ParseState = pNC.ParseState;
                             zType = expr.columnType(sNC, ref zOriginDb, ref zOriginTab, ref zOriginCol);
                             break;
                         }

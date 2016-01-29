@@ -20,7 +20,7 @@ namespace Community.CsharpSqlite.Engine
 {
     using sqlite3_value = Engine.Mem;
     
-    using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+    using Parse = Community.CsharpSqlite.Sqlite3.ParseState;
     using Community.CsharpSqlite.Metadata;
     using Utils;
     using Metadata;

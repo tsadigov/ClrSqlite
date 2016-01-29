@@ -15,7 +15,7 @@ namespace Community.CsharpSqlite.Utils
     using Metadata;
     using System.Globalization;
     using System.Collections.Generic;
-    using Parse = Sqlite3.Parse;
+    using Parse = Sqlite3.ParseState;
     using Community.CsharpSqlite.Os;
 
     public static class MathExtensions

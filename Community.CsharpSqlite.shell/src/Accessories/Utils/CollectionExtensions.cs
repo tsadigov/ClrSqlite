@@ -14,7 +14,19 @@ namespace Community.CsharpSqlite.Utils
         //{
         //    return this.sqlite3ExprListAppend(null, pExpr);
         //}
-        
+        public static T WinnerBy<T>(this IEnumerable<T> src,Func<T, int> point) {
+            int max = int.MinValue;
+            T winner = default(T);
+            foreach (var item in src)
+            {
+                var ptValue = point(item);
+                if (ptValue > max) {
+                    max = ptValue;
+                    winner = item;
+                }
+            }
+            return winner;
+        }
 
         public static  ExprList Append(
               this ExprList pList,///

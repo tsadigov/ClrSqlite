@@ -84,7 +84,7 @@ set { _n = value; }
 
 		public override string ToString ()
 		{
-			return TokenType + "\t[\t" + Start + "\t:\t" + Length + "\t]\t" + Text + "\tz        >>rest>>     " + zRestSql;
+			return TokenType + "[ " + Start + " : " + Length + " ] " + Text;
 		}
 	}
 

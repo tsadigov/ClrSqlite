@@ -84,11 +84,11 @@ namespace Community.CsharpSqlite {
 		/// error message to pErrorDb.
 		///</summary>
 		static Btree findBtree(Connection pErrorDb,Connection pDb,string zDb) {
-            int i = pDb.sqlite3FindDbName(zDb);
+            int i = pDb.FindDbIdxByName(zDb);
 			if(i==1) {
-				Parse pParse;
+				ParseState pParse;
 				var rc=(SqlResult)0;
-				pParse=new Parse();
+				pParse=new ParseState();
 				//sqlite3StackAllocZero(pErrorDb, sizeof(*pParse));
 				if(pParse==null) {
 					utilc.sqlite3Error(pErrorDb, SqlResult.SQLITE_NOMEM, "out of memory");

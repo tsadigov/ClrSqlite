@@ -109,12 +109,12 @@ namespace Community.CsharpSqlite
 			if (argv == null || argv [0] == null || argv [2] == null) {
 				return 0;
 			}
-			pTable = TableBuilder.sqlite3FindTable(pInfo.db, pInfo.zDatabase, argv[0]);
+			pTable = TableBuilder.FindByName(pInfo.db, pInfo.zDatabase, argv[0]);
 			if (pTable == null) {
 				return 0;
 			}
 			if (!String.IsNullOrEmpty (argv [1])) {
-				pIndex = IndexBuilder.sqlite3FindIndex (pInfo.db, argv [1], pInfo.zDatabase);
+				pIndex = IndexBuilder.FindByName (pInfo.db, argv [1], pInfo.zDatabase);
 			}
 			else {
 				pIndex = null;
@@ -222,7 +222,7 @@ namespace Community.CsharpSqlite
 
 			sInfo.db = db;
 			sInfo.zDatabase = db.Backends [iDb].Name;
-			if (TableBuilder.sqlite3FindTable(db, sInfo.zDatabase, "sqlite_stat1") == null) {
+			if (TableBuilder.FindByName(db, sInfo.zDatabase, "sqlite_stat1") == null) {
 				return SqlResult.SQLITE_ERROR;
 			}
 			///

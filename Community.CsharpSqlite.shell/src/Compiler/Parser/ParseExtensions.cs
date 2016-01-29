@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Community.CsharpSqlite.Ast
 {
-    using Parse=Community.CsharpSqlite.Sqlite3.Parse;
+    using ParseState=Community.CsharpSqlite.Sqlite3.ParseState;
     using Metadata;
     using Engine;
     using Community.CsharpSqlite.Os;
@@ -17,7 +17,7 @@ namespace Community.CsharpSqlite.Ast
             /// If an error occurs, return NULL and leave a message in pParse.
             ///
             ///</summary>
-            public static Vdbe sqlite3GetVdbe(this Parse pParse)
+            public static Vdbe sqlite3GetVdbe(this ParseState pParse)
             {
                 Vdbe v = pParse.pVdbe;
                 if (v == null)
@@ -40,7 +40,7 @@ namespace Community.CsharpSqlite.Ast
 		///
 		///</summary>
 		#if !SQLITE_OMIT_EXPLAIN
-		public static void explainSimpleCount(this Parse pParse,///
+		public static void explainSimpleCount(this ParseState pParse,///
 		///<summary>
 		///Parse context 
 		///</summary>

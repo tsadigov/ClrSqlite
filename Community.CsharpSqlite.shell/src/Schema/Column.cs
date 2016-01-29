@@ -60,7 +60,7 @@ namespace Community.CsharpSqlite.Metadata
             ///<summary>
             ///Collating sequence.  If NULL, use the default 
             ///</summary>
-            public string zColl;
+            public string Collation;
 
             
             ///<summary>

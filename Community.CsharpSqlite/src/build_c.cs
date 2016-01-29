@@ -22,7 +22,7 @@ using yDbMask=System.Int32;
 namespace Community.CsharpSqlite
 {
     using Utils;
-    using Parse = Sqlite3.Parse;
+    using ParseState = Sqlite3.ParseState;
 
     using System.Linq;
     using Community.CsharpSqlite.Ast;
@@ -75,7 +75,7 @@ namespace Community.CsharpSqlite
             /// be parsed.  Initialize the pParse structure as needed.
             ///
             ///</summary>
-            public static void sqlite3BeginParse(Parse pParse, int explainFlag)
+            public static void setupExplain(ParseState pParse, int explainFlag)
             {
                 pParse.explain = (byte)explainFlag;
                 pParse.nVar = 0;
@@ -167,7 +167,7 @@ p.zName,  P4Usage.P4_STATIC );
 }
 #else
             //  #define codeTableLocks(x)
-            static void codeTableLocks(Parse pParse)
+            static void codeTableLocks(ParseState pParse)
             {
             }
 #endif
@@ -181,7 +181,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// Note that if an error occurred, it might be the case that
             /// no VDBE code was generated.
             ///</summary>
-            public static void sqlite3FinishCoding(Parse pParse)
+            public static void sqlite3FinishCoding(ParseState pParse)
             {
                 Connection db;
                 Vdbe v;
@@ -229,7 +229,7 @@ p.zName,  P4Usage.P4_STATIC );
                             if (!db.init.IsBusy)
                             {
                                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                                v.sqlite3VdbeAddOp3(OpCode.OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.Backends[iDb].pSchema.iGeneration);
+                                v.AddOpp3(OpCode.OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.Backends[iDb].pSchema.iGeneration);
                             }
                         }
 #if !SQLITE_OMIT_VIRTUALTABLE
@@ -318,7 +318,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// care if you decide to try to use this routine for some other purposes.
             ///
             ///</summary>
-            public static void sqlite3NestedParse(Parse pParse, string zFormat, params object[] ap)
+            public static void sqlite3NestedParse(ParseState pParse, string zFormat, params object[] ap)
             {
                 string zSql;
                 //  string zSql;
@@ -470,7 +470,7 @@ p.zName,  P4Usage.P4_STATIC );
                         exprc.Delete(db, ref pCol.DefaultValue);
                         db.DbFree(ref pCol.DefaultValueSource);
                         db.DbFree(ref pCol.zType);
-                        db.DbFree(ref pCol.zColl);
+                        db.DbFree(ref pCol.Collation);
                     }
                 }
             }
@@ -510,11 +510,11 @@ p.zName,  P4Usage.P4_STATIC );
             /// writing. The table is opened using cursor 0.
             ///
             ///</summary>
-            public static void sqlite3OpenMasterTable(Parse p, int iDb)
+            public static void sqlite3OpenMasterTable(ParseState p, int iDb)
             {
                 Vdbe v = p.sqlite3GetVdbe();
                 sqliteinth.sqlite3TableLock(p, iDb, sqliteinth.MASTER_ROOT, 1, sqliteinth.SCHEMA_TABLE(iDb));
-                v.sqlite3VdbeAddOp3(OpCode.OP_OpenWrite, 0, sqliteinth.MASTER_ROOT, iDb);
+                v.AddOpp3(OpCode.OP_OpenWrite, 0, sqliteinth.MASTER_ROOT, iDb);
                 v.sqlite3VdbeChangeP4(-1, (int)5,  P4Usage.P4_INT32);
                 ///5 column table 
                 if (p.nTab == 0)
@@ -541,7 +541,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// database "xxx" is returned.
             ///
             ///</summary>
-            public static int sqlite3TwoPartName(Parse pParse,///
+            public static int sqlite3TwoPartName(ParseState pParse,///
                 ///<summary>
                 ///Parsing and code generating context 
                 ///</summary>
@@ -595,7 +595,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// is reserved for internal use.
             ///
             ///</summary>
-            public static SqlResult sqlite3CheckObjectName(Parse pParse, string zName)
+            public static SqlResult sqlite3CheckObjectName(ParseState pParse, string zName)
             {
                 if (0 == pParse.db.init.busy && 
                     pParse.nested == 0 && 
@@ -630,7 +630,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// column.
             ///
             ///</summary>
-            public static void parse_AddColumn(Parse pParse, Token pName)
+            public static void parse_AddColumn(ParseState pParse, Token pName)
             {
                 int i;
                 string z;
@@ -686,7 +686,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// the column currently under construction.
             ///
             ///</summary>
-            public static void sqlite3AddNotNull(Parse pParse, int onError)
+            public static void sqlite3AddNotNull(ParseState pParse, int onError)
             {
                 Table p;
                 p = pParse.pNewTable;
@@ -775,7 +775,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// in zType.
             ///
             ///</summary>
-            public static void sqlite3AddColumnType(Parse pParse, Token pType)
+            public static void InitColumnType(ParseState pParse, Token pType)
             {
                 var parse = pParse.pNewTable;
                 if (parse == null || Sqlite3.NEVER(parse.nCol < 1))
@@ -797,14 +797,14 @@ p.zName,  P4Usage.P4_STATIC );
             ///parsing a CREATE TABLE statement.
             ///
             ///</summary>
-            public static void sqlite3AddDefaultValue(Parse pParse, ExprSpan pSpan)
+            public static void sqlite3AddDefaultValue(ParseState pParse, ExprSpan pSpan)
             {                
                 Connection db = pParse.db;
                 var p = pParse.pNewTable;
                 if (p != null)
                 {
                     var pCol = (p.aCol[p.nCol - 1]);
-                    if (pSpan.pExpr.sqlite3ExprIsConstantOrFunction() == 0)
+                    if ( !pSpan.pExpr.IsConstantOrFunction() )
                     {
                         utilc.sqlite3ErrorMsg(pParse, "default value of column [%s] is not constant", pCol.zName);
                     }
@@ -814,7 +814,7 @@ p.zName,  P4Usage.P4_STATIC );
                         ///tokens that point to volatile memory. The 'span' of the expression
                         ///is required by pragma table_info.                        
                         exprc.Delete(db, ref pCol.DefaultValue);
-                        pCol.DefaultValue = exprc.sqlite3ExprDup(db, pSpan.pExpr, Sqlite3.EXPRDUP_REDUCE);
+                        pCol.DefaultValue = exprc.Duplicate(db, pSpan.pExpr, Sqlite3.EXPRDUP_REDUCE);
                         db.DbFree(ref pCol.DefaultValueSource);
                         pCol.DefaultValueSource = pSpan.zStart.Substring(0, pSpan.zStart.Length - pSpan.zEnd.Length);
                         //sqlite3DbStrNDup( db, pSpan.zStart,
@@ -844,11 +844,11 @@ p.zName,  P4Usage.P4_STATIC );
             ///
             ///</summary>
             // OVERLOADS, so I don't need to rewrite parse.c
-            public static void sqlite3AddPrimaryKey(Parse pParse, int null_2, OnConstraintError onError, int autoInc, SortOrder sortOrder)
+            public static void sqlite3AddPrimaryKey(ParseState pParse, int null_2, OnConstraintError onError, int autoInc, SortOrder sortOrder)
             {
                 build.sqlite3AddPrimaryKey(pParse, null, onError, autoInc, sortOrder);
             }
-            public static void sqlite3AddPrimaryKey(Parse pParse,///
+            public static void sqlite3AddPrimaryKey(ParseState pParse,///
                     ///Parsing context 
                 ExprList pList,///
                     ///List of field names to be indexed 
@@ -931,7 +931,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// Add a new CHECK constraint to the table currently under construction.
             ///
             ///</summary>
-            public static void sqlite3AddCheckConstraint(Parse pParse,///
+            public static void sqlite3AddCheckConstraint(ParseState pParse,///
                 ///Parsing context 
                 Expr pCheckExpr///
                 ///The check expression 
@@ -955,7 +955,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// to the CollSeq given.
             ///
             ///</summary>
-            public static void sqlite3AddCollateType(Parse pParse, Token pToken)
+            public static void sqlite3AddCollateType(ParseState pParse, Token pToken)
             {
                 Table p;
                 int i;
@@ -975,7 +975,7 @@ p.zName,  P4Usage.P4_STATIC );
                 if (build.sqlite3LocateCollSeq(pParse, zColl) != null)
                 {
                     Index pIdx;
-                    p.aCol[i].zColl = zColl;
+                    p.aCol[i].Collation = zColl;
                     ///
                     ///<summary>
                     ///If the column is declared as "<name> PRIMARY KEY COLLATE <type>",
@@ -986,9 +986,9 @@ p.zName,  P4Usage.P4_STATIC );
                     for (pIdx = p.pIndex; pIdx != null; pIdx = pIdx.pNext)
                     {
                         Debug.Assert(pIdx.nColumn == 1);
-                        if (pIdx.aiColumn[0] == i)
+                        if (pIdx.ColumnIdx[0] == i)
                         {
-                            pIdx.azColl[0] = p.aCol[i].zColl;
+                            pIdx.Collations[0] = p.aCol[i].Collation;
                         }
                     }
                 }
@@ -1018,7 +1018,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// See also: sqlite3FindCollSeq(), sqlite3GetCollSeq()
             ///
             ///</summary>
-            public static CollSeq sqlite3LocateCollSeq(Parse pParse, string zName)
+            public static CollSeq sqlite3LocateCollSeq(ParseState pParse, string zName)
             {
                 Connection db = pParse.db;
                 SqliteEncoding enc = db.Backends[0].pSchema.enc;
@@ -1053,7 +1053,7 @@ p.zName,  P4Usage.P4_STATIC );
             /// 1 chance in 2^32.  So we're safe enough.
             ///
             ///</summary>
-            public static void codegenChangeCookie(Parse pParse, int iDb)
+            public static void codegenChangeCookie(ParseState pParse, int iDb)
             {
                 int r1 = pParse.allocTempReg();
                 Connection db = pParse.db;
@@ -1147,7 +1147,7 @@ p.zName,  P4Usage.P4_STATIC );
             ///<summary>
             /// The parser calls this routine in order to create a new VIEW
             ///</summary>
-            public static void sqlite3CreateView(Parse pParse,///
+            public static void sqlite3CreateView(ParseState pParse,///
                 ///The parsing context 
                 Token pBegin,///The CREATE token that begins the statement 
                 Token pName1,///The token that holds the name of the view 
@@ -1186,7 +1186,7 @@ p.zName,  P4Usage.P4_STATIC );
                 ///<param name="allocated rather than point to the input string "> which means that</param>
                 ///<param name="they will persist after the current sqlite3_exec() call returns.">they will persist after the current sqlite3_exec() call returns.</param>
                 ///<param name=""></param>
-                p.pSelect = exprc.sqlite3SelectDup(db, pSelect, Sqlite3.EXPRDUP_REDUCE);
+                p.pSelect = exprc.Clone(db, pSelect, Sqlite3.EXPRDUP_REDUCE);
                 SelectMethods.SelectDestructor(db, ref pSelect);
                 //if ( db.mallocFailed != 0 )
                 //{
@@ -1236,12 +1236,8 @@ p.zName,  P4Usage.P4_STATIC );
             /// the columns of the view in the pTable structure.  Return the number
             /// of errors.  If an error is seen leave an error message in pParse.zErrMsg.
             ///</summary>
-            public static SqlResult sqlite3ViewGetColumnNames(Parse pParse, Table pTable)
-            {
-                Table pSelTab;
-                ///A fake table from which we get the result set 
-                Select pSel;
-                ///Copy of the SELECT that implements the view 
+            public static SqlResult sqlite3ViewGetColumnNames(ParseState pParse, Table pTable)
+            {                
                 SqlResult nErr = (SqlResult)0;
                 ///Number of errors encountered 
                 int n;
@@ -1291,12 +1287,12 @@ p.zName,  P4Usage.P4_STATIC );
                 ///to be permanent.  So the computation is done on a copy of the SELECT
                 ///statement that defines the view.
                 Debug.Assert(pTable.pSelect != null);
-                pSel = exprc.sqlite3SelectDup(db, pTable.pSelect, 0);
-                if (pSel != null)
+                var pSel = exprc.Clone(db, pTable.pSelect, 0);///Copy of the SELECT that implements the view 
+            if (pSel != null)
                 {
                     u8 enableLookaside = db.lookaside.bEnabled;
                     n = pParse.nTab;
-                    sqlite3SrcListAssignCursors(pParse, pSel.pSrc);
+                    sqlite3SrcListAssignCursors(pParse, pSel.FromSource);
                     pTable.nCol = -1;
                     db.lookaside.bEnabled = 0;
 #if !SQLITE_OMIT_AUTHORIZATION
@@ -1305,9 +1301,9 @@ db.xAuth = 0;
 pSelTab = SelectMethods.sqlite3ResultSetOfSelect(pParse, pSel);
 db.xAuth = xAuth;
 #else
-                    pSelTab = SelectMethods.sqlite3ResultSetOfSelect(pParse, pSel);
+                    var pSelTab = SelectMethods.sqlite3ResultSetOfSelect(pParse, pSel);///A fake table from which we get the result set 
 #endif
-                    db.lookaside.bEnabled = enableLookaside;
+                db.lookaside.bEnabled = enableLookaside;
                     pParse.nTab = n;
                     if (pSelTab != null)
                     {
@@ -1420,11 +1416,11 @@ db.xAuth = xAuth;
             /// erasing iTable (this can happen with an auto-vacuum database).
             ///</summary>
         public    
-        static void destroyRootPage(Parse pParse, int iTable, int iDb)
+        static void destroyRootPage(ParseState pParse, int iTable, int iDb)
             {
                 Vdbe v = pParse.sqlite3GetVdbe();
                 int r1 = pParse.allocTempReg();
-                v.sqlite3VdbeAddOp3( OpCode.OP_Destroy, iTable, r1, iDb);
+                v.AddOpp3( OpCode.OP_Destroy, iTable, r1, iDb);
                 build.sqlite3MayAbort(pParse);
 #if !SQLITE_OMIT_AUTOVACUUM
                 ///OP_Destroy stores an in integer r1. If this integer
@@ -1460,11 +1456,11 @@ db.xAuth = xAuth;
             ///
             ///</summary>
             // OVERLOADS, so I don't need to rewrite parse.c
-            public static void sqlite3CreateForeignKey(Parse pParse, int null_2, Token pTo, ExprList pToCol, int flags)
+            public static void sqlite3CreateForeignKey(ParseState pParse, int null_2, Token pTo, ExprList pToCol, int flags)
             {
                 build.sqlite3CreateForeignKey(pParse, null, pTo, pToCol, flags);
             }
-            public static void sqlite3CreateForeignKey(Parse pParse,///
+            public static void sqlite3CreateForeignKey(ParseState pParse,///
                 ///<summary>
                 ///Parsing context 
                 ///</summary>
@@ -1630,7 +1626,7 @@ db.xAuth = xAuth;
             /// accordingly.
             ///
             ///</summary>
-            public static void sqlite3DeferForeignKey(Parse pParse, int isDeferred)
+            public static void sqlite3DeferForeignKey(ParseState pParse, int isDeferred)
             {
 #if !SQLITE_OMIT_FOREIGN_KEY
                 Table pTab;
@@ -1691,7 +1687,7 @@ db.xAuth = xAuth;
             /// implements the DROP INDEX statement.
             ///
             ///</summary>
-            public static void sqlite3DropIndex(Parse pParse, SrcList pName, int ifExists)
+            public static void sqlite3DropIndex(ParseState pParse, SrcList pName, int ifExists)
             {
                 Index pIndex;
                 Vdbe v;
@@ -1711,7 +1707,7 @@ db.xAuth = xAuth;
                 {
                     goto exit_drop_index;
                 }
-                pIndex = IndexBuilder.sqlite3FindIndex(db, pName.a[0].zName, pName.a[0].zDatabase);
+                pIndex = IndexBuilder.FindByName(db, pName.a[0].zName, pName.a[0].zDatabase);
                 if (pIndex == null)
                 {
                     if (ifExists == 0)
@@ -1755,7 +1751,7 @@ goto exit_drop_index;
                 {
                     sqlite3BeginWriteOperation(pParse, 1, iDb);
                     build.sqlite3NestedParse(pParse, "DELETE FROM %Q.%s WHERE name=%Q AND type='index'", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), pIndex.zName);
-                    if (TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, "sqlite_stat1") != null)
+                    if (TableBuilder.FindByName(db, db.Backends[iDb].Name, "sqlite_stat1") != null)
                     {
                         build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE idx=%Q", db.Backends[iDb].Name, pIndex.zName);
                     }
@@ -1970,7 +1966,7 @@ goto exit_drop_index;
         /// Assign VdbeCursor index numbers to all tables in a SrcList
         ///
         ///</summary>
-        public static void sqlite3SrcListAssignCursors(Parse pParse, SrcList pList)
+        public static void sqlite3SrcListAssignCursors(ParseState pParse, SrcList pList)
             {
                 Debug.Assert(pList != null///
                     ///<summary>
@@ -1985,7 +1981,7 @@ goto exit_drop_index;
                         pItem.iCursor = pParse.nTab++;
                         if (pItem.pSelect != null)
                         {
-                            sqlite3SrcListAssignCursors(pParse, pItem.pSelect.pSrc);
+                            sqlite3SrcListAssignCursors(pParse, pItem.pSelect.FromSource);
                         }
                     }
                 );
@@ -2003,7 +1999,7 @@ goto exit_drop_index;
                     db.DbFree(ref pItem.zName);
                     db.DbFree(ref pItem.zAlias);
                     db.DbFree(ref pItem.zIndex);
-                    TableBuilder.sqlite3DeleteTable(db, ref pItem.pTab);
+                    TableBuilder.sqlite3DeleteTable(db, ref pItem.TableReference);
                     SelectMethods.SelectDestructor(db, ref pItem.pSelect);
                     exprc.Delete(db, ref pItem.pOn);
                     build.sqlite3IdListDelete(db, ref pItem.pUsing);
@@ -2037,15 +2033,15 @@ goto exit_drop_index;
             ///
             ///</summary>
         // OVERLOADS, so I don't need to rewrite parse.c
-        public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse, SrcList p, int null_3, int null_4, Token pAlias, Select pSubquery, Expr pOn, IdList pUsing)
+        public static SrcList sqlite3SrcListAppendFromTerm(ParseState pParse, SrcList p, int null_3, int null_4, Token pAlias, Select pSubquery, Expr pOn, IdList pUsing)
             {
                 return build.sqlite3SrcListAppendFromTerm(pParse, p, null, null, pAlias, pSubquery, pOn, pUsing);
             }
-            public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse, SrcList p, Token pTable, Token pDatabase, Token pAlias, int null_6, Expr pOn, IdList pUsing)
+            public static SrcList sqlite3SrcListAppendFromTerm(ParseState pParse, SrcList p, Token pTable, Token pDatabase, Token pAlias, int null_6, Expr pOn, IdList pUsing)
             {
                 return build.sqlite3SrcListAppendFromTerm(pParse, p, pTable, pDatabase, pAlias, null, pOn, pUsing);
             }
-            public static SrcList sqlite3SrcListAppendFromTerm(Parse pParse,///
+            public static SrcList sqlite3SrcListAppendFromTerm(ParseState pParse,///
                 ///Parsing context 
             SrcList p,///
                 ///The left part of the FROM clause already seen 
@@ -2099,7 +2095,7 @@ goto exit_drop_index;
             /// element of the source-list passed as the second argument.
             ///
             ///</summary>
-            public static void sqlite3SrcListIndexedBy(Parse pParse, SrcList p, Token pIndexedBy)
+            public static void sqlite3SrcListIndexedBy(ParseState pParse, SrcList p, Token pIndexedBy)
             {
                 Debug.Assert(pIndexedBy != null);
                 if (p != null && Sqlite3.ALWAYS(p.Count > 0))
@@ -2153,7 +2149,7 @@ goto exit_drop_index;
             ///<summary>
             /// Begin a transaction
             ///</summary>
-            public static void sqlite3BeginTransaction(Parse pParse, int type)
+            public static void sqlite3BeginTransaction(ParseState pParse, int type)
             {   
                 Debug.Assert(pParse != null);
                 Connection db = pParse.db;
@@ -2180,7 +2176,7 @@ goto exit_drop_index;
             ///<summary>
             /// Commit a transaction
             ///</summary>
-            public static void sqlite3CommitTransaction(Parse pParse)
+            public static void sqlite3CommitTransaction(ParseState pParse)
             {   
                 trans(pParse,TransAction.COMMIT);
             }
@@ -2188,7 +2184,7 @@ goto exit_drop_index;
             ///<summary>
             ///Rollback a transaction
             ///</summary>
-            public static void sqlite3RollbackTransaction(Parse pParse)
+            public static void sqlite3RollbackTransaction(ParseState pParse)
             {
                 trans(pParse, TransAction.ROLLBACK);
             }
@@ -2201,7 +2197,7 @@ goto exit_drop_index;
             static int[,] transParams = {{1,0},{1,1}};
             //commit 1, 0
             //rollback 1,1
-            static void trans(Parse pParse, TransAction action)
+            static void trans(ParseState pParse, TransAction action)
             {
                 Debug.Assert(pParse != null);
                 Connection db = pParse.db;
@@ -2228,7 +2224,7 @@ goto exit_drop_index;
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																						const string[] az = { "BEGIN", "RELEASE", "ROLLBACK" };
 #endif
-            public static void sqlite3Savepoint(Parse pParse, int op, Token pName)
+            public static void sqlite3Savepoint(ParseState pParse, int op, Token pName)
             {
                 string zName = build.Token2Name(pParse.db, pName);
                 if (zName != null)
@@ -2254,7 +2250,7 @@ goto exit_drop_index;
             /// the number of errors.  Leave any error messages in the pParse structure.
             ///
             ///</summary>
-            public static int sqlite3OpenTempDatabase(Parse pParse)
+            public static int sqlite3OpenTempDatabase(ParseState pParse)
             {
                 Connection db = pParse.db;
                 if (db.Backends[1].BTree == null && pParse.explain == 0)
@@ -2301,9 +2297,9 @@ goto exit_drop_index;
             /// early in the code, before we know if any database tables will be used.
             ///
             ///</summary>
-            public static void sqlite3CodeVerifySchema(Parse pParse, int iDb)
+            public static void sqlite3CodeVerifySchema(ParseState pParse, int iDb)
             {
-                Parse pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
+                ParseState pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
                 if (pToplevel.cookieGoto == 0)
                 {
                     Vdbe v = pToplevel.sqlite3GetVdbe();
@@ -2336,7 +2332,7 @@ goto exit_drop_index;
             /// If argument zDb is NULL, then call sqlite3CodeVerifySchema() for each
             /// attached database. Otherwise, invoke it for the database named zDb only.
             ///</summary>
-            public static void sqlite3CodeVerifyNamedSchema(Parse pParse, string zDb)
+            public static void sqlite3CodeVerifyNamedSchema(ParseState pParse, string zDb)
             {
                 Connection db = pParse.db;
                 int i;
@@ -2362,9 +2358,9 @@ goto exit_drop_index;
             /// can be checked before any changes are made to the database, it is never
             /// necessary to undo a write and the checkpoint should not be set.
             ///</summary>
-            public static void sqlite3BeginWriteOperation(Parse pParse, int setStatement, int iDb)
+            public static void sqlite3BeginWriteOperation(ParseState pParse, int setStatement, int iDb)
             {
-                Parse pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
+                ParseState pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
                 sqlite3CodeVerifySchema(pParse, iDb);
                 pToplevel.writeMask |= ((yDbMask)1) << iDb;
                 pToplevel.isMultiWrite |= (u8)setStatement;
@@ -2376,9 +2372,9 @@ goto exit_drop_index;
             /// If an abort occurs after some of these writes have completed, then it will
             /// be necessary to undo the completed writes.
             ///</summary>
-            public static void sqlite3MultiWrite(Parse pParse)
+            public static void sqlite3MultiWrite(ParseState pParse)
             {
-                Parse pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
+                ParseState pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
                 pToplevel.isMultiWrite = 1;
             }
             ///<summary>
@@ -2398,9 +2394,9 @@ goto exit_drop_index;
             /// implementation of sqlite3AssertMayAbort()) and so we have chosen
             /// to take the safe route and skip the optimization.
             ///</summary>
-            public static void sqlite3MayAbort(Parse pParse)
+            public static void sqlite3MayAbort(ParseState pParse)
             {
-                Parse pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
+                ParseState pToplevel = sqliteinth.sqlite3ParseToplevel(pParse);
                 pToplevel.mayAbort = 1;
             }
             ///<summary>
@@ -2408,7 +2404,7 @@ goto exit_drop_index;
             /// error. The onError parameter determines which (if any) of the statement
             /// and/or current transaction is rolled back.
             ///</summary>
-            public static void sqlite3HaltConstraint(Parse pParse, OnConstraintError onError, string p4, P4Usage p4type)
+            public static void sqlite3HaltConstraint(ParseState pParse, OnConstraintError onError, string p4, P4Usage p4type)
             {
                 Vdbe v = pParse.sqlite3GetVdbe();
                 if (onError == OnConstraintError.OE_Abort)
@@ -2417,7 +2413,7 @@ goto exit_drop_index;
                 }
                 v.sqlite3VdbeAddOp4(OpCode.OP_Halt, (int)SqlResult.SQLITE_CONSTRAINT, (int)onError, 0, p4, p4type);
             }
-            static void sqlite3HaltConstraint(Parse pParse,OnConstraintError onError, byte[] p4, P4Usage p4type)
+            static void sqlite3HaltConstraint(ParseState pParse,OnConstraintError onError, byte[] p4, P4Usage p4type)
             {
                 Vdbe v = pParse.sqlite3GetVdbe();
                 if (onError == OnConstraintError.OE_Abort)

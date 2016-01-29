@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite.Compiler.Parser
         ///</summary>
         public class NameContext:ILinkedListNode<NameContext>
         {
-            public Sqlite3.Parse pParse;
+            public Sqlite3.ParseState ParseState;
             ///
             ///<summary>
             ///The parser 
@@ -121,10 +121,10 @@ namespace Community.CsharpSqlite.Compiler.Parser
                 {
                     if (pExpr.Operator != TokenType.TK_ID)
                     {
-                        rc = Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(this, ref pExpr);
-                        if (rc == SqlResult.SQLITE_OK && pExpr.sqlite3ExprIsConstant() == 0)
+                        rc = Sqlite3.ResolveExtensions.ResolveExprNames(this, ref pExpr);
+                        if (rc == SqlResult.SQLITE_OK && pExpr.sqlite3ExprIsConstant() == false)
                         {
-                            utilc.sqlite3ErrorMsg(this.pParse, "invalid name: \"%s\"", pExpr.u.zToken);
+                            utilc.sqlite3ErrorMsg(this.ParseState, "invalid name: \"%s\"", pExpr.u.zToken);
                             return SqlResult.SQLITE_ERROR;
                         }
                     }

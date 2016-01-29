@@ -57,21 +57,22 @@ namespace Community.CsharpSqlite.Metadata
     ///</summary>
     public class Index:ILinkedListNode<Index>
         {
-            public string zName;
-            ///
-            ///<summary>
-            ///Name of this index 
-            ///</summary>
-            public int nColumn;
-            ///
-            ///<summary>
-            ///Number of columns in the table used by this index 
-            ///</summary>
-            public int[] aiColumn;
-            ///
-            ///<summary>
-            ///Which columns are used by this index.  1st is 0 
-            ///</summary>
+        ///<summary>
+        ///Name of this index 
+        ///</summary>
+        public string zName;
+
+        ///<summary>
+        ///Number of columns in the table used by this index 
+        ///</summary>
+        public int nColumn;
+
+
+        ///<summary>
+        ///Which columns are used by this index.  1st is 0 
+        ///</summary>
+        public int[] ColumnIdx;
+            
             public int[] aiRowEst;
             ///
             ///<summary>
@@ -122,7 +123,7 @@ namespace Community.CsharpSqlite.Metadata
             ///<summary>
             ///Array of size Index.nColumn. True==DESC, False==ASC 
             ///</summary>
-            public string[] azColl;
+            public string[] Collations;
             ///<summary>
             ///Array of collation sequence names for index
             ///</summary>

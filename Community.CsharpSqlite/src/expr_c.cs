@@ -16,7 +16,7 @@ using ynVar = System.Int32;
 #endif
 namespace Community.CsharpSqlite.Ast
 {
-    using Parse = Sqlite3.Parse;
+    using ParseState = Sqlite3.ParseState;
     using Metadata;
     using Engine;
     using Community.CsharpSqlite.Utils;
@@ -391,7 +391,7 @@ namespace Community.CsharpSqlite.Ast
             /// portion of the buffer copied into by this function.
             ///
             ///</summary>
-            static Expr exprDup(Connection db, Expr p, int flags, ref Expr pzBuffer)
+            static Expr Duplicate(Connection db, Expr p, int flags, ref Expr pzBuffer)
             {
                 Expr pNew = null;
                 ///
@@ -481,11 +481,11 @@ namespace Community.CsharpSqlite.Ast
                             ///</summary>
                             if (p.HasProperty(ExprFlags.EP_xIsSelect))
                             {
-                                pNew.x.pSelect = exprc.sqlite3SelectDup(db, p.x.pSelect, isReduced ? 1 : 0);
+                                pNew.x.pSelect = exprc.Clone(db, p.x.pSelect, isReduced ? 1 : 0);
                             }
                             else
                             {
-                                pNew.x.pList = exprc.sqlite3ExprListDup(db, p.x.pList, isReduced ? 1 : 0);
+                                pNew.x.pList = exprc.Duplicate(db, p.x.pList, isReduced ? 1 : 0);
                             }
                         }
                         ///
@@ -497,8 +497,8 @@ namespace Community.CsharpSqlite.Ast
                             //zAlloc += dupedExprNodeSize( p, flags );
                             if (pNew.HasProperty(ExprFlags.EP_Reduced))
                             {
-                                pNew.pLeft = exprDup(db, p.pLeft, Sqlite3.EXPRDUP_REDUCE, ref pzBuffer);
-                                pNew.pRight = exprDup(db, p.pRight, Sqlite3.EXPRDUP_REDUCE, ref pzBuffer);
+                                pNew.pLeft = Duplicate(db, p.pLeft, Sqlite3.EXPRDUP_REDUCE, ref pzBuffer);
+                                pNew.pRight = Duplicate(db, p.pRight, Sqlite3.EXPRDUP_REDUCE, ref pzBuffer);
                             }
                             //if ( pzBuffer != null )
                             //{
@@ -510,8 +510,8 @@ namespace Community.CsharpSqlite.Ast
                             pNew.flags2 = 0;
                             if (!p.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
                             {
-                                pNew.pLeft = exprc.sqlite3ExprDup(db, p.pLeft, 0);
-                                pNew.pRight = exprc.sqlite3ExprDup(db, p.pRight, 0);
+                                pNew.pLeft = exprc.Duplicate(db, p.pLeft, 0);
+                                pNew.pRight = exprc.Duplicate(db, p.pRight, 0);
                             }
                         }
                     }
@@ -536,50 +536,33 @@ namespace Community.CsharpSqlite.Ast
             /// part of the in-memory representation of the database schema.
             ///
             ///</summary>
-            public static Expr sqlite3ExprDup(Connection db, Expr p, int flags)
+            public static Expr Duplicate(Connection db, Expr p, int flags)
             {
                 Expr ExprDummy = null;
-                return exprDup(db, p, flags, ref ExprDummy);
+                return Duplicate(db, p, flags, ref ExprDummy);
             }
-            public static ExprList sqlite3ExprListDup(Connection db, ExprList p, int flags)
-            {
-                ExprList pNew;
-                ExprList_item pItem;
-                ExprList_item pOldItem;
-                int i;
-                if (p == null)
-                    return null;
+        public static ExprList Duplicate(Connection db, ExprList p, int flags)
+        {
+            if (p == null)
+                return null;
 
-                pNew = new ExprList(p.Count) {
-                    iECursor = 0
-                };
-                //sqlite3DbMallocRaw(db, sizeof(*pNew) );
-                //if ( pNew == null ) return null;
-                
-                //sqlite3DbMallocRaw(db,  p.nExpr*sizeof(p.a[0]) );
-                //if( pItem==null ){
-                //  sqlite3DbFree(db,ref pNew);
-                //  return null;
-                //}
-                //pOldItem = p.a;
-                for (i = 0; i < p.Count; i++)
-                {
-                    //pItem++, pOldItem++){
-                    pItem = pNew.a[i] = new ExprList_item();
-                    pOldItem = p.a[i];
-                    Expr pOldExpr = pOldItem.pExpr;
-                    pItem.pExpr = exprc.sqlite3ExprDup(db, pOldExpr, flags);
-                    pItem.zName = pOldItem.zName;
-                    // sqlite3DbStrDup(db, pOldItem.zName);
-                    pItem.zSpan = pOldItem.zSpan;
-                    // sqlite3DbStrDup( db, pOldItem.zSpan );
-                    pItem.sortOrder = pOldItem.sortOrder;
-                    pItem.done = 0;
-                    pItem.iCol = pOldItem.iCol;
-                    pItem.iAlias = pOldItem.iAlias;
-                }
-                return pNew;
-            }
+            return new ExprList(p.Count)
+            {
+                iECursor = 0,
+                a = p.Select(
+                    pOldItem => new ExprList_item()
+                    {
+                        pExpr = exprc.Duplicate(db, pOldItem.pExpr, flags),
+                        zName = pOldItem.zName,
+                        zSpan = pOldItem.zSpan,
+                        sortOrder = pOldItem.sortOrder,
+                        done = 0,
+                        iCol = pOldItem.iCol,
+                        iAlias = pOldItem.iAlias
+                    }
+                    ).ToList()
+            };
+        }
             ///<summary>
             /// If cursors, triggers, views and subqueries are all omitted from
             /// the build, then none of the following routines, except for
@@ -622,13 +605,13 @@ namespace Community.CsharpSqlite.Ast
                     // sqlite3DbStrDup( db, pOldItem.zIndex );
                     pNewItem.notIndexed = pOldItem.notIndexed;
                     pNewItem.pIndex = pOldItem.pIndex;
-                    pTab = pNewItem.pTab = pOldItem.pTab;
+                    pTab = pNewItem.TableReference = pOldItem.TableReference;
                     if (pTab != null)
                     {
                         pTab.nRef++;
                     }
-                    pNewItem.pSelect = exprc.sqlite3SelectDup(db, pOldItem.pSelect, flags);
-                    pNewItem.pOn = exprc.sqlite3ExprDup(db, pOldItem.pOn, flags);
+                    pNewItem.pSelect = exprc.Clone(db, pOldItem.pSelect, flags);
+                    pNewItem.pOn = exprc.Duplicate(db, pOldItem.pOn, flags);
                     pNewItem.pUsing = exprc.sqlite3IdListDup(db, pOldItem.pUsing);
                     pNewItem.colUsed = pOldItem.colUsed;
                 }
@@ -650,33 +633,29 @@ namespace Community.CsharpSqlite.Ast
                     ).ToList()
             };
         }
-            public static Select sqlite3SelectDup(Connection db, Select p, int flags)
+        public static Select Clone(Connection db, Select p, int flags)
+        {
+            if (p == null)
+                return null;
+            return new Select()
             {
-                Select pNew;
-                if (p == null)
-                    return null;
-                pNew = new Select();
-                //sqlite3DbMallocRaw(db, sizeof(*p) );
-                //if ( pNew == null ) return null;
-                pNew.ResultingFieldList = exprc.sqlite3ExprListDup(db, p.ResultingFieldList, flags);
-                pNew.pSrc = exprc.sqlite3SrcListDup(db, p.pSrc, flags);
-                pNew.pWhere = exprc.sqlite3ExprDup(db, p.pWhere, flags);
-                pNew.pGroupBy = exprc.sqlite3ExprListDup(db, p.pGroupBy, flags);
-                pNew.pHaving = exprc.sqlite3ExprDup(db, p.pHaving, flags);
-                pNew.pOrderBy = exprc.sqlite3ExprListDup(db, p.pOrderBy, flags);
-                pNew.TokenOp  = p.TokenOp ;
-                pNew.pPrior = exprc.sqlite3SelectDup(db, p.pPrior, flags);
-                pNew.pLimit = exprc.sqlite3ExprDup(db, p.pLimit, flags);
-                pNew.pOffset = exprc.sqlite3ExprDup(db, p.pOffset, flags);
-                pNew.iLimit = 0;
-                pNew.iOffset = 0;
-                pNew.selFlags = (p.selFlags & ~SelectFlags.UsesEphemeral);
-                pNew.pRightmost = null;
-                pNew.addrOpenEphm[0] = -1;
-                pNew.addrOpenEphm[1] = -1;
-                pNew.addrOpenEphm[2] = -1;
-                return pNew;
-            }
+                ResultingFieldList = exprc.Duplicate(db, p.ResultingFieldList, flags),
+                FromSource = exprc.sqlite3SrcListDup(db, p.FromSource, flags),
+                pWhere = exprc.Duplicate(db, p.pWhere, flags),
+                pGroupBy = exprc.Duplicate(db, p.pGroupBy, flags),
+                pHaving = exprc.Duplicate(db, p.pHaving, flags),
+                pOrderBy = exprc.Duplicate(db, p.pOrderBy, flags),
+                TokenOp = p.TokenOp,
+                pPrior = exprc.Clone(db, p.pPrior, flags),
+                pLimit = exprc.Duplicate(db, p.pLimit, flags),
+                pOffset = exprc.Duplicate(db, p.pOffset, flags),
+                iLimit = 0,
+                iOffset = 0,
+                Flags = (p.Flags & ~SelectFlags.UsesEphemeral),
+                pRightmost = null,
+                addrOpenEphm = new int[] { -1, -1, -1 }
+            };
+        }
 #else
 																																																Select exprc.sqlite3SelectDup(sqlite3 db, Select p, int flags){
 Debug.Assert( p==null );
@@ -721,15 +700,14 @@ return null;
             ///</summary>
             public static void Delete(Connection db, ref ExprList pList)
             {
-                int i;
-                ExprList_item pItem;
                 if (pList == null)
                     return;
                 Debug.Assert(pList.a != null || (pList.Count == 0 && pList.nAlloc == 0));
                 Debug.Assert(pList.Count <= pList.nAlloc);
-                for (i = 0; i < pList.Count; i++)
+                for (var i = 0; i < pList.Count; i++)
                 {
-                    if ((pItem = pList.a[i]) != null)
+                    ExprList_item pItem = pList.a[i];
+                    if (pItem  != null)
                     {
                         exprc.Delete(db, ref pItem.pExpr);
                         db.DbFree(ref pItem.zName);
@@ -756,12 +734,9 @@ return null;
             ///</summary>
             public static WRC exprNodeIsConstant(Walker pWalker,  Expr pExpr)
             {
-                ///
-                ///<summary>
                 ///If pWalker.u.i is 3 then any term of the expression that comes from
                 ///the ON or USING clauses of a join disqualifies the expression
                 ///from being considered constant. 
-                ///</summary>
                 if (pWalker.u.i == 3 && pExpr.ExprHasAnyProperty(ExprFlags.EP_FromJoin))
                 {
                     pWalker.u.i = 0;
@@ -769,19 +744,13 @@ return null;
                 }
                 switch (pExpr.Operator)
                 {
-                    ///
-                    ///<summary>
                     ///Consider functions to be constant if all their arguments are constant
                     ///and pWalker.u.i==2 
-                    ///</summary>
                     case TokenType.TK_FUNCTION:
                         if ((pWalker.u.i) == 2)
                             return 0;
                         goto case TokenType.TK_ID;
-                    ///
-                    ///<summary>
                     ///Fall through 
-                    ///</summary>
                     case TokenType.TK_ID:
                     case TokenType.TK_COLUMN:
                     case TokenType.TK_AGG_FUNCTION:
@@ -794,15 +763,9 @@ return null;
                         return WRC.WRC_Abort;
                     default:
                         sqliteinth.testcase(pExpr.Operator == TokenType.TK_SELECT);
-                        ///
-                        ///<summary>
                         ///selectNodeIsConstant will disallow 
-                        ///</summary>
                         sqliteinth.testcase(pExpr.Operator == TokenType.TK_EXISTS);
-                        ///
-                        ///<summary>
                         ///selectNodeIsConstant will disallow 
-                        ///</summary>
                         return WRC.WRC_Continue;
                 }
             }
@@ -945,10 +908,10 @@ return null;
                 ///<summary>
                 ///Not a compound SELECT 
                 ///</summary>
-                if ((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0)
+                if ((p.Flags & (SelectFlags.Distinct | SelectFlags.Aggregate)) != 0)
                 {
-                    sqliteinth.testcase((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
-                    sqliteinth.testcase((p.selFlags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
+                    sqliteinth.testcase((p.Flags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Distinct);
+                    sqliteinth.testcase((p.Flags & (SelectFlags.Distinct | SelectFlags.Aggregate)) == SelectFlags.Aggregate);
                     return 0;
                     ///
                     ///<summary>
@@ -977,7 +940,7 @@ return null;
                 ///<summary>
                 ///Has no WHERE clause 
                 ///</summary>
-                pSrc = p.pSrc;
+                pSrc = p.FromSource;
                 Debug.Assert(pSrc != null);
                 if (pSrc.Count != 1)
                     return 0;
@@ -991,7 +954,7 @@ return null;
                 ///<summary>
                 ///FROM is not a subquery or view 
                 ///</summary>
-                pTab = pSrc.a[0].pTab;
+                pTab = pSrc.a[0].TableReference;
                 if (Sqlite3.NEVER(pTab == null))
                     return 0;
                 Debug.Assert(pTab.pSelect == null);
@@ -1279,7 +1242,7 @@ return null;
             ///</summary>
             public static WRC evalConstExpr(Walker pWalker, Expr pExpr)
             {
-                Parse pParse = pWalker.pParse;
+                ParseState pParse = pWalker.ParseState;
                 switch (pExpr.Operator)
                 {
                     case TokenType.TK_IN:
@@ -1522,8 +1485,8 @@ return null;
             static WRC analyzeAggregate(Walker pWalker,  Expr pExpr)
             {
                 int i;
-                NameContext pNC = pWalker.u.pNC;
-                Parse pParse = pNC.pParse;
+                NameContext pNC = pWalker.u.NameContext;
+                ParseState pParse = pNC.ParseState;
                 SrcList pSrcList = pNC.pSrcList;
                 AggInfo pAggInfo = pNC.pAggInfo;
                 switch (pExpr.Operator)
@@ -1573,7 +1536,7 @@ return null;
                                         if ((k >= pAggInfo.nColumn) && (k = addAggInfoColumn(pParse.db, pAggInfo)) >= 0)
                                         {
                                             pCol = pAggInfo.aCol[k];
-                                            pCol.pTab = pExpr.pTab;
+                                            pCol.pTab = pExpr.TableReference;
                                             pCol.iTable = pExpr.iTable;
                                             pCol.iColumn = pExpr.iColumn;
                                             pCol.iMem = ++pParse.UsedCellCount;
@@ -1672,7 +1635,7 @@ return null;
                                         pItem.pExpr = pExpr;
                                         pItem.iMem = ++pParse.UsedCellCount;
                                         Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_IntValue));
-                                        pItem.pFunc = FuncDefTraverse.sqlite3FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.Count : 0, enc, 0);
+                                        pItem.pFunc = FuncDefTraverse.FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.Count : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
                                         {
                                             pItem.iDistinct = pParse.nTab++;
@@ -1701,7 +1664,7 @@ return null;
             }
             static WRC analyzeAggregatesInSelect(Walker pWalker, Select pSelect)
             {
-                NameContext pNC = pWalker.u.pNC;
+                NameContext pNC = pWalker.u.NameContext;
                 if (pNC.nDepth == 0)
                 {
                     pNC.nDepth++;
@@ -1728,9 +1691,9 @@ return null;
                 Walker w = new Walker();
                 w.xExprCallback = (dxExprCallback)analyzeAggregate;
                 w.xSelectCallback = (dxSelectCallback)analyzeAggregatesInSelect;
-                w.u.pNC = pNC;
+                w.u.NameContext = pNC;
                 Debug.Assert(pNC.pSrcList != null);
-                w.sqlite3WalkExpr(ref pExpr);
+                w.WalkExpression(ref pExpr);
             }
             ///<summary>
             /// Call exprc.sqlite3ExprAnalyzeAggregates() for every expression in an

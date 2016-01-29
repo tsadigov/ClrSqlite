@@ -10,7 +10,7 @@ using i16 = System.Int16;
 
 namespace Community.CsharpSqlite.Metadata.Traverse
 {
-
+    using Utils;
     public static class FuncDefTraverse
     {
         ///<summary>
@@ -86,11 +86,10 @@ namespace Community.CsharpSqlite.Metadata.Traverse
             ///The function definition to insert 
         )
         {
-            FuncDef pOther;
             int nName = StringExtensions.Strlen30(pDef.zName);
             u8 c1 = (u8)pDef.zName[0];
             int h = (_Custom.sqlite3UpperToLower[c1] + nName) % Sqlite3.ArraySize(pHash.a);
-            pOther = functionSearch(pHash, h, pDef.zName, nName);
+            var pOther = functionSearch(pHash, h, pDef.zName, nName);
             if (pOther != null)
             {
                 Debug.Assert(pOther != pDef && pOther.pNext != pDef);
@@ -103,6 +102,12 @@ namespace Community.CsharpSqlite.Metadata.Traverse
                 pDef.pHash = pHash.a[h];
                 pHash.a[h] = pDef;
             }
+        }
+
+
+        struct FuncScore {
+            public FuncDef Func;
+            public int Score;
         }
         ///<summary>
         /// Locate a user function given a name, a number of arguments and a flag
@@ -125,87 +130,49 @@ namespace Community.CsharpSqlite.Metadata.Traverse
         /// match that requested.
         ///
         ///</summary>
-        public static FuncDef sqlite3FindFunction(Connection db,///
-            ///An open database 
-        string zName,///
-            ///<param name="Name of the function.  Not null">terminated </param>
-        int nName,///
-            ///Number of characters in the name 
-        int nArg,///
-            ///<param name="Number of arguments.  ">1 means any number </param>
-        SqliteEncoding enc,///
-            ///Preferred text encoding 
-        u8 createFlag///
-            ///Create new entry if true and does not otherwise exist 
+        public static FuncDef FindFunction(
+            Connection db,///An open database 
+            string zName,///<param name="Name of the function.  Not null">terminated </param>
+            int nName,///Number of characters in the name 
+            int nArg,///<param name="Number of arguments.  ">1 means any number </param>
+            SqliteEncoding enc,///Preferred text encoding 
+            u8 createFlag///Create new entry if true and does not otherwise exist 
         )
-        {
-            FuncDef p;
-            ///<summary>
-            ///Iterator variable 
-            ///</summary>
-            FuncDef pBest = null;
-            ///
-            ///<summary>
-            ///Best match found so far 
-            ///</summary>
-            int bestScore = 0;
-            int h;
-            ///
-            ///<summary>
-            ///Hash value 
-            ///</summary>
+        {   
             Debug.Assert(enc == SqliteEncoding.UTF8 || enc == SqliteEncoding.UTF16LE || enc == SqliteEncoding.UTF16BE);
-            h = (_Custom.sqlite3UpperToLower[(u8)zName[0]] + nName) % Sqlite3.ArraySize(db.aFunc.a);
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="First search for a match amongst the application">defined functions.</param>
-            ///<param name=""></param>
-            p = functionSearch(db.aFunc, h, zName, nName);
-            while (p != null)
-            {
-                int score = matchQuality(p, nArg, enc);
-                if (score > bestScore)
-                {
-                    pBest = p;
-                    bestScore = score;
-                }
-                p = p.pNext;
-            }
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="If no match is found, search the built">in functions.</param>
-            ///<param name=""></param>
-            ///<param name="If the SQLITE_PreferBuiltin flag is set, then search the built">in</param>
-            ///<param name="functions even if a prior app">defined function was found.  And give</param>
-            ///<param name="priority to built">in functions.</param>
-            ///<param name=""></param>
-            ///<param name="Except, if createFlag is true, that means that we are trying to">Except, if createFlag is true, that means that we are trying to</param>
-            ///<param name="install a new function.  Whatever FuncDef structure is returned it will">install a new function.  Whatever FuncDef structure is returned it will</param>
-            ///<param name="have fields overwritten with new information appropriate for the">have fields overwritten with new information appropriate for the</param>
-            ///<param name="new function.  But the FuncDefs for built">only.</param>
-            ///<param name="So we must not search for built">ins when creating a new function.</param>
-            ///<param name=""></param>
-            if (0 == createFlag && (pBest == null || (db.flags & SqliteFlags.SQLITE_PreferBuiltin) != 0))
+            var h = (_Custom.sqlite3UpperToLower[(u8)zName[0]] + nName) % Sqlite3.ArraySize(db.aFunc.a);///Hash value 
+            ///First search for a match amongst the application-defined functions.
+            
+            var func = functionSearch(db.aFunc, h, zName, nName);///Iterator variable 
+            var winner=func.linkedList()
+                .Select(f => new FuncScore { Score = matchQuality(f, nArg, enc), Func = f })
+                .WinnerBy(r=>r.Score);
+
+
+            /* If no match is found, search the built-in functions.
+            **
+            ** If the SQLITE_PreferBuiltin flag is set, then search the built-in
+            ** functions even if a prior app-defined function was found.  And give
+            ** priority to built-in functions.
+            **
+            ** Except, if createFlag is true, that means that we are trying to
+            ** install a new function.  Whatever FuncDef structure is returned it will
+            ** have fields overwritten with new information appropriate for the
+            ** new function.  But the FuncDefs for built-in functions are read-only.
+            ** So we must not search for built-ins when creating a new function.
+            */
+            if (0 == createFlag && (winner.Func == null || (db.flags & SqliteFlags.SQLITE_PreferBuiltin) != 0))
             {
 #if SQLITE_OMIT_WSD
 																																																																																				FuncDefHash pHash = GLOBAL( FuncDefHash, sqlite3GlobalFunctions );
 #else
                 FuncDefHash pHash = Sqlite3.sqlite3GlobalFunctions;
 #endif
-                bestScore = 0;
-                p = functionSearch(pHash, h, zName, nName);
-                while (p != null)
-                {
-                    int score = matchQuality(p, nArg, enc);
-                    if (score > bestScore)
-                    {
-                        pBest = p;
-                        bestScore = score;
-                    }
-                    p = p.pNext;
-                }
+                winner.Score = 0;
+                func = functionSearch(pHash, h, zName, nName);
+                winner = func.linkedList()
+                    .Select(f => new FuncScore { Score = matchQuality(f, nArg, enc), Func = f })
+                    .WinnerBy(r => r.Score);
             }
             ///
             ///<summary>
@@ -214,20 +181,18 @@ namespace Community.CsharpSqlite.Metadata.Traverse
             ///new entry to the hash table and return it.
             ///
             ///</summary>
-            if (createFlag != 0 && (bestScore < 6 || pBest.nArg != nArg) && (pBest = new FuncDef()) != null)
+            if (createFlag != 0 && (winner.Score < 6 || winner.Func.nArg != nArg) )
             {
-                //sqlite3DbMallocZero(db, sizeof(*pBest)+nName+1))!=0 ){
-                //pBest.zName = (char *)&pBest[1];
-                pBest.nArg = (i16)nArg;
-                pBest.iPrefEnc = enc;
-                pBest.zName = zName;
-                //memcpy(pBest.zName, zName, nName);
-                //pBest.zName[nName] = 0;
-                sqlite3FuncDefInsert(db.aFunc, pBest);
+                winner.Func = new FuncDef() {
+                    nArg = (i16)nArg,
+                    iPrefEnc = enc,
+                    zName = zName
+                };               
+                sqlite3FuncDefInsert(db.aFunc, winner.Func);
             }
-            if (pBest != null && (pBest.xStep != null || pBest.xFunc != null || createFlag != 0))
+            if (winner.Func != null && (winner.Func.xStep != null || winner.Func.xFunc != null || createFlag != 0))
             {
-                return pBest;
+                return winner.Func;
             }
             return null;
         }

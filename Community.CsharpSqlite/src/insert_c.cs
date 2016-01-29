@@ -424,7 +424,7 @@ namespace Community.CsharpSqlite
 
 			}
 			for (i = 0; i < pSrc.nColumn; i++) {
-				if (pSrc.aiColumn [i] != pDest.aiColumn [i]) {
+				if (pSrc.ColumnIdx [i] != pDest.ColumnIdx [i]) {
 					return false;
 					///
 ///<summary>
@@ -440,7 +440,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				}
-				if (!xferCompatibleCollation (pSrc.azColl [i], pDest.azColl [i])) {
+				if (!xferCompatibleCollation (pSrc.Collations [i], pDest.Collations [i])) {
 					return false;
 					///
 ///<summary>
@@ -491,7 +491,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-		static int xferOptimization (Parse pParse, ///
+		static int xferOptimization (ParseState pParse, ///
 ///<summary>
 ///Parser context 
 ///</summary>
@@ -645,13 +645,13 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			}
-			Debug.Assert (pSelect.pSrc != null);
+			Debug.Assert (pSelect.FromSource != null);
 			///
 ///<summary>
 ///allocated even if there is no FROM clause 
 ///</summary>
 
-			if (pSelect.pSrc.Count != 1) {
+			if (pSelect.FromSource.Count != 1) {
 				return 0;
 				///
 ///<summary>
@@ -659,7 +659,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			}
-			if (pSelect.pSrc.a [0].pSelect != null) {
+			if (pSelect.FromSource.a [0].pSelect != null) {
 				return 0;
 				///
 ///<summary>
@@ -719,7 +719,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 			}
-			if ((pSelect.selFlags & SelectFlags.Distinct) != 0) {
+			if ((pSelect.Flags & SelectFlags.Distinct) != 0) {
 				return 0;
 				///
 ///<summary>
@@ -754,7 +754,7 @@ namespace Community.CsharpSqlite
 ///
 ///</summary>
 
-			pItem = pSelect.pSrc.a [0];
+			pItem = pSelect.FromSource.a [0];
 			pSrc = TableBuilder.sqlite3LocateTable(pParse, pItem.zName, pItem.zDatabase);
 			if (pSrc == null) {
 				return 0;
@@ -813,7 +813,7 @@ namespace Community.CsharpSqlite
 ///</summary>
 
 				}
-				if (!xferCompatibleCollation (pDest.aCol [i].zColl, pSrc.aCol [i].zColl)) {
+				if (!xferCompatibleCollation (pDest.aCol [i].Collation, pSrc.aCol [i].Collation)) {
 					return 0;
 					///
 ///<summary>
@@ -928,7 +928,7 @@ namespace Community.CsharpSqlite
 			regRowid = pParse.allocTempReg ();
 			if (pDest.iPKey >= 0) {
                 addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iSrc, regRowid);
-                addr2 = v.sqlite3VdbeAddOp3(OpCode.OP_NotExists, iDest, 0, regRowid);
+                addr2 = v.AddOpp3(OpCode.OP_NotExists, iDest, 0, regRowid);
 				build.sqlite3HaltConstraint (pParse, onError, "PRIMARY KEY must be unique",  P4Usage.P4_STATIC);
 				v.sqlite3VdbeJumpHere (addr2);
 				pParse.autoIncStep (regAutoinc, regRowid);
@@ -942,7 +942,7 @@ namespace Community.CsharpSqlite
 					Debug.Assert ((pDest.tabFlags & TableFlags.TF_Autoincrement) == 0);
 				}
             v.sqlite3VdbeAddOp2(OpCode.OP_RowData, iSrc, regData);
-            v.sqlite3VdbeAddOp3(OpCode.OP_Insert, iDest, regData, regRowid);
+            v.AddOpp3(OpCode.OP_Insert, iDest, regData, regRowid);
             v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_NCHANGE | OpFlag.OPFLAG_LASTROWID | OpFlag.OPFLAG_APPEND);
 			v.sqlite3VdbeChangeP4 (-1, pDest.zName, 0);
             v.sqlite3VdbeAddOp2(OpCode.OP_Next, iSrc, addr1);
@@ -954,19 +954,19 @@ namespace Community.CsharpSqlite
 				Debug.Assert (pSrcIdx != null);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Close, iSrc, 0);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Close, iDest, 0);
-                pKey = pSrcIdx.sqlite3IndexKeyinfo(pParse);
+                pKey = pSrcIdx.GetKeyinfo(pParse);
 				v.sqlite3VdbeAddOp4 ( OpCode.OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
-                pKey = pDestIdx.sqlite3IndexKeyinfo(pParse);
+                pKey = pDestIdx.GetKeyinfo(pParse);
                 v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey, P4Usage.P4_KEYINFO_HANDOFF);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pDestIdx.zName );
 #endif
 				addr1 = v.sqlite3VdbeAddOp2 ( OpCode.OP_Rewind, iSrc, 0);
 				v.sqlite3VdbeAddOp2 ( OpCode.OP_RowKey, iSrc, regData);
-				v.sqlite3VdbeAddOp3 ( OpCode.OP_IdxInsert, iDest, regData, 1);
+				v.AddOpp3 ( OpCode.OP_IdxInsert, iDest, regData, 1);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Next, iSrc, addr1 + 1);
 				v.sqlite3VdbeJumpHere (addr1);
 			}

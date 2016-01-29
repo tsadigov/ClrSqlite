@@ -597,7 +597,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
                 uint nEq = pPlan.nEq;
                 int i, j;
                 Column[] aCol = pTab.aCol;
-                int[] aiColumn = pIndex.aiColumn;
+                int[] aiColumn = pIndex.ColumnIdx;
                 StrAccum txt = new StrAccum(100);
                 if (nEq == 0 && (pPlan.wsFlags & (wherec.WHERE_BTM_LIMIT | wherec.WHERE_TOP_LIMIT)) == 0)
                 {

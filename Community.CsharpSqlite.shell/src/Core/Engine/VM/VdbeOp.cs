@@ -9,7 +9,7 @@ namespace Community.CsharpSqlite.Engine
     
     using sqlite3_value = Engine.Mem;
     using Metadata;
-    using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+    using Parse = Community.CsharpSqlite.Sqlite3.ParseState;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
 
@@ -222,7 +222,7 @@ set { _p3 = value; }
 																																						public int cnt;             /* Number of times this instruction was executed */
 public u64 cycles;         /* Total time spend executing this instruction */
 #endif
-		public string ToString (Community.CsharpSqlite.Sqlite3.Parse parse)
+		public string ToString (Community.CsharpSqlite.Sqlite3.ParseState parse)
 		{
 			var vdbe = parse.pVdbe;
 			return ToString (vdbe);

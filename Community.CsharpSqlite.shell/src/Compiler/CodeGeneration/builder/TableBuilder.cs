@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+using ParseState = Community.CsharpSqlite.Sqlite3.ParseState;
 namespace Community.CsharpSqlite.builder
 {
     using Community.CsharpSqlite.Engine;
@@ -54,7 +54,7 @@ namespace Community.CsharpSqlite.builder
             /// See also build.sqlite3LocateTable().
             ///
             ///</summary>
-            public static Table sqlite3FindTable(this Connection db, string zDatabase, string zName)
+            public static Table FindByName(this Connection db, string zDatabase, string zName)
         {
             return db.FindInBackendsSchemas(zName, zDatabase, schema => schema.Tables);            
             }
@@ -70,7 +70,7 @@ namespace Community.CsharpSqlite.builder
             ///
             ///</summary>
             public static Table sqlite3LocateTable(
-                Parse pParse,///True if looking for a VIEW rather than a TABLE 
+                ParseState pParse,///True if looking for a VIEW rather than a TABLE 
                 string zName,///Name of the table we are looking for 
                 string zDbase=null,///context in which to report errors 
                 bool isView=false///Name of the database.  Might be NULL 
@@ -82,7 +82,7 @@ namespace Community.CsharpSqlite.builder
                 {
                     return null;
                 }
-                Table p = pParse.db.sqlite3FindTable(zDbase, zName);
+                Table p = pParse.db.FindByName(zDbase, zName);
                 if (p == null)
                 {
                     string zMsg = isView ? "no such view" : "no such table";
@@ -117,7 +117,7 @@ namespace Community.CsharpSqlite.builder
         ///is called to complete the construction of the new table record.
         ///
         ///</summary>
-        public static void sqlite3StartTable(Parse pParse,///
+        public static void sqlite3StartTable(ParseState pParse,///
                                                           ///Parser context 
             Token pName1,///
                          ///First part of the name of the table or view 
@@ -134,10 +134,8 @@ namespace Community.CsharpSqlite.builder
             )
         {
             Table pTable;
-            string zName = null;
             ///The name of the new table 
             Connection db = pParse.db;
-            int iDb;
             ///Database number to create the table in 
             Token pName = new Token();
             ///Unqualified name of the table to create 
@@ -157,7 +155,7 @@ namespace Community.CsharpSqlite.builder
             ///pName2) that stores the unqualified table name. The variable iDb is
             ///set to the index of the database that the table or view is to be
             ///created in.
-            iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
+            var iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pName);
             if (iDb < 0)
                 return;
             if (0 == sqliteinth.OMIT_TEMPDB && isTemp != 0 && pName2.Length > 0 && iDb != 1)
@@ -170,7 +168,7 @@ namespace Community.CsharpSqlite.builder
             if (sqliteinth.OMIT_TEMPDB == 0 && isTemp != 0)
                 iDb = 1;
             pParse.sNameToken = pName;
-            zName = build.Token2Name(db, pName);
+            var zName = build.Token2Name(db, pName);
             if (zName == null)
                 return;
             if (SqlResult.SQLITE_OK != build.sqlite3CheckObjectName(pParse, zName))
@@ -221,7 +219,7 @@ goto begin_table_error;
                 {
                     goto begin_table_error;
                 }
-                pTable = TableBuilder.sqlite3FindTable(db, zDb, zName);
+                pTable = TableBuilder.FindByName(db, zDb, zName);
                 if (pTable != null)
                 {
                     if (noErr == 0)
@@ -235,7 +233,7 @@ goto begin_table_error;
                     }
                     goto begin_table_error;
                 }
-                if (IndexBuilder.sqlite3FindIndex(db, zName, zDb) != null)
+                if (IndexBuilder.FindByName(db, zName, zDb) != null)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "there is already an index named %s", zName);
                     goto begin_table_error;
@@ -297,14 +295,14 @@ goto begin_table_error;
                     var reg1 = pParse.regRowid = ++pParse.UsedCellCount;
                     var reg2 = pParse.regRoot = ++pParse.UsedCellCount;
                     var reg3 = ++pParse.UsedCellCount;
-                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_ReadCookie, iDb, reg3,(int) BTreeProp.FILE_FORMAT);
+                    vdbEngine.AddOpp3(OpCode.OP_ReadCookie, iDb, reg3,(int) BTreeProp.FILE_FORMAT);
                     Engine.vdbeaux.markUsed(vdbEngine, iDb);
-                    var j1 = vdbEngine.sqlite3VdbeAddOp1(OpCode.OP_If, reg3);
+                    var j1 = vdbEngine.AddOpp1(OpCode.OP_If, reg3);
                     var fileFormat = (db.flags & SqliteFlags.SQLITE_LegacyFileFmt) != 0 ? 1 : sqliteinth.SQLITE_MAX_FILE_FORMAT;
                     vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, fileFormat, reg3);
-                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, reg3);
+                    vdbEngine.AddOpp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.FILE_FORMAT, reg3);
                     vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Integer, (int)sqliteinth.ENC(db), reg3);
-                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.TEXT_ENCODING, reg3);
+                    vdbEngine.AddOpp3(OpCode.OP_SetCookie, iDb, (int)BTreeProp.TEXT_ENCODING, reg3);
                     vdbEngine.sqlite3VdbeJumpHere(j1);
                     ///
                     ///<summary>
@@ -327,13 +325,10 @@ goto begin_table_error;
                     build.sqlite3OpenMasterTable(pParse, iDb);
                     vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_NewRowid, 0, reg1);
                     vdbEngine.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, reg3);
-                    vdbEngine.sqlite3VdbeAddOp3(OpCode.OP_Insert, 0, reg3, reg1);
+                    vdbEngine.AddOpp3(OpCode.OP_Insert, 0, reg3, reg1);
                     vdbEngine.sqlite3VdbeChangeP5(OpFlag.OPFLAG_APPEND);
                     vdbEngine.sqlite3VdbeAddOp0(OpCode.OP_Close);
                 }
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="Normal (non">error) return. </param>
                 return;
             ///
@@ -351,7 +346,7 @@ goto begin_table_error;
             ///This routine is called to do the work of a DROP TABLE statement.
             ///pName is the name of the table to be dropped.
             ///</summary>
-            public static void sqlite3DropTable(Parse pParse, SrcList pName, bool isView, int noErr)
+            public static void sqlite3DropTable(ParseState pParse, SrcList pName, bool isView, int noErr)
             {
                 //if ( db.mallocFailed != 0 )
                 //{
@@ -475,7 +470,7 @@ goto exit_drop_table;
                     ///database.
                     build.sqlite3NestedParse(pParse, "DELETE FROM %Q.%s WHERE tbl_name=%Q and type!='trigger'", pDb.Name, sqliteinth.SCHEMA_TABLE(iDb), pTab.zName);
                     ///Drop any statistics from the sqlite_stat1 table, if it exists 
-                    if (TableBuilder.sqlite3FindTable(db, db.Backends[iDb].Name, "sqlite_stat1") != null)
+                    if (TableBuilder.FindByName(db, db.Backends[iDb].Name, "sqlite_stat1") != null)
                     {
                         build.sqlite3NestedParse(pParse, "DELETE FROM %Q.sqlite_stat1 WHERE tbl=%Q", pDb.Name, pTab.zName);
                     }
@@ -507,7 +502,7 @@ goto exit_drop_table;
             /// is also added (this can happen with an auto-vacuum database).
             ///
             ///</summary>
-            static void destroyTable(Parse pParse, Table pTab)
+            static void destroyTable(ParseState pParse, Table pTab)
             {
 #if SQLITE_OMIT_AUTOVACUUM
 																																																																																	Index pIdx;
@@ -748,15 +743,15 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
             ///
             ///</summary>
             // OVERLOADS, so I don't need to rewrite parse.c
-            public static void sqlite3EndTable(this Parse pParse, Token pCons, Token pEnd, int null_4)
+            public static void sqlite3EndTable(this ParseState pParse, Token pCons, Token pEnd, int null_4)
             {
                 sqlite3EndTable(pParse, pCons, pEnd, null);
             }
-            public static void sqlite3EndTable(this Parse pParse, int null_2, int null_3, Select pSelect)
+            public static void sqlite3EndTable(this ParseState pParse, int null_2, int null_3, Select pSelect)
             {
                 sqlite3EndTable(pParse, null, null, pSelect);
             }
-            public static void sqlite3EndTable(this Parse pParse,///Parse context 
+            public static void sqlite3EndTable(this ParseState parseState,///Parse context 
                 Token pCons,///The ',' token after the last column defn. 
                 Token pEnd,///The final ')' token in the CREATE TABLE 
                 Select pSelect///Select from a "CREATE ... AS SELECT" 
@@ -769,10 +764,10 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     return;
                 }
 
-                var pNewTable = pParse.pNewTable;
+                var pNewTable = parseState.pNewTable;
                 if (pNewTable == null)
                     return;
-                var db = pParse.db;
+                var db = parseState.db;
                 Debug.Assert(!db.init.IsBusy || pSelect == null);
 #if !SQLITE_OMIT_CHECK
                 ///Resolve names in all CHECK constraint expressions.
@@ -786,7 +781,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                         a = new List<SrcList_item> {
                             new SrcList_item(){
                                 zName = pNewTable.zName,
-                                pTab = pNewTable,
+                                TableReference = pNewTable,
                                 iCursor = -1,
                             }
                         }
@@ -795,12 +790,12 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     ///Name context for pParse.pNewTable 
                     var sNC = new NameContext()
                     {
-                        pParse = pParse,
+                        ParseState = parseState,
                         pSrcList = sSrc,
                         isCheck = 1
                     };
 
-                    if (Sqlite3.ResolveExtensions.sqlite3ResolveExprNames(sNC, ref pNewTable.pCheck) != 0)
+                    if (Sqlite3.ResolveExtensions.ResolveExprNames(sNC, ref pNewTable.pCheck) != 0)
                     {
                         return;
                     }
@@ -832,10 +827,10 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     String zType2 = "";
                     ///"VIEW" or "TABLE" 
                      
-                    var v = pParse.sqlite3GetVdbe();
-                    if (Sqlite3.NEVER(v == null))
+                    var vdbe = parseState.sqlite3GetVdbe();
+                    if (Sqlite3.NEVER(vdbe == null))
                         return;
-                    v.sqlite3VdbeAddOp1(OpCode.OP_Close, 0);
+                    vdbe.AddOpp1(OpCode.OP_Close, 0);
                     ///Initialize zType for the new view or table.
                     if (pNewTable.pSelect == null)
                     {
@@ -866,17 +861,17 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
 
                     if (pSelect != null)
                     {
-                        Debug.Assert(pParse.nTab == 1);
-                        v.sqlite3VdbeAddOp3(OpCode.OP_OpenWrite, 1, pParse.regRoot, iDb);
-                        v.sqlite3VdbeChangeP5(1);
+                        Debug.Assert(parseState.nTab == 1);
+                        vdbe.AddOpp3(OpCode.OP_OpenWrite, 1, parseState.regRoot, iDb);
+                        vdbe.ChangeP5(1);
                         SelectDest dest = new SelectDest();
-                        pParse.nTab = 2;
+                        parseState.nTab = 2;
                         dest.Init(SelectResultType.Table, 1);
-                        Select.sqlite3Select(pParse, pSelect, ref dest);
-                        v.sqlite3VdbeAddOp1(OpCode.OP_Close, 1);
-                        if (pParse.nErr == 0)
+                        Compiler.CodeGeneration.ForSelect.codegenSelect(parseState, pSelect, ref dest);
+                        vdbe.AddOpp1(OpCode.OP_Close, 1);
+                        if (parseState.nErr == 0)
                         {
-                            var pSelTab = SelectMethods.sqlite3ResultSetOfSelect(pParse, pSelect);
+                            var pSelTab = SelectMethods.sqlite3ResultSetOfSelect(parseState, pSelect);
                             if (pSelTab == null)
                                 return;
                             Debug.Assert(pNewTable.aCol == null);
@@ -896,15 +891,15 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                     }
                     else
                     {
-                        n = (int)(pParse.sNameToken.zRestSql.Length - pEnd.zRestSql.Length) + 1;
-                        zStmt = io.sqlite3MPrintf(db, "CREATE %s %.*s", zType2, n, pParse.sNameToken.zRestSql);
+                        n = (int)(parseState.sNameToken.zRestSql.Length - pEnd.zRestSql.Length) + 1;
+                        zStmt = io.sqlite3MPrintf(db, "CREATE %s %.*s", zType2, n, parseState.sNameToken.zRestSql);
                     }
                     ///A slot for the record has already been allocated in the
                     ///SQLITE_MASTER table.  We just need to update that slot with all
                     ///the information we've collected.
-                    build.sqlite3NestedParse(pParse, "UPDATE %Q.%s " + "SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), zType, pNewTable.zName, pNewTable.zName, pParse.regRoot, zStmt, pParse.regRowid);
+                    build.sqlite3NestedParse(parseState, "UPDATE %Q.%s " + "SET type='%s', name=%Q, tbl_name=%Q, rootpage=#%d, sql=%Q " + "WHERE rowid=#%d", db.Backends[iDb].Name, sqliteinth.SCHEMA_TABLE(iDb), zType, pNewTable.zName, pNewTable.zName, parseState.regRoot, zStmt, parseState.regRowid);
                     db.DbFree(ref zStmt);
-                    build.codegenChangeCookie(pParse, iDb);
+                    build.codegenChangeCookie(parseState, iDb);
 #if !SQLITE_OMIT_AUTOINCREMENT
                     ///Check to see if we need to create an sqlite_sequence table for
                     ///keeping track of autoincrement keys.
@@ -914,12 +909,12 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                         Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
                         if (pDb.pSchema.pSeqTab == null)
                         {
-                            build.sqlite3NestedParse(pParse, "CREATE TABLE %Q.sqlite_sequence(name,seq)", pDb.Name);
+                            build.sqlite3NestedParse(parseState, "CREATE TABLE %Q.sqlite_sequence(name,seq)", pDb.Name);
                         }
                     }
 #endif
                     ///Reparse everything to update our internal data structures 
-                    v.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "tbl_name='%q'", pNewTable.zName));
+                    vdbe.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "tbl_name='%q'", pNewTable.zName));
                 }
                 ///Add the table to the in-memory representation of the database.
                 if (db.init.busy != 0)
@@ -934,13 +929,13 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                         //        db.mallocFailed = 1;
                         return;
                     }
-                    pParse.pNewTable = null;
+                    parseState.pNewTable = null;
                     db.nTable++;
                     db.flags |= SqliteFlags.SQLITE_InternChanges;
 #if !SQLITE_OMIT_ALTERTABLE
                     if (pNewTable.pSelect == null)
                     {
-                        string zName = pParse.sNameToken.zRestSql;
+                        string zName = parseState.sNameToken.zRestSql;
                         Debug.Assert(pSelect == null && pCons != null && pEnd != null);
                         if (pCons.zRestSql == null)
                         {

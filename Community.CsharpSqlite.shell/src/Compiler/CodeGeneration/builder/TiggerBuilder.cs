@@ -5,13 +5,13 @@ using System.Linq;
 using u8 = System.Byte;
 using u32 = System.UInt32;
 
-namespace Community.CsharpSqlite.Compiler.CodeGen
+namespace Community.CsharpSqlite.Compiler.CodeGeneration
 {
     using Utils;
     using Ast;
     using Metadata;
     using System.Diagnostics;
-    using Parse = Sqlite3.Parse;
+    using ParseState = Sqlite3.ParseState;
     using CsharpSqlite.Parsing;
     public class TriggerBuilder
     {
@@ -21,7 +21,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGen
         /// trigger.
         ///</summary>
         public static int codeTriggerProgram(
-            Parse pParse,///The parser context 
+            ParseState pParse,///The parser context 
             TriggerStep pStepList,///List of statements inside the trigger body 
             OnConstraintError orconf///Conflict algorithm. (OnConstraintError.OE_Abort, etc) 
         )
@@ -51,26 +51,26 @@ namespace Community.CsharpSqlite.Compiler.CodeGen
                     {
                         case TokenType.TK_UPDATE:
                             {
-                                pParse.sqlite3Update(TriggerParser.targetSrcList(pParse, pStep), exprc.sqlite3ExprListDup(db, pStep.pExprList, 0), exprc.sqlite3ExprDup(db, pStep.pWhere, 0), pParse.eOrconf);
+                                pParse.sqlite3Update(TriggerParser.targetSrcList(pParse, pStep), exprc.Duplicate(db, pStep.pExprList, 0), exprc.Duplicate(db, pStep.pWhere, 0), pParse.eOrconf);
                                 break;
                             }
                         case TokenType.TK_INSERT:
                             {
-                                pParse.sqlite3Insert(TriggerParser.targetSrcList(pParse, pStep), exprc.sqlite3ExprListDup(db, pStep.pExprList, 0), exprc.sqlite3SelectDup(db, pStep.pSelect, 0), exprc.sqlite3IdListDup(db, pStep.pIdList), pParse.eOrconf);
+                                pParse.sqlite3Insert(TriggerParser.targetSrcList(pParse, pStep), exprc.Duplicate(db, pStep.pExprList, 0), exprc.Clone(db, pStep.pSelect, 0), exprc.sqlite3IdListDup(db, pStep.pIdList), pParse.eOrconf);
                                 break;
                             }
                         case TokenType.TK_DELETE:
                             {
-                                pParse.sqlite3DeleteFrom(TriggerParser.targetSrcList(pParse, pStep), exprc.sqlite3ExprDup(db, pStep.pWhere, 0));
+                                pParse.sqlite3DeleteFrom(TriggerParser.targetSrcList(pParse, pStep), exprc.Duplicate(db, pStep.pWhere, 0));
                                 break;
                             }
                         default:
                             Debug.Assert(pStep.Operator == TokenType.TK_SELECT);
                             {
                                 SelectDest sDest = new SelectDest();
-                                Select pSelect = exprc.sqlite3SelectDup(db, pStep.pSelect, 0);
+                                Select pSelect = exprc.Clone(db, pStep.pSelect, 0);
                                 sDest.Init(SelectResultType.Discard, 0);
-                                Select.sqlite3Select(pParse, pSelect, ref sDest);
+                                Compiler.CodeGeneration.ForSelect.codegenSelect(pParse, pSelect, ref sDest);
                                 SelectMethods.SelectDestructor(db, ref pSelect);
                                 break;
                             }
@@ -127,7 +127,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGen
         ///
         ///</summary>
         public static void sqlite3CodeRowTrigger(
-            Parse pParse,///Parse context 
+            ParseState pParse,///Parse context 
             Trigger pTrigger,///List of triggers on table pTab 
             TokenType op,///One of TokenType.TK_UPDATE, TokenType.TK_INSERT, TokenType.TK_DELETE 
             ExprList pChanges,///Changes list for any UPDATE OF triggers 
@@ -169,7 +169,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGen
         ///
         ///</summary>
         public static void sqlite3CodeRowTriggerDirect(
-            Parse pParse,///Parse context 
+            ParseState pParse,///Parse context 
             Trigger p,///Trigger to code 
             Table pTab,///The table to code triggers from 
             int reg,///Reg array containing OLD.* and NEW.* values 
@@ -187,7 +187,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGen
             if (pPrg != null)
             {
                 bool bRecursive = (!String.IsNullOrEmpty(p.zName) && 0 == (pParse.db.flags & SqliteFlags.SQLITE_RecTriggers));
-                v.sqlite3VdbeAddOp3(OpCode.OP_Program, reg, ignoreJump, ++pParse.UsedCellCount);
+                v.AddOpp3(OpCode.OP_Program, reg, ignoreJump, ++pParse.UsedCellCount);
                 v.sqlite3VdbeChangeP4(-1, pPrg.pProgram, P4Usage.P4_SUBPROGRAM);
 #if SQLITE_DEBUG
 																																																																																																        VdbeComment
@@ -198,7 +198,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGen
                 ///invocation is disallowed if (a) the sub-program is really a trigger,
                 ///not a foreign key action, and (b) the flag to enable recursive triggers
                 ///is clear.
-                v.sqlite3VdbeChangeP5((u8)(bRecursive ? 1 : 0));
+                v.ChangeP5((u8)(bRecursive ? 1 : 0));
             }
         }
     }

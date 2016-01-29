@@ -8,7 +8,7 @@ namespace Community.CsharpSqlite
 {
     using sqlite3_value = Engine.Mem;
     
-    using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+    using ParseState = Community.CsharpSqlite.Sqlite3.ParseState;
     
     using System.Diagnostics;
     using Community.CsharpSqlite.Ast;
@@ -24,7 +24,7 @@ namespace Community.CsharpSqlite
     //typedef struct DbFixer DbFixer;
     public class DbFixer
     {
-        public Parse pParse;
+        public ParseState pParse;
         ///
         ///<summary>
         ///The parsing context.  Error messages written here 
@@ -55,7 +55,7 @@ namespace Community.CsharpSqlite
             ///<summary>
             ///The fixer to be initialized 
             ///</summary>
-        Parse pParse,///
+        ParseState pParse,///
             ///<summary>
             ///Error messages will be written here 
             ///</summary>
@@ -154,7 +154,7 @@ namespace Community.CsharpSqlite
                 {
                     return 1;
                 }
-                if (this.sqlite3FixSrcList(pSelect.pSrc) != 0)
+                if (this.sqlite3FixSrcList(pSelect.FromSource) != 0)
                 {
                     return 1;
                 }

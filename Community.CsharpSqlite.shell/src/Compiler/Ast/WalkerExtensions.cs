@@ -139,7 +139,7 @@ namespace Community.CsharpSqlite.Ast
             SrcList pSrc;
             int i;
             SrcList_item pItem;
-            pSrc = p.pSrc;
+            pSrc = p.FromSource;
             if (Sqlite3.ALWAYS(pSrc))
             {
                 for (i = pSrc.Count; i > 0; i--)// pItem++ )

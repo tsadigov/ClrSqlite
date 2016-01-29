@@ -33,7 +33,7 @@ using yDbMask=System.Int32;
 namespace Community.CsharpSqlite
 {
     using sqlite3_value = Engine.Mem;
-    using Parse = Sqlite3.Parse;
+    using ParseState = Sqlite3.ParseState;
     using Community.CsharpSqlite.Ast;
     using Metadata;
     using Vdbe = Engine.Vdbe;
@@ -1209,7 +1209,7 @@ void *sqlite3_wsd_find(void *K, int L);
     }
 #else
         //#define IN_DECLARE_VTAB (pParse.declareVtab)
-        public static bool IN_DECLARE_VTAB(Parse pParse)
+        public static bool IN_DECLARE_VTAB(ParseState pParse)
         {
             return pParse.declareVtab != 0;
         }
@@ -1582,7 +1582,7 @@ static void sqlite3StackFree( sqlite3 D, object P ) {sqlite3DbFree( D, P ); }
         //void sqlite3UnlinkAndDeleteTrigger(sqlite3*,int,const char);
         //  u32  sqlite3TriggerColmask(Parse*,Trigger*,ExprList*,int,int,Table*,int);
         //# define sqliteinth.sqlite3ParseToplevel(p) ((p)->pToplevel ? (p)->pToplevel : (p))
-        public static Parse sqlite3ParseToplevel(Parse p)
+        public static ParseState sqlite3ParseToplevel(ParseState p)
         {
             return p.pToplevel != null ? p.pToplevel : p;
         }
@@ -1683,20 +1683,20 @@ void sqlite3AuthContextPop(AuthContext);
 int sqlite3AuthReadCol(Parse*, string , string , int);
 #else
         //# define sqlite3AuthRead(a,b,c,d)
-        public static void sqlite3AuthRead(Parse a, Expr b, Schema c, SrcList d)
+        public static void sqlite3AuthRead(ParseState a, Expr b, Schema c, SrcList d)
         {
         }
         //# define sqlite3AuthCheck(a,b,c,d,e)    SqlResult.SQLITE_OK
-        public static SqlResult sqlite3AuthCheck(Parse a, AuthTarget b, string c, byte[] d, byte[] e)
+        public static SqlResult sqlite3AuthCheck(ParseState a, AuthTarget b, string c, byte[] d, byte[] e)
         {
             return SqlResult.SQLITE_OK;
         }
         //# define sqlite3AuthContextPush(a,b,c)
-        public static void sqlite3AuthContextPush(Parse a, AuthContext b, string c)
+        public static void sqlite3AuthContextPush(ParseState a, AuthContext b, string c)
         {
         }
         //# define sqlite3AuthContextPop(a)  ((void)(a))
-        public static Parse sqlite3AuthContextPop(Parse a)
+        public static ParseState sqlite3AuthContextPop(ParseState a)
         {
             return a;
         }
@@ -1872,10 +1872,10 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
 																																																												//void sqliteinth.sqlite3TableLock(Parse *, int, int, u8, string );
 #else
         //#define sqliteinth.sqlite3TableLock(v,w,x,y,z)
-        public static void sqlite3TableLock(Parse p, int p1, int p2, u8 p3, byte[] p4)
+        public static void sqlite3TableLock(ParseState p, int p1, int p2, u8 p3, byte[] p4)
         {
         }
-        public static void sqlite3TableLock(Parse p, int p1, int p2, u8 p3, string p4)
+        public static void sqlite3TableLock(ParseState p, int p1, int p2, u8 p3, string p4)
         {
         }
 #endif

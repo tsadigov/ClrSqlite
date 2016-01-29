@@ -23,13 +23,27 @@ namespace AnalysingClasses
 
             Connection pSrc = new Connection();
             var zSrcFile = "hehehe";
-            Btree btree = null;
-            r = Btree.Open(fs, "hehehe", pSrc, ref btree, 0, 262);
-
+            
             r = Sqlite3.sqlite3_open(zSrcFile, out pSrc);
             String m="";
-            pSrc.init.busy = 1;
+            //pSrc.init.busy = 1;
             pSrc.InitialiseAllDatabases(  ref m);
+
+            Shell.callback_data data=new Shell.callback_data {
+                db=pSrc,
+                showHeader=true
+            };
+            
+            
+            //memcpy( data, p, sizeof( data ) );
+            
+            
+            legacy.Exec(pSrc, "SELECT * FROM x1;", Shell.callback ,data, 0);
+            legacy.Exec(pSrc, "CREATE TABLE x2(i int, c varchar);", Shell.callback, data, 0);
+
+            Btree btree = null;
+            r = Btree.Open(fs, "db123", pSrc, ref btree, 0, 262);
+
             var schema = btree.GetSchema(pSrc);
 
             var zMaster = sqliteinth.SCHEMA_TABLE(1);
@@ -52,6 +66,12 @@ namespace AnalysingClasses
                     r = pSrc.Exec( zSql, SchemaExtensions.InitTableDefinitionCallback, initData, 0);
                 }
             }
+
+            pSrc.Backends.Take(pSrc.BackendCount).ForEach(
+                b => {
+                    Console.WriteLine(b.pSchema);
+                }
+                );
 
             Pager p =null;
             

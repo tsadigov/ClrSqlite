@@ -17,7 +17,7 @@ using Community.CsharpSqlite.Engine;
 using Community.CsharpSqlite.tree;
 using Community.CsharpSqlite.Compiler;
 
-class Shell
+public class Shell
 {
 	///<summary>
 	/// 2001 September 15
@@ -407,7 +407,7 @@ malloc_cs.sqlite3_free(ref z);
 		return zResult;
 	}
 
-	class previous_mode_data
+	public class previous_mode_data
 	{
 		public bool valid;
 
@@ -432,7 +432,7 @@ malloc_cs.sqlite3_free(ref z);
 ///
 ///</summary>
 
-	class callback_data
+	public class callback_data
 	{
 		public Connection db;
 
@@ -1089,7 +1089,7 @@ if( db ) sqlite3_interrupt(db);
 	/// This is the callback routine that the SQLite library
 	/// invokes for each row of a query result.
 	///</summary>
-	static int callback (callback_data pArg, sqlite3_int64 nArg, object azArgs, object azCols)
+	public static int callback (callback_data pArg, sqlite3_int64 nArg, object azArgs, object azCols)
 	{
 		int i;
 		callback_data p = (callback_data)pArg;

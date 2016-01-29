@@ -81,7 +81,7 @@ namespace Community.CsharpSqlite
             /// then again, we might not...
             ///
             ///</summary>
-            public static void resolveAlias(Parse pParse,///
+            public static void resolveAlias(ParseState pParse,///
                 ///Parsing context 
             ExprList pEList,///
                 ///A result set 
@@ -106,7 +106,7 @@ namespace Community.CsharpSqlite
                 db = pParse.db;
                 if (pOrig.Operator != TokenType.TK_COLUMN && (zType.Length == 0 || zType[0] != 'G'))
                 {
-                    pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
+                    pDup = exprc.Duplicate(db, pOrig, 0);
                     pDup = pParse.sqlite3PExpr(TokenType.TK_AS, pDup, null, null);
                     if (pDup == null)
                         return;
@@ -119,7 +119,7 @@ namespace Community.CsharpSqlite
                 else
                     if (pOrig.HasProperty(ExprFlags.EP_IntValue) || pOrig.u.zToken == null)
                     {
-                        pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
+                        pDup = exprc.Duplicate(db, pOrig, 0);
                         if (pDup == null)
                             return;
                     }
@@ -128,7 +128,7 @@ namespace Community.CsharpSqlite
                         string zToken = pOrig.u.zToken;
                         Debug.Assert(zToken != null);
                         pOrig.u.zToken = null;
-                        pDup = exprc.sqlite3ExprDup(db, pOrig, 0);
+                        pDup = exprc.Duplicate(db, pOrig, 0);
                         pOrig.u.zToken = zToken;
                         if (pDup == null)
                             return;
@@ -167,12 +167,10 @@ namespace Community.CsharpSqlite
             /// pEList has been resolved.  pE has not.
             ///
             ///</summary>
-            public static int resolveAsName(Parse pParse,///
-                ///Parsing context for error messages 
-            ExprList pEList,///
-                ///List of expressions to scan 
-            Expr pE///
-                ///Expression we are trying to match 
+            public static int resolveAsName(
+                ParseState pParse,///Parsing context for error messages 
+                ExprList pEList,///List of expressions to scan 
+                Expr pE///Expression we are trying to match 
             )
             {
                 int i;
@@ -218,7 +216,7 @@ namespace Community.CsharpSqlite
             /// If there is no match, return 0.  Return -1 if an error occurs.
             ///
             ///</summary>
-            public static int resolveOrderByTermToExprList(Parse pParse,///
+            public static int resolveOrderByTermToExprList(ParseState pParse,///
                 ///Parsing context for error messages 
             Select pSelect,///
                 ///The SELECT statement with the ORDER BY clause 
@@ -243,15 +241,15 @@ namespace Community.CsharpSqlite
                 ///Resolve all names in the ORDER BY term expression
                 nc = new NameContext();
                 // memset( &nc, 0, sizeof( nc ) );
-                nc.pParse = pParse;
-                nc.pSrcList = pSelect.pSrc;
+                nc.ParseState = pParse;
+                nc.pSrcList = pSelect.FromSource;
                 nc.pEList = pEList;
                 nc.allowAgg = 1;
                 nc.nErr = 0;
                 db = pParse.db;
                 savedSuppErr = db.suppressErr;
                 db.suppressErr = 1;
-                rc = sqlite3ResolveExprNames(nc, ref pE);
+                rc = ResolveExprNames(nc, ref pE);
                 db.suppressErr = savedSuppErr;
                 if (rc != 0)
                     return 0;
@@ -281,9 +279,9 @@ namespace Community.CsharpSqlite
                 if (p != null)
                 {
                     SrcList_item pItem = pSrc.a[iSrc];
-                    p.pTab = pItem.pTab;
+                    p.TableReference = pItem.TableReference;
                     p.iTable = pItem.iCursor;
-                    if (p.pTab.iPKey == iCol)
+                    if (p.TableReference.iPKey == iCol)
                     {
                         p.iColumn = -1;
                     }
@@ -329,7 +327,7 @@ namespace Community.CsharpSqlite
             ///
             ///</summary>
             public static WRC lookupName(
-                Parse pParse,///The parsing context 
+                ParseState pParse,///The parsing context 
                 string zDb,///Name of the database containing table, or NULL 
                 string tableName,///Name of table containing column, or NULL 
                 string zCol,///Name of the column. 
@@ -342,7 +340,7 @@ namespace Community.CsharpSqlite
                 Connection db = pParse.db;///The database connection 
                 
                 SrcList_item pMatch = null;///The matching pSrcList item 
-                NameContext topNameContext = nameContext;///First namecontext in the list 
+                var topNameContext = nameContext;///First namecontext in the list 
                 Schema pSchema = null;///Schema of the expression 
                 int isTrigger = 0;
                 Debug.Assert(nameContext != null);///the name context cannot be NULL. 
@@ -350,7 +348,7 @@ namespace Community.CsharpSqlite
                 Debug.Assert(!pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly | ExprFlags.EP_Reduced));
                 ///<param name="Initialize the node to no">match </param>
                 pExpr.iTable = -1;
-                pExpr.pTab = null;
+                pExpr.TableReference = null;
                 pExpr.ExprSetIrreducible();
                 ///Start at the inner-most context and move outward until a match is found 
 
@@ -368,7 +366,7 @@ namespace Community.CsharpSqlite
                                #region not matching                          
                                if (null != tableName)
                                {
-                                   var pTab = srcItem.pTab;
+                                   var pTab = srcItem.TableReference;
                                    Debug.Assert(pTab != null && pTab.zName != null);
 
                                    Debug.Assert(pTab.nCol > 0);
@@ -391,11 +389,11 @@ namespace Community.CsharpSqlite
                                #endregion
                            })
                            .ForEach((srcItem, i)=> {
-                               var pTab = srcItem.pTab;
+                               var pTab = srcItem.TableReference;
                                if (0 == (cntTab++))
                                {
                                    pExpr.iTable = srcItem.iCursor;
-                                   pExpr.pTab = pTab;
+                                   pExpr.TableReference = pTab;
                                    pSchema = pTab.pSchema;
                                    pMatch = srcItem;
                                }
@@ -410,10 +408,10 @@ namespace Community.CsharpSqlite
                                        IdList pUsing;
                                        cnt++;
                                        pExpr.iTable = srcItem.iCursor;
-                                       pExpr.pTab = pTab;
+                                       pExpr.TableReference = pTab;
                                        pMatch = srcItem;
                                        pSchema = pTab.pSchema;
-                                       ///<param name="Substitute the rowid (column ">1) for the INTEGER PRIMARY KEY </param>
+                                       ///Substitute the rowid (column -1) for the INTEGER PRIMARY KEY
                                        pExpr.iColumn = (short)(j == pTab.iPKey ? -1 : j);
                                        if (i < pSrcList.Count - 1)
                                        {
@@ -422,7 +420,7 @@ namespace Community.CsharpSqlite
                                                ///If this match occurred in the left table of a natural join,
                                                ///then skip the right table to avoid a duplicate match 
                                                //pItem++;
-                                               i++;
+                                               i++;//TODO:ERROR: i is not by ref
                                            }
                                            else
                                                if ((pUsing = pSrcList.a[i + 1].pUsing) != null)//pItem[1].pUsing
@@ -516,7 +514,7 @@ namespace Community.CsharpSqlite
                                         pParse.newmask |= (iCol >= 32 ? 0xffffffff : (((u32)1) << iCol));
                                     }
                                     pExpr.iColumn = (i16)iCol;
-                                    pExpr.pTab = pTab;
+                                    pExpr.TableReference = pTab;
                                     isTrigger = 1;
                                 }
                             }
@@ -605,7 +603,7 @@ namespace Community.CsharpSqlite
                 if (cnt == 0 && tableName == null && pExpr.HasProperty(ExprFlags.EP_DblQuoted))
                 {
                     pExpr.Operator = TokenType.TK_STRING;
-                    pExpr.pTab = null;
+                    pExpr.TableReference = null;
                     return WRC.WRC_Prune;
                 }
                 ///cnt==0 means there was not match.  cnt>1 means there were two or
@@ -686,10 +684,10 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static WRC resolveExprStep(Walker pWalker, Expr pExpr)
             {
-                var pNC = pWalker.u.pNC;
-                Debug.Assert(pNC != null);
-                var pParse = pNC.pParse;
-                Debug.Assert(pParse == pWalker.pParse);
+                var nameContext = pWalker.u.NameContext;
+                Debug.Assert(nameContext != null);
+                var pParse = nameContext.ParseState;
+                Debug.Assert(pParse == pWalker.ParseState);
                 if (pExpr.ExprHasAnyProperty(ExprFlags.EP_Resolved))
                     return WRC.WRC_Prune;
                 pExpr.ExprSetProperty(ExprFlags.EP_Resolved);
@@ -727,7 +725,7 @@ break;
                     ///A lone identifier is the name of a column.
                     case TokenType.TK_ID:
                         {
-                            return ResolveExtensions.lookupName(pParse, null, null, pExpr.u.zToken, pNC, pExpr);
+                            return ResolveExtensions.lookupName(pParse:pParse, zDb:null, tableName:null, zCol:pExpr.u.zToken, nameContext:nameContext, pExpr:pExpr);
                         }
                     ///A table name and column name:     ID.ID
                     ///Or a database, table and column:  ID.ID.ID
@@ -736,9 +734,9 @@ break;
                             string zColumn;
                             string zTable;
                             string zDb;
-                            Expr pRight;
+                            
                             ///if( pSrcList==0 ) break; 
-                            pRight = pExpr.pRight;
+                            var pRight = pExpr.pRight;
                             if (pRight.Operator == TokenType.TK_ID)
                             {
                                 zDb = null;
@@ -752,37 +750,28 @@ break;
                                 zTable = pRight.pLeft.u.zToken;
                                 zColumn = pRight.pRight.u.zToken;
                             }
-                            return ResolveExtensions.lookupName(pParse, zDb, zTable, zColumn, pNC, pExpr);
+                            return ResolveExtensions.lookupName(pParse, zDb, zTable, zColumn, nameContext, pExpr);
                         }
                     ///Resolve function names
                     case TokenType.TK_CONST_FUNC:
                     case TokenType.TK_FUNCTION:
                         {
-                            ExprList pList = pExpr.x.pList;
-                            ///The argument list 
-                            int n = pList != null ? pList.Count : 0;
-                            ///Number of arguments 
-                            bool no_such_func = false;
-                            ///True if no such function exists 
-                            bool wrong_num_args = false;
-                            ///True if wrong number of arguments 
-                            bool is_agg = false;
-                            ///True if is an aggregate function 
-                            int auth;
-                            ///Authorization to use the function 
-                            
-                            
+                            ExprList pList = pExpr.x.pList;///The argument list 
+                            int argumentCount = pList != null ? pList.Count : 0;///Number of arguments 
+                            bool no_such_func = false;///True if no such function exists 
+                            bool wrong_num_args = false;///True if wrong number of arguments 
+                            bool is_agg = false;///True if is an aggregate function 
                             
                             SqliteEncoding enc = pParse.db.aDbStatic[0].pSchema.enc;
                             // ENC( pParse.db );   /* The database encoding */
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_CONST_FUNC);
                             Debug.Assert(!pExpr.HasProperty(ExprFlags.EP_xIsSelect));
-                            var zId = pExpr.u.zToken;///The function name. 
-                            var nId = StringExtensions.Strlen30(zId);///Number of characters in function name 
-                            var pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, n, enc, 0);///Information about the function 
+                            var functionName = pExpr.u.zToken;///The function name. 
+                            var functionNameLength = StringExtensions.Strlen30(functionName);///Number of characters in function name 
+                            var pDef = FuncDefTraverse.FindFunction(pParse.db, functionName, functionNameLength, argumentCount, enc, 0);///Information about the function 
                             if (pDef == null)
                             {
-                                pDef = FuncDefTraverse.sqlite3FindFunction(pParse.db, zId, nId, -1, enc, 0);
+                                pDef = FuncDefTraverse.FindFunction(pParse.db, functionName, functionNameLength, -1, enc, 0);
                                 if (pDef == null)
                                 {
                                     no_such_func = true;
@@ -810,34 +799,34 @@ return WRC.WRC_Prune;
 }
 }
 #endif
-                            if (is_agg && 0 == pNC.allowAgg)
+                            if (is_agg && 0 == nameContext.allowAgg)
                             {
-                                utilc.sqlite3ErrorMsg(pParse, "misuse of aggregate function %.*s()", nId, zId);
-                                pNC.nErr++;
+                                utilc.sqlite3ErrorMsg(pParse, "misuse of aggregate function %.*s()", functionNameLength, functionName);
+                                nameContext.nErr++;
                                 is_agg = false;
                             }
                             else
                                 if (no_such_func)
                                 {
-                                    utilc.sqlite3ErrorMsg(pParse, "no such function: %.*s", nId, zId);
-                                    pNC.nErr++;
+                                    utilc.sqlite3ErrorMsg(pParse, "no such function: %.*s", functionNameLength, functionName);
+                                    nameContext.nErr++;
                                 }
                                 else
                                     if (wrong_num_args)
                                     {
-                                        utilc.sqlite3ErrorMsg(pParse, "wrong number of arguments to function %.*s()", nId, zId);
-                                        pNC.nErr++;
+                                        utilc.sqlite3ErrorMsg(pParse, "wrong number of arguments to function %.*s()", functionNameLength, functionName);
+                                        nameContext.nErr++;
                                     }
                             if (is_agg)
                             {
                                 pExpr.Operator = TokenType.TK_AGG_FUNCTION;
-                                pNC.hasAgg = 1;
+                                nameContext.hasAgg = 1;
                             }
                             if (is_agg)
-                                pNC.allowAgg = 0;
+                                nameContext.allowAgg = 0;
                             pWalker.sqlite3WalkExprList(pList);
                             if (is_agg)
-                                pNC.allowAgg = 1;
+                                nameContext.allowAgg = 1;
                             ///FIX ME:  Compute pExpr.affinity based on the expected return
                             ///type of the function
                             return WRC.WRC_Prune;
@@ -855,16 +844,16 @@ return WRC.WRC_Prune;
                             sqliteinth.testcase(pExpr.Operator == TokenType.TK_IN);
                             if (pExpr.HasProperty(ExprFlags.EP_xIsSelect))
                             {
-                                int nRef = pNC.nRef;
+                                int nRef = nameContext.nRef;
 #if !SQLITE_OMIT_CHECK
-                                if (pNC.isCheck != 0)
+                                if (nameContext.isCheck != 0)
                                 {
                                     utilc.sqlite3ErrorMsg(pParse, "subqueries prohibited in CHECK constraints");
                                 }
 #endif
                                 pWalker.sqlite3WalkSelect(pExpr.x.pSelect);
-                                Debug.Assert(pNC.nRef >= nRef);
-                                if (nRef != pNC.nRef)
+                                Debug.Assert(nameContext.nRef >= nRef);
+                                if (nRef != nameContext.nRef)
                                 {
                                     pExpr.ExprSetProperty(ExprFlags.EP_VarSelect);
                                 }
@@ -874,7 +863,7 @@ return WRC.WRC_Prune;
 #if !SQLITE_OMIT_CHECK
                     case TokenType.TK_VARIABLE:
                         {
-                            if (pNC.isCheck != 0)
+                            if (nameContext.isCheck != 0)
                             {
                                 utilc.sqlite3ErrorMsg(pParse, "parameters prohibited in CHECK constraints");
                             }
@@ -894,7 +883,7 @@ return WRC.WRC_Prune;
             ///
             ///</summary>
             public static void resolveOutOfRangeError(
-                Parse pParse,///The error context into which to write the error 
+                ParseState pParse,///The error context into which to write the error 
                 string zType,///"ORDER" or "GROUP" 
                 int i,///The index (1">based) of the term out of range </param>
                 int mx///Largest permissible value of i 
@@ -922,14 +911,9 @@ return WRC.WRC_Prune;
             /// Return the number of errors seen.
             ///
             ///</summary>
-            public static int resolveCompoundOrderBy(Parse pParse,///
-                ///<summary>
-                ///Parsing context.  Leave error messages here 
-                ///</summary>
-            Select pSelect///
-                ///<summary>
-                ///The SELECT statement containing the ORDER BY 
-                ///</summary>
+            public static int resolveCompoundOrderBy(
+                ParseState pParse,///Parsing context.  Leave error messages here 
+                Select pSelect///The SELECT statement containing the ORDER BY 
             )
             {
                 int i;
@@ -985,7 +969,7 @@ return WRC.WRC_Prune;
                             iCol = ResolveExtensions.resolveAsName(pParse, pEList, pE);
                             if (iCol == 0)
                             {
-                                pDup = exprc.sqlite3ExprDup(db, pE, 0);
+                                pDup = exprc.Duplicate(db, pE, 0);
                                 ////if ( 0 == db.mallocFailed )
                                 {
                                     Debug.Assert(pDup != null);
@@ -1039,7 +1023,7 @@ return WRC.WRC_Prune;
             /// return non-zero.  Return zero if no errors are seen.
             ///
             ///</summary>
-            public static int sqlite3ResolveOrderGroupBy(Parse pParse,///
+            public static int sqlite3ResolveOrderGroupBy(ParseState pParse,///
                 ///Parsing context.  Leave error messages here 
             Select pSelect,///
                 ///The SELECT statement containing the clause 
@@ -1136,7 +1120,7 @@ return WRC.WRC_Prune;
                 ///<summary>
                 ///A term of the ORDER BY clause 
                 ///</summary>
-                Parse pParse;
+                ParseState pParse;
                 ///
                 ///<summary>
                 ///Parsing context 
@@ -1149,7 +1133,7 @@ return WRC.WRC_Prune;
                 if (pOrderBy == null)
                     return 0;
                 nResult = pSelect.ResultingFieldList.Count;
-                pParse = pNC.pParse;
+                pParse = pNC.ParseState;
                 for (i = 0; i < pOrderBy.Count; i++)//, pItem++ )
                 {
                     pItem = pOrderBy.a[i];
@@ -1188,7 +1172,7 @@ return WRC.WRC_Prune;
                     ///Otherwise, treat the ORDER BY term as an ordinary expression 
                     ///</summary>
                     pItem.iCol = 0;
-                    if (sqlite3ResolveExprNames(pNC, ref pE) != 0)
+                    if (ResolveExprNames(pNC, ref pE) != 0)
                     {
                         return 1;
                     }
@@ -1200,154 +1184,112 @@ return WRC.WRC_Prune;
 
             ///<summary>
             /// Resolve names in the SELECT statement p and all of its descendents.
-            ///
             ///</summary>
-            public static WRC resolveSelectStep(Walker pWalker, Select p)
-            {
-                NameContext pOuterNC;
-                ///Context that contains this SELECT 
-                NameContext sNC;
-                ///Name context of this SELECT 
-                bool isCompound;
-                ///True if p is a compound select 
-                int nCompound;
-                ///Number of compound terms processed so far 
-                Parse pParse;
-                ///Parsing context 
-                ExprList pEList;
-                ///Result set expression list 
-                int i;
-                ///Loop counter 
-                ExprList pGroupBy;
-                ///The GROUP BY clause 
-                Select pLeftmost;
-                ///Left most of SELECT of a compound 
-                Connection db;
-                ///Database connection 
-                Debug.Assert(p != null);
-                if ((p.selFlags & SelectFlags.Resolved) != 0)
+            public static WRC resolveSelectStep(Walker pWalker, Select select)
+            {                
+                NameContext sNC;///Name context of this SELECT                
+                ExprList pGroupBy;///The GROUP BY clause 
+                Debug.Assert(select != null);
+                if ((select.Flags & SelectFlags.Resolved) != 0)
                 {
                     return WRC.WRC_Prune;
                 }
-                pOuterNC = pWalker.u.pNC;
-                pParse = pWalker.pParse;
-                db = pParse.db;
-                ///
-                ///<summary>
-                ///Normally sqlite3SelectExpand() will be called first and will have
-                ///already expanded this SELECT.  However, if this is a subquery within
-                ///an expression, sqlite3ResolveExprNames() will be called without a
-                ///prior call to sqlite3SelectExpand().  When that happens, let
-                ///sqlite3SelectPrep() do all of the processing for this SELECT.
-                ///sqlite3SelectPrep() will invoke both sqlite3SelectExpand() and
-                ///this routine in the correct order.
-                ///
-                ///</summary>
-                if ((p.selFlags & SelectFlags.Expanded) == 0)
+                var pOuterNC = pWalker.u.NameContext;///Context that contains this SELECT 
+                var parseState = pWalker.ParseState;
+                var db = parseState.db;//Database connection 
+
+                                       ///
+                                       ///<summary>
+                                       ///Normally sqlite3SelectExpand() will be called first and will have
+                                       ///already expanded this SELECT.  However, if this is a subquery within
+                                       ///an expression, sqlite3ResolveExprNames() will be called without a
+                                       ///prior call to sqlite3SelectExpand().  When that happens, let
+                                       ///sqlite3SelectPrep() do all of the processing for this SELECT.
+                                       ///sqlite3SelectPrep() will invoke both sqlite3SelectExpand() and
+                                       ///this routine in the correct order.
+                                       ///
+                                       ///</summary>
+                if ((select.Flags & SelectFlags.Expanded) == 0)
                 {
-                    Select.sqlite3SelectPrep(pParse, p, pOuterNC);
-                    return (pParse.nErr != 0///
+                    Select.sqlite3SelectPrep(parseState, select, pOuterNC);
+                    return (parseState.nErr != 0///
                         ///<summary>
                         ///|| db.mallocFailed != 0 
                         ///</summary>
                     ) ? WRC.WRC_Abort : WRC.WRC_Prune;
                 }
-                isCompound = p.pPrior != null;
-                nCompound = 0;
-                pLeftmost = p;
-                while (p != null)
+
+                
+                
+                var isCompound = select.pPrior != null;///True if p is a compound select 
+                var nCompound = 0;///Number of compound terms processed so far 
+                var pLeftmost = select;///Left most of SELECT of a compound 
+                while (select != null)
                 {
-                    Debug.Assert((p.selFlags & SelectFlags.Expanded) != 0);
-                    Debug.Assert((p.selFlags & SelectFlags.Resolved) == 0);
-                    p.selFlags |= SelectFlags.Resolved;
-                    ///
-                    ///<summary>
+                    Debug.Assert((select.Flags & SelectFlags.Expanded) != 0);
+                    Debug.Assert((select.Flags & SelectFlags.Resolved) == 0);
+                    select.Flags |= SelectFlags.Resolved;
                     ///Resolve the expressions in the LIMIT and OFFSET clauses. These
                     ///are not allowed to refer to any names, so pass an empty NameContext.
-                    ///
-                    ///</summary>
-                    sNC = new NameContext();
-                    // memset( &sNC, 0, sizeof( sNC ) );
-                    sNC.pParse = pParse;
-                    if (sqlite3ResolveExprNames(sNC, ref p.pLimit) != 0 || sqlite3ResolveExprNames(sNC, ref p.pOffset) != 0)
+                    sNC = new NameContext() {
+                        ParseState = parseState
+                    };
+                    
+                    if (ResolveExprNames(sNC, ref select.pLimit) != 0 || ResolveExprNames(sNC, ref select.pOffset) != 0)
                     {
                         return WRC.WRC_Abort;
                     }
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="Set up the local name">context to pass to sqlite3ResolveExprNames() to</param>
-                    ///<param name="resolve the result">set expression list.</param>
-                    ///<param name=""></param>
+                    ///Set up the local name-context to pass to sqlite3ResolveExprNames() to
+                    ///resolve the result-set expression list.
                     sNC.allowAgg = 1;
-                    sNC.pSrcList = p.pSrc;
+                    sNC.pSrcList = select.FromSource;
                     sNC.pNext = pOuterNC;
-                    ///
-                    ///<summary>
                     ///Resolve names in the result set. 
-                    ///</summary>
-                    pEList = p.ResultingFieldList;
+                    var pEList = select.ResultingFieldList;///Result set expression list 
                     Debug.Assert(pEList != null);
-                    for (i = 0; i < pEList.Count; i++)
+                    for (var i = 0; i < pEList.Count; i++)
                     {
                         Expr pX = pEList.a[i].pExpr;
-                        if (sqlite3ResolveExprNames(sNC, ref pX) != 0)
+                        if (ResolveExprNames(sNC, ref pX) != 0)
                         {
                             return WRC.WRC_Abort;
                         }
                     }
-                    ///
-                    ///<summary>
                     ///Recursively resolve names in all subqueries
-                    ///
-                    ///</summary>
-                    for (i = 0; i < p.pSrc.Count; i++)
-                    {
-                        SrcList_item pItem = p.pSrc.a[i];
-                        if (pItem.pSelect != null)
+                    foreach (var pItem in select.FromSource)
+                        if (null != pItem.pSelect)
                         {
-                            string zSavedContext = pParse.zAuthContext;
-                            if (pItem.zName != null)
-                                pParse.zAuthContext = pItem.zName;
-                            ResolveExtensions.sqlite3ResolveSelectNames(pParse, pItem.pSelect, pOuterNC);
-                            pParse.zAuthContext = zSavedContext;
-                            if (pParse.nErr != 0///
-                                ///<summary>
-                                ///|| db.mallocFailed != 0 
-                                ///</summary>
+                            string zSavedContext = parseState.zAuthContext;
+                            if (null != pItem.zName)parseState.zAuthContext = pItem.zName;
+                            ResolveExtensions.ResolveSelectNames(parseState, pItem.pSelect, pOuterNC);
+                            parseState.zAuthContext = zSavedContext;
+                            if (parseState.nErr != 0///
+                                                    ///<summary>
+                                                    ///|| db.mallocFailed != 0 
+                                                    ///</summary>
                             )
                                 return WRC.WRC_Abort;
                         }
-                    }
-                    ///
-                    ///<summary>
-                    ///</summary>
+
+                    
                     ///<param name="If there are no aggregate functions in the result">set, and no GROUP BY</param>
                     ///<param name="expression, do not allow aggregates in any of the other expressions.">expression, do not allow aggregates in any of the other expressions.</param>
-                    ///<param name=""></param>
-                    Debug.Assert((p.selFlags & SelectFlags.Aggregate) == 0);
-                    pGroupBy = p.pGroupBy;
+                    Debug.Assert((select.Flags & SelectFlags.Aggregate) == 0);
+                    pGroupBy = select.pGroupBy;
                     if (pGroupBy != null || sNC.hasAgg != 0)
                     {
-                        p.selFlags |= SelectFlags.Aggregate;
+                        select.Flags |= SelectFlags.Aggregate;
                     }
                     else
                     {
                         sNC.allowAgg = 0;
                     }
-                    ///
-                    ///<summary>
                     ///If a HAVING clause is present, then there must be a GROUP BY clause.
-                    ///
-                    ///</summary>
-                    if (p.pHaving != null && pGroupBy == null)
+                    if (select.pHaving != null && pGroupBy == null)
                     {
-                        utilc.sqlite3ErrorMsg(pParse, "a GROUP BY clause is required before HAVING");
+                        utilc.sqlite3ErrorMsg(parseState, "a GROUP BY clause is required before HAVING");
                         return WRC.WRC_Abort;
                     }
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Add the expression list to the name">context before parsing the</param>
                     ///<param name="other expressions in the SELECT statement. This is so that">other expressions in the SELECT statement. This is so that</param>
                     ///<param name="expressions in the WHERE clause (etc.) can refer to expressions by">expressions in the WHERE clause (etc.) can refer to expressions by</param>
@@ -1356,80 +1298,50 @@ return WRC.WRC_Prune;
                     ///<param name="Minor point: If this is the case, then the expression will be">Minor point: If this is the case, then the expression will be</param>
                     ///<param name="re">evaluated for each reference to it.</param>
                     ///<param name=""></param>
-                    sNC.pEList = p.ResultingFieldList;
-                    if (sqlite3ResolveExprNames(sNC, ref p.pWhere) != 0 || sqlite3ResolveExprNames(sNC, ref p.pHaving) != 0)
+                    sNC.pEList = select.ResultingFieldList;
+                    if (ResolveExprNames(sNC, ref select.pWhere) != 0 || ResolveExprNames(sNC, ref select.pHaving) != 0)
                     {
                         return WRC.WRC_Abort;
                     }
-                    ///
-                    ///<summary>
                     ///The ORDER BY and GROUP BY clauses may not refer to terms in
                     ///outer queries
-                    ///
-                    ///</summary>
                     sNC.pNext = null;
                     sNC.allowAgg = 1;
-                    ///
-                    ///<summary>
                     ///Process the ORDER BY clause for singleton SELECT statements.
                     ///The ORDER BY clause for compounds SELECT statements is handled
-                    ///</summary>
                     ///<param name="below, after all of the result">sets for all of the elements of</param>
                     ///<param name="the compound have been resolved.">the compound have been resolved.</param>
                     ///<param name=""></param>
-                    if (!isCompound && resolveOrderGroupBy(sNC, p, p.pOrderBy, "ORDER") != 0)
+                    if (!isCompound && resolveOrderGroupBy(sNC, select, select.pOrderBy, "ORDER") != 0)
                     {
                         return WRC.WRC_Abort;
                     }
-                    //if ( db.mallocFailed != 0 )
-                    //{
-                    //  return WRC.WRC_Abort;
-                    //}
-                    ///
-                    ///<summary>
+                   
                     ///Resolve the GROUP BY clause.  At the same time, make sure
                     ///the GROUP BY clause does not contain aggregate functions.
-                    ///
-                    ///</summary>
+                   
                     if (pGroupBy != null)
                     {
-                        ExprList_item pItem;
-                        if (resolveOrderGroupBy(sNC, p, pGroupBy, "GROUP") != 0///
-                            ///<summary>
-                            ///|| db.mallocFailed != 0 
-                            ///</summary>
-                        )
-                        {
+                        if (resolveOrderGroupBy(sNC, select, pGroupBy, "GROUP") != 0)
                             return WRC.WRC_Abort;
-                        }
-                        for (i = 0; i < pGroupBy.Count; i++)//, pItem++)
-                        {
-                            pItem = pGroupBy.a[i];
+
+                        foreach (var pItem in pGroupBy)
                             if ((pItem.pExpr.Flags & ExprFlags.EP_Agg) != 0)//HasProperty(pItem.pExpr, ExprFlags.EP_Agg) )
                             {
-                                utilc.sqlite3ErrorMsg(pParse, "aggregate functions are not allowed in " + "the GROUP BY clause");
+                                utilc.sqlite3ErrorMsg(parseState, "aggregate functions are not allowed in " + "the GROUP BY clause");
                                 return WRC.WRC_Abort;
                             }
-                        }
+                        
                     }
-                    ///
-                    ///<summary>
                     ///Advance to the next term of the compound
-                    ///
-                    ///</summary>
-                    p = p.pPrior;
+                    select = select.pPrior;
                     nCompound++;
                 }
-                ///
-                ///<summary>
                 ///Resolve the ORDER BY on a compound SELECT after all terms of
                 ///the compound have been resolved.
-                ///
-                ///</summary>
-                if (isCompound && resolveCompoundOrderBy(pParse, pLeftmost) != 0)
-                {
+                if (isCompound && resolveCompoundOrderBy(parseState, pLeftmost) != 0)
                     return WRC.WRC_Abort;
-                }
+
                 return WRC.WRC_Prune;
             }
 
@@ -1486,38 +1398,38 @@ return WRC.WRC_Prune;
             /// if errors is returned.
             ///
             ///</summary>
-            public static SqlResult sqlite3ResolveExprNames(
-                NameContext pNC,///Namespace to resolve expressions in. 
+            public static SqlResult ResolveExprNames(
+                NameContext nameContext,///Namespace to resolve expressions in. 
                 ref Expr pExpr///The expression to be analyzed. 
             )
             {
                 if (null == pExpr)
                     return 0;
 
-                var savedHasAgg = pNC.hasAgg;
-                pNC.hasAgg = 0;
+                var savedHasAgg = nameContext.hasAgg;
+                nameContext.hasAgg = 0;
                 Walker w = new Walker()
                 {
                     xExprCallback = ResolveExtensions.resolveExprStep,
                     xSelectCallback = resolveSelectStep,
-                    pParse = pNC.pParse,
-                    u = new Walker.uw() { pNC = pNC }
+                    ParseState = nameContext.ParseState,
+                    u = new Walker.uw() { NameContext = nameContext }
                 };
 
-                w.sqlite3WalkExpr(ref pExpr);
+                w.WalkExpression(ref pExpr);
 
-                if (pNC.nErr > 0 || w.pParse.nErr > 0)
+                if (nameContext.nErr > 0 || w.ParseState.nErr > 0)
                 {
                     pExpr.ExprSetProperty(ExprFlags.EP_Error);
                 }
-                if (pNC.hasAgg != 0)
+                if (nameContext.hasAgg != 0)
                 {
                     pExpr.ExprSetProperty(ExprFlags.EP_Agg);
                 }
                 else
                     if (savedHasAgg != 0)
                     {
-                        pNC.hasAgg = 1;
+                        nameContext.hasAgg = 1;
                     }
                 return (SqlResult) (pExpr.HasProperty(ExprFlags.EP_Error) ? 1 : 0);
             }
@@ -1537,20 +1449,20 @@ return WRC.WRC_Prune;
             ///sqlite3SelectExpand() prior to invoking this routine.
             ///
             ///</summary>
-            public static void sqlite3ResolveSelectNames(/*The parser context */Parse pParse,
-                /*The SELECT statement being coded.*/
-            Select p,
-                /*Name context for parent SELECT statement */
-            NameContext pOuterNC
-                
+            public static void ResolveSelectNames(
+                ParseState pParse,/*The parser context */                                  
+                Select p,/*The SELECT statement being coded.*/                         
+                NameContext pOuterNC/*Name context for parent SELECT statement */
             )
             {
-                Walker w = new Walker();
-                Debug.Assert(p != null);
-                w.xExprCallback = ResolveExtensions.resolveExprStep;
-                w.xSelectCallback = resolveSelectStep;
-                w.pParse = pParse;
-                w.u.pNC = pOuterNC;
+                Walker w = new Walker()
+                {
+                    xExprCallback = ResolveExtensions.resolveExprStep,
+                    xSelectCallback = resolveSelectStep,
+                    ParseState = pParse
+                };
+            
+                w.u.NameContext = pOuterNC;
                 w.sqlite3WalkSelect(p);
             }
 

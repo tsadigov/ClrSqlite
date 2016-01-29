@@ -12,7 +12,7 @@ using u8 = System.Byte;
 using u16 = System.UInt16;
 using u32 = System.UInt32;
 using Pgno = System.UInt32;
-using Parse = Community.CsharpSqlite.Sqlite3.Parse;
+using ParseState = Community.CsharpSqlite.Sqlite3.ParseState;
 using Community.CsharpSqlite.Ast;
 
 namespace Community.CsharpSqlite.builder
@@ -38,7 +38,7 @@ namespace Community.CsharpSqlite.builder
         /// using the ATTACH command.
         ///
         ///</summary>
-        public static Index sqlite3FindIndex(Connection db, string zName, string zDb)
+        public static Index FindByName(Connection db, string zName, string zDb)
         {
             return db.FindInBackendsSchemas(zName,zDb,schema=>schema.Indexes);
         }
@@ -97,30 +97,19 @@ namespace Community.CsharpSqlite.builder
         ///sequence), NULL is returned and the state of pParse updated to reflect
         ///the error.
         ///</summary>
-        public static KeyInfo sqlite3IndexKeyinfo(this Index pIdx, Community.CsharpSqlite.Sqlite3.Parse pParse )
+        public static KeyInfo GetKeyinfo(this Index pIdx, Community.CsharpSqlite.Sqlite3.ParseState pParse )
         {
-            int i;
             int nCol = pIdx.nColumn;
             //int nBytes = KeyInfo.Length + (nCol - 1) * CollSeq*.Length + nCol;
             Connection db = pParse.db;
-            KeyInfo pKey = new KeyInfo();
-            // (KeyInfo)sqlite3DbMallocZero(db, nBytes);
-            if (pKey != null)
+            KeyInfo pKey = new KeyInfo()
             {
-                pKey.db = pParse.db;
-                pKey.aSortOrder = new SortOrder[nCol];
-                pKey.aColl = new CollSeq[nCol];
-                // (u8)&(pKey.aColl[nCol]);
-                //        Debug.Assert(pKey.aSortOrder[nCol] == (((u8)pKey)[nBytes]));
-                for (i = 0; i < nCol; i++)
-                {
-                    string zColl = pIdx.azColl[i];
-                    Debug.Assert(zColl != null);
-                    pKey.aColl[i] = build.sqlite3LocateCollSeq(pParse, zColl);
-                    pKey.aSortOrder[i] = pIdx.aSortOrder[i];
-                }
-                pKey.nField = (u16)nCol;
-            }
+                db = pParse.db,
+                aSortOrder =pIdx.aSortOrder.Select(x=>x).ToArray(),
+                aColl = pIdx.Collations.Select(zColl => build.sqlite3LocateCollSeq(pParse, zColl)).ToArray(),
+                nField = (u16)nCol
+            };
+            
             if (pParse.nErr != 0)
             {
                 pKey = null;
@@ -137,18 +126,7 @@ namespace Community.CsharpSqlite.builder
 #if !SQLITE_OMIT_REINDEX
         static bool collationMatch(string zColl, Index pIndex)
         {
-            int i;
-            Debug.Assert(zColl != null);
-            for (i = 0; i < pIndex.nColumn; i++)
-            {
-                string z = pIndex.azColl[i];
-                Debug.Assert(z != null);
-                if (z.Equals(zColl, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return pIndex.Collations.Any(x=>x.Equals(zColl, StringComparison.InvariantCultureIgnoreCase));//Debug.Assert(zColl != null);
         }
 #endif
 
@@ -169,29 +147,12 @@ namespace Community.CsharpSqlite.builder
         ///</summary>
 #if !SQLITE_OMIT_REINDEX
         // OVERLOADS, so I don't need to rewrite parse.c
-        public static void sqlite3Reindex(this Community.CsharpSqlite.Sqlite3.Parse pParse, int null_2, int null_3)
+        public static void sqlite3Reindex(this Community.CsharpSqlite.Sqlite3.ParseState pParse, int null_2, int null_3)
         {
             sqlite3Reindex(pParse, null, null);
         }
-        public static void sqlite3Reindex(this Community.CsharpSqlite.Sqlite3.Parse pParse, Token pName1, Token pName2)
+        public static void sqlite3Reindex(this Community.CsharpSqlite.Sqlite3.ParseState pParse, Token pName1, Token pName2)
         {
-            CollSeq pColl;
-            ///Collating sequence to be reindexed, or NULL 
-            string z;
-            ///Name of a table or index 
-            string zDb;
-            ///Name of the database 
-            Table pTab;
-            ///A table in the database 
-            Index pIndex;
-            ///An index associated with pTab 
-            int iDb;
-            ///The database index number 
-            Connection db = pParse.db;
-            ///The database connection 
-            Token pObjName = new Token();
-            ///Name of the table or index to be reindexed 
-            ///
             ///Read the database schema. If an error occurs, leave an error message
             ///and code in pParse and return NULL. 
             if (SqlResult.SQLITE_OK != pParse.sqlite3ReadSchema())
@@ -203,44 +164,54 @@ namespace Community.CsharpSqlite.builder
                 reindexDatabases(pParse, null);
                 return;
             }
-            else
-                if (Sqlite3.NEVER(pName2 == null) || pName2.zRestSql == null || pName2.zRestSql.Length == 0)
+            //else
+
+            CollSeq pColl;
+            ///Collating sequence to be reindexed, or NULL 
+            Connection connection = pParse.db;
+            ///The database connection 
+
+            if (Sqlite3.NEVER(pName2 == null) || pName2.zRestSql == null || pName2.zRestSql.Length == 0)
                 {
                     string zColl;
                     Debug.Assert(pName1.zRestSql != null);
                     zColl = build.Token2Name(pParse.db, pName1);
                     if (zColl == null)
                         return;
-                    pColl = db.sqlite3FindCollSeq(sqliteinth.ENC(db), zColl, 0);
+                    pColl = connection.sqlite3FindCollSeq(sqliteinth.ENC(connection), zColl, 0);
                     if (pColl != null)
                     {
                         reindexDatabases(pParse, zColl);
-                        db.DbFree(ref zColl);
+                        connection.DbFree(ref zColl);
                         return;
                     }
-                    db.DbFree(ref zColl);
+                    connection.DbFree(ref zColl);
                 }
-            iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pObjName);
+
+            Token pObjName = new Token();///Name of the table or index to be reindexed 
+            var iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pObjName);//The database index number 
             if (iDb < 0)
                 return;
-            z = build.Token2Name(db, pObjName);
-            if (z == null)
+            var nameOfTableOrIndex = build.Token2Name(connection, pObjName);///Name of a table or index 
+            if (nameOfTableOrIndex == null)
                 return;
-            zDb = db.Backends[iDb].Name;
-            pTab = TableBuilder.sqlite3FindTable(db, zDb, z);
+            var  zDb = connection.Backends[iDb].Name;///Name of the database
+            //IF
+            var pTab = TableBuilder.FindByName(connection, zDb, nameOfTableOrIndex);///A table in the database
             if (pTab != null)
             {
                 reindexTable(pParse, pTab, null);
-                db.DbFree(ref z);
+                connection.DbFree(ref nameOfTableOrIndex);
                 return;
             }
-            pIndex = IndexBuilder.sqlite3FindIndex(db, z, zDb);
-            db.DbFree(ref z);
+            //ELSE
+            var pIndex = IndexBuilder.FindByName(connection, nameOfTableOrIndex, zDb);///An index associated with pTab 
+            connection.DbFree(ref nameOfTableOrIndex);
             if (pIndex != null)
             {
                 Community.CsharpSqlite.build.sqlite3BeginWriteOperation(pParse, 0, iDb);
                 //Community.CsharpSqlite.build.
-                pParse.sqlite3RefillIndex(pIndex, -1);
+                pParse.codegenRefillIndex(pIndex, -1);
                 return;
             }
             utilc.sqlite3ErrorMsg(pParse, "unable to identify the object to be reindexed");
@@ -251,16 +222,16 @@ namespace Community.CsharpSqlite.builder
         /// If pColl == null then recompute all indices of pTab.
         ///</summary>
 #if !SQLITE_OMIT_REINDEX
-        static void reindexTable(Community.CsharpSqlite.Sqlite3.Parse pParse, Table pTab, string zColl)
+        static void reindexTable(Community.CsharpSqlite.Sqlite3.ParseState pParse, Table pTab, string zColl)
         {
             ///An index associated with pTab 
-            foreach (var pIndex in pTab.pIndex.path(pi => pi.pNext))
+            foreach (var pIndex in pTab.pIndex.linkedList())
             {
                 if (zColl == null || collationMatch(zColl, pIndex))
                 {
                     int iDb = pParse.db.indexOfBackendWithSchema( pTab.pSchema);
                     Community.CsharpSqlite.build.sqlite3BeginWriteOperation(pParse, 0, iDb);
-                    pParse.sqlite3RefillIndex(pIndex, -1);
+                    pParse.codegenRefillIndex(pIndex, -1);
                 }
             }
         }
@@ -271,7 +242,7 @@ namespace Community.CsharpSqlite.builder
         /// all indices everywhere.
         ///</summary>
 #if !SQLITE_OMIT_REINDEX
-        static void reindexDatabases(this Community.CsharpSqlite.Sqlite3.Parse pParse, string zColl)
+        static void reindexDatabases(this Community.CsharpSqlite.Sqlite3.ParseState pParse, string zColl)
         {
             Connection db = pParse.db;///The database connection 
             Table pTab;///A table in the database 
@@ -282,7 +253,7 @@ namespace Community.CsharpSqlite.builder
                 Debug.Assert(pDb != null);
                 //HashElem k;///For looping over tables in pDb 
                 pDb.pSchema.Tables.first
-                    .path(h => h.pNext)
+                    .linkedList()
                     .ForEach(k=> reindexTable(pParse, (Table)k.data, zColl));
                 //for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
             }
@@ -302,7 +273,7 @@ namespace Community.CsharpSqlite.builder
         ///the root page number of the index is taken from pIndex.tnum.
         ///
         ///</summary>
-        public static void sqlite3RefillIndex(this Parse pParse, Index pIndex, int memRootPage)
+        public static void codegenRefillIndex(this ParseState pParse, Index pIndex, int memRootPage)
         {
             Table pTab = pIndex.pTable;
             ///The table that is indexed 
@@ -310,18 +281,8 @@ namespace Community.CsharpSqlite.builder
             ///Btree cursor used for pTab 
             int iIdx = pParse.nTab++;
             ///Btree cursor used for pIndex 
-            int addr1;
-            ///Address of top of loop 
             int tnum;
-            ///Root page of index 
-            Vdbe v;
-            ///Generate code into this virtual machine 
-            KeyInfo pKey;
-            ///KeyInfo for index 
-            int regIdxKey;
-            ///Registers containing the index key 
-            int regRecord;
-            ///Register holding assemblied index record 
+            ///Root page of index
             Connection db = pParse.db;
             ///The database connection 
             int iDb = db.indexOfBackendWithSchema( pIndex.pSchema);
@@ -333,28 +294,29 @@ return;
 #endif
             ///<param name="Require a write">lock on the table to perform this operation </param>
             sqliteinth.sqlite3TableLock(pParse, iDb, pTab.tnum, 1, pTab.zName);
-            v = pParse.sqlite3GetVdbe();
+            var v = pParse.sqlite3GetVdbe();///Generate code into this virtual machine 
             if (v == null)
                 return;
             if (memRootPage >= 0)
-            {
                 tnum = memRootPage;
-            }
             else
             {
                 tnum = pIndex.tnum;
                 v.sqlite3VdbeAddOp2(OpCode.OP_Clear, tnum, iDb);
             }
-            pKey = pIndex.sqlite3IndexKeyinfo(pParse);
+            var pKey = pIndex.GetKeyinfo(pParse);///KeyInfo for index
             v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iIdx, tnum, iDb, pKey, P4Usage.P4_KEYINFO_HANDOFF);
             if (memRootPage >= 0)
             {
-                v.sqlite3VdbeChangeP5(1);
+                v.ChangeP5(1);
             }
             pParse.sqlite3OpenTable(iTab, iDb, pTab, OpCode.OP_OpenRead);
-            addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iTab, 0);
-            regRecord = pParse.allocTempReg();
-            regIdxKey = pParse.codegenGenerateIndexKey(pIndex, iTab, regRecord, true);
+            ///Address of top of loop 
+            var addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iTab, 0);
+            ///Register holding assemblied index record 
+            var regRecord = pParse.allocTempReg();
+            ///Registers containing the index key 
+            var regIdxKey = pParse.codegenGenerateIndexKey(pIndex, iTab, regRecord, true);
             if (pIndex.onError != OnConstraintError.OE_None)
             {
                 int regRowid = regIdxKey + pIndex.nColumn;
@@ -378,8 +340,8 @@ return;
             pParse.deallocTempReg(regRecord);
             v.sqlite3VdbeAddOp2(OpCode.OP_Next, iTab, addr1 + 1);
             v.sqlite3VdbeJumpHere(addr1);
-            v.sqlite3VdbeAddOp1(OpCode.OP_Close, iTab);
-            v.sqlite3VdbeAddOp1(OpCode.OP_Close, iIdx);
+            v.AddOpp1(OpCode.OP_Close, iTab);
+            v.AddOpp1(OpCode.OP_Close, iIdx);
         }
 
 
@@ -402,35 +364,25 @@ return;
         ///
         ///</summary>
         // OVERLOADS, so I don't need to rewrite parse.c
-        public static Index sqlite3CreateIndex(this Parse pParse, int null_2, int null_3, int null_4, int null_5, OnConstraintError onError, int null_7, int null_8, SortOrder sortOrder, int ifNotExist)
+        public static Index sqlite3CreateIndex(this ParseState pParse, int null_2, int null_3, int null_4, int null_5, OnConstraintError onError, int null_7, int null_8, SortOrder sortOrder, int ifNotExist)
         {
             return pParse.sqlite3CreateIndex(null, null, null, null, onError, null, null, sortOrder, ifNotExist);
         }
-        public static Index sqlite3CreateIndex(this Parse pParse, int null_2, int null_3, int null_4, ExprList pList, OnConstraintError onError, int null_7, int null_8, SortOrder sortOrder, int ifNotExist)
+        public static Index sqlite3CreateIndex(this ParseState pParse, int null_2, int null_3, int null_4, ExprList pList, OnConstraintError onError, int null_7, int null_8, SortOrder sortOrder, int ifNotExist)
         {
             return sqlite3CreateIndex(pParse, null, null, null, pList, onError, null, null, sortOrder, ifNotExist);
         }
-        public static Index sqlite3CreateIndex(this Parse pParse,///
-            ///All information about this Parse 
-        Token pName1,///
-            ///First part of index name. May be NULL 
-        Token pName2,///
-            ///Second part of index name. May be NULL 
-        SrcList pTblName,///
-            ///Table to index. Use pParse.pNewTable if 0 
-        ExprList pList,///
-            ///A list of columns to be indexed 
-        OnConstraintError onError,///
-            ///OE_Abort, OnConstraintError.OE_Ignore, OnConstraintError.OE_Replace, or OnConstraintError.OE_None 
-        Token pStart,///
-            ///The CREATE token that begins this statement 
-            ///</summary>
-        Token pEnd,///
-            ///The ")" that closes the CREATE INDEX statement 
-        SortOrder sortOrder,///
-            ///Sort order of primary key when pList==NULL 
-        int ifNotExist///
-            ///Omit error if index already exists 
+        public static Index sqlite3CreateIndex(
+            this ParseState pParse,///All information about this Parse 
+            Token pName1,///First part of index name. May be NULL 
+            Token pName2,///Second part of index name. May be NULL 
+            SrcList pTblName,///Table to index. Use pParse.pNewTable if 0 
+            ExprList pList,///A list of columns to be indexed 
+            OnConstraintError onError,///OE_Abort, OnConstraintError.OE_Ignore, OnConstraintError.OE_Replace, or OnConstraintError.OE_None 
+            Token pStart,///The CREATE token that begins this statement             
+            Token pEnd,//////The ")" that closes the CREATE INDEX statement 
+            SortOrder sortOrder,///Sort order of primary key when pList==NULL 
+            int ifNotExist///Omit error if index already exists 
         )
         {
             Index pRet = null;
@@ -443,7 +395,6 @@ return;
             ///Name of the index 
             int nName;
             ///Number of characters in zName 
-            int i, j;
             Token nullId = new Token();
             ///Fake token for an empty ID list 
             DbFixer sFix = new DbFixer();
@@ -457,13 +408,10 @@ return;
             ///Index of the database that is being written 
             Token pName = null;
             ///Unqualified name of the index to create 
-            ExprList_item pListItem;
-            ///For looping over pList 
             int nCol;
             int nExtra = 0;
-            StringBuilder zExtra = new StringBuilder();
             Debug.Assert(pStart == null || pEnd != null);
-            ///<param name="pEnd must be non">NULL if pStart is </param>
+            ///pEnd must be non-NULL if pStart is 
             Debug.Assert(pParse.nErr == 0);
             ///Never called with prior errors 
             if (///
@@ -543,7 +491,6 @@ return;
                 utilc.sqlite3ErrorMsg(pParse, "virtual tables may not be indexed");
                 goto exit_create_index;
             }
-            ///
             ///<summary>
             ///Find the name of the index.  Make sure there is not already another
             ///index or table with the same name.
@@ -556,7 +503,6 @@ return;
             ///If pName==0 it means that we are
             ///dealing with a primary key or UNIQUE constraint.  We have to invent our
             ///own name.
-            ///
             ///</summary>
             if (pName != null)
             {
@@ -569,13 +515,13 @@ return;
                 }
                 if (0 == db.init.busy)
                 {
-                    if (TableBuilder.sqlite3FindTable(db, null, zName) != null)
+                    if (TableBuilder.FindByName(db, null, zName) != null)
                     {
                         utilc.sqlite3ErrorMsg(pParse, "there is already a table named %s", zName);
                         goto exit_create_index;
                     }
                 }
-                if (IndexBuilder.sqlite3FindIndex(db, zName, pDb.Name) != null)
+                if (IndexBuilder.FindByName(db, zName, pDb.Name) != null)
                 {
                     if (ifNotExist == 0)
                     {
@@ -591,11 +537,7 @@ return;
             }
             else
             {
-                int n = 0;
-                Index pLoop;
-                for (pLoop = pTab.pIndex, n = 1; pLoop != null; pLoop = pLoop.pNext, n++)
-                {
-                }
+                int n = pTab.pIndex.linkedList().Count();                
                 zName = io.sqlite3MPrintf(db, "sqlite_autoindex_%s_%d", pTab.zName, n);
                 if (zName == null)
                 {
@@ -631,7 +573,7 @@ goto exit_create_index;
             }
             ///Figure out how many bytes of space are required to store explicitly
             ///specified collation sequence names.
-            for (i = 0; i < pList.Count; i++)
+            for (var i = 0; i < pList.Count; i++)
             {
                 Expr pExpr = pList.a[i].pExpr;
                 if (pExpr != null)
@@ -645,58 +587,31 @@ goto exit_create_index;
                     }
                 }
             }
-            ///Allocate the index structure.
-            nName = StringExtensions.Strlen30(zName);
             nCol = pList.Count;
-            pIndex = new Index();
-            // sqlite3DbMallocZero( db,
-            //    Index.Length +              /* Index structure  */
-            //    sizeof( int ) * nCol +           /* Index.aiColumn   */
-            //    sizeof( int ) * ( nCol + 1 ) +       /* Index.aiRowEst   */
-            //    sizeof( char* ) * nCol +        /* Index.azColl     */
-            //    u8.Length * nCol +            /* Index.aSortOrder */
-            //    nName + 1 +                  /* Index.zName      */
-            //    nExtra                       /* Collation sequence names */
-            //);
-            //if ( db.mallocFailed != 0 )
-            //{
-            //  goto exit_create_index;
-            //}
-            pIndex.azColl = new string[nCol + 1];
-            //(char*)(pIndex[1]);
-            pIndex.aiColumn = new int[nCol + 1];
-            //(int )(pIndex->azColl[nCol]);
-            pIndex.aiRowEst = new int[nCol + 1];
-            //(unsigned )(pIndex->aiColumn[nCol]);
-            pIndex.aSortOrder = new SortOrder[nCol + 1];
-            //(u8 )(pIndex->aiRowEst[nCol+1]);
-            //pIndex.zName = null;// (char)( &pIndex->aSortOrder[nCol] );
-            zExtra = new StringBuilder(nName + 1);
-            // (char)( &pIndex.zName[nName + 1] );
-            if (zName.Length == nName)
-                pIndex.zName = zName;
-            else
-            {
-                pIndex.zName = zName.Substring(0, nName);
-            }
-            // memcpy( pIndex.zName, zName, nName + 1 );
-            pIndex.pTable = pTab;
-            pIndex.nColumn = pList.Count;
-            pIndex.onError = onError;
-            pIndex.autoIndex = (u8)(pName == null ? 1 : 0);
-            pIndex.pSchema = db.Backends[iDb].pSchema;
+
+            ///Allocate the index structure.
+            
+            nName = StringExtensions.Strlen30(zName);
+            pIndex = new Index() { 
+                Collations = new string[nCol + 1],
+                ColumnIdx = new int[nCol + 1],
+                aiRowEst = new int[nCol + 1],
+                aSortOrder = new SortOrder[nCol + 1],
+                pTable = pTab,
+                nColumn = pList.Count,
+                onError = onError,
+                autoIndex = (u8)(pName == null ? 1 : 0),
+                pSchema = db.Backends[iDb].pSchema,                
+                zName = (zName.Length == nName)? zName:zName.Substring(0, nName)
+            
+            };
+            
             Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
             ///Check to see if we should honor DESC requests on index columns
             if (pDb.pSchema.file_format >= 4)
-            {
-                ///Honor DESC 
-                sortOrderMask = SortOrder.SQLITE_SO_DESC;
-            }
+                sortOrderMask = SortOrder.SQLITE_SO_DESC;///Honor DESC 
             else
-            {
-                ///Ignore DESC 
-                sortOrderMask = SortOrder.SQLITE_SO_ASC;
-            }
+                sortOrderMask = SortOrder.SQLITE_SO_ASC;///Ignore DESC 
             ///Scan the names of the columns of the table to be indexed and
             ///load the column indices into the Index structure.  Report an error
             ///if any column is not found.
@@ -707,52 +622,41 @@ goto exit_create_index;
             ///same column more than once cannot be an error because that would
             ///<param name="break backwards compatibility "> it needs to be a warning.</param>
             ///<param name=""></param>
-            for (i = 0; i < pList.Count; i++)
+            for (var i = 0; i < pList.Count; i++)
             {
                 //, pListItem++){
-                pListItem = pList.a[i];
+                var pListItem = pList.a[i];
                 string zColName = pListItem.zName;
-                Column pTabCol;
-                SortOrder requestedSortOrder;
                 string zColl;
                 ///Collation sequence name 
-                for (j = 0; j < pTab.nCol; j++)
-                {
-                    //, pTabCol++){
-                    pTabCol = pTab.aCol[j];
-                    if (zColName.Equals(pTabCol.zName, StringComparison.InvariantCultureIgnoreCase))
-                        break;
-                }
-                if (j >= pTab.nCol)
+
+                int idx = 0;
+                var pTabCol = pTab.aCol.FirstOrDefault(c => { idx++; return zColName.Equals(c.zName, StringComparison.InvariantCultureIgnoreCase); });
+
+                if (null != pTabCol)//found
+                    pIndex.ColumnIdx[i] = idx;
+                else//not found
                 {
                     utilc.sqlite3ErrorMsg(pParse, "table %s has no column named %s", pTab.zName, zColName);
                     pParse.checkSchema = 1;
                     goto exit_create_index;
                 }
-                pIndex.aiColumn[i] = j;
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Justification of the Sqlite3.ALWAYS(pListItem">>pColl):  Because of</param>
-                ///<param name="the way the "idxlist" non">terminal is constructed by the parser,</param>
-                ///<param name="if pListItem">>pColl</param>
-                ///<param name="must exist or else there must have been an OOM error.  But if there">must exist or else there must have been an OOM error.  But if there</param>
-                ///<param name="was an OOM error, we would never reach this point. ">was an OOM error, we would never reach this point. </param>
+                ///Justification of the Sqlite3.ALWAYS(pListItem">>pColl):  Because of
+                ///the way the "idxlist" non"-terminal is constructed by the parser,
+                ///"if pListItem">>pColl
+                ///must exist or else there must have been an OOM error.  But if there 
+                ///was an OOM error, we would never reach this point. 
                 if (pListItem.pExpr != null && Sqlite3.ALWAYS(pListItem.pExpr.CollatingSequence))
-                {
-                    int nColl;
+                {                    
                     zColl = pListItem.pExpr.CollatingSequence.zName;
-                    nColl = StringExtensions.Strlen30(zColl);
-                    Debug.Assert(nExtra >= nColl);
-                    zExtra = new StringBuilder(zColl.Substring(0, nColl));
-                    // memcpy( zExtra, zColl, nColl );
-                    zColl = zExtra.ToString();
-                    //zExtra += nColl;
+                    var nColl = StringExtensions.Strlen30(zColl);
+                    Debug.Assert(nExtra >= nColl);                                    
+                    zColl = zColl.Substring(0, nColl);                    
                     nExtra -= nColl;
                 }
                 else
                 {
-                    zColl = pTab.aCol[j].zColl;
+                    zColl = pTabCol.Collation;
                     if (zColl == null)
                     {
                         zColl = db.pDfltColl.zName;
@@ -762,8 +666,8 @@ goto exit_create_index;
                 {
                     goto exit_create_index;
                 }
-                pIndex.azColl[i] = zColl;
-                requestedSortOrder = ((pListItem.sortOrder.Intersects(sortOrderMask)) ? SortOrder.SQLITE_SO_DESC : SortOrder.SQLITE_SO_ASC);
+                pIndex.Collations[i] = zColl;
+                var requestedSortOrder = ((pListItem.sortOrder.Intersects(sortOrderMask)) ? SortOrder.SQLITE_SO_DESC : SortOrder.SQLITE_SO_ASC);
                 pIndex.aSortOrder[i] = requestedSortOrder;
             }
             build.sqlite3DefaultRowEst(pIndex);
@@ -799,10 +703,10 @@ goto exit_create_index;
                         continue;
                     for (k = 0; k < pIdx.nColumn; k++)
                     {
-                        if (pIdx.aiColumn[k] != pIndex.aiColumn[k])
+                        if (pIdx.ColumnIdx[k] != pIndex.ColumnIdx[k])
                             break;
-                        var z1 = pIdx.azColl[k];
-                        var z2 = pIndex.azColl[k];
+                        var z1 = pIdx.Collations[k];
+                        var z2 = pIndex.Collations[k];
                         if (z1 != z2 && !z1.Equals(z2, StringComparison.InvariantCultureIgnoreCase))
                             break;
                     }
@@ -830,14 +734,11 @@ goto exit_create_index;
                 }
             }
             ///Link the new Index structure to its table and to the other
-            ///</summary>
-            ///<param name="in">memory database structures.</param>
-            ///<param name=""></param>
+            ///in-memory database structures.
             if (db.init.busy != 0)
             {
-                Index p;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, 0, pIndex.pSchema));
-                p = HashExtensions.Insert( pIndex.pSchema.Indexes, pIndex.zName, StringExtensions.Strlen30(pIndex.zName), pIndex);
+                var p = HashExtensions.Insert( pIndex.pSchema.Indexes, pIndex.zName, StringExtensions.Strlen30(pIndex.zName), pIndex);
                 if (p != null)
                 {
                     Debug.Assert(p == pIndex);
@@ -898,10 +799,10 @@ goto exit_create_index;
                 ///<param name=""></param>
                 if (pTblName != null)
                 {
-                    pParse.sqlite3RefillIndex(pIndex, iMem);
+                    pParse.codegenRefillIndex(pIndex, iMem);
                     build.codegenChangeCookie(pParse, iDb);
                     facade.codegenAddParseSchemaOp(iDb, io.sqlite3MPrintf(db, "name='%q' AND type='index'", pIndex.zName));
-                    v.sqlite3VdbeAddOp1(OpCode.OP_Expire, 0);
+                    v.AddOpp1(OpCode.OP_Expire, 0);
                 }
             }
             ///When adding an index to the list of indices for a table, make

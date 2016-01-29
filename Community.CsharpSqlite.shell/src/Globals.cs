@@ -1,10 +1,12 @@
-﻿using Community.CsharpSqlite.Os;
+﻿#define NDEBUG
+using Community.CsharpSqlite.Os;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Bitmask = System.UInt64;
+
 
 namespace Community.CsharpSqlite
 {

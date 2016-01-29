@@ -560,16 +560,16 @@ ct.pLruNext=pLruNext;
 
             public int sqlite3VdbeAddOp3(OpCode op, int p1, BTreeProp p2, int p3)
             {
-                return sqlite3VdbeAddOp3(op, p1, (int)p2, p3);
+                return AddOpp3(op, p1, (int)p2, p3);
             }
             public int sqlite3VdbeAddOp3(OpCode op, int p1, int p2, BTreeProp p3) {
-                return sqlite3VdbeAddOp3(op,p1,p2,(int)p3);
+                return AddOpp3(op,p1,p2,(int)p3);
             }
             public int sqlite3VdbeAddOp3(TokenType op, int p1, int p2, int p3)
             {
-                return sqlite3VdbeAddOp3((OpCode)op, p1, p2, p3);
+                return AddOpp3((OpCode)op, p1, p2, p3);
             }
-            public int sqlite3VdbeAddOp3(OpCode op, int p1, int p2, int p3)
+            public int AddOpp3(OpCode op, int p1, int p2, int p3)
             {   
                 //var i = this.nOp;
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
@@ -608,15 +608,15 @@ pOp.cnt = 0;
 
             public int sqlite3VdbeAddOp0(OpCode op)
             {
-                return this.sqlite3VdbeAddOp3(op, 0, 0, 0);
+                return this.AddOpp3(op, 0, 0, 0);
             }
             public int sqlite3VdbeAddOp0(TokenType op)
             {//---------------------
                 return this.sqlite3VdbeAddOp3(op, 0, 0, 0);
             }
-            public int sqlite3VdbeAddOp1(OpCode op, int p1)
+            public int AddOpp1(OpCode op, int p1)
             {
-                return this.sqlite3VdbeAddOp3(op, p1, 0, 0);
+                return this.AddOpp3(op, p1, 0, 0);
             }
             public int sqlite3VdbeAddOp2(OpCode op, int p1, bool b2)
             {
@@ -628,7 +628,7 @@ pOp.cnt = 0;
             }
             public int sqlite3VdbeAddOp2(OpCode op, int p1, int p2)
             {
-                return this.sqlite3VdbeAddOp3(op, p1, p2, 0);
+                return this.AddOpp3(op, p1, p2, 0);
             }
             public int sqlite3VdbeAddOp4(OpCode op, int p1, int p2, int p3, i32 pP4, P4Usage p4type)
             {
@@ -659,7 +659,7 @@ pOp.cnt = 0;
                 //      Debug.Assert( pP4 != null );
                 union_p4 _p4 = new union_p4();
                 _p4.z = pP4.ToString();
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -671,7 +671,7 @@ pOp.cnt = 0;
                 //      Debug.Assert( pP4 != null );
                 union_p4 _p4 = new union_p4();
                 _p4.z = pP4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -681,7 +681,7 @@ pOp.cnt = 0;
                 Debug.Assert(op == OpCode.OP_Null || pP4 != null);
                 union_p4 _p4 = new union_p4();
                 _p4.z = Encoding.UTF8.GetString(pP4, 0, pP4.Length);
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -691,7 +691,7 @@ pOp.cnt = 0;
                 Debug.Assert(pP4 != null);
                 union_p4 _p4 = new union_p4();
                 _p4.ai = pP4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -700,7 +700,7 @@ pOp.cnt = 0;
             {
                 union_p4 _p4 = new union_p4();
                 _p4.pI64 = pP4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -708,7 +708,7 @@ pOp.cnt = 0;
             {
                 union_p4 _p4 = new union_p4();
                 _p4.pReal = pP4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -729,7 +729,7 @@ pOp.cnt = 0;
             {
                 union_p4 _p4 = new union_p4();
                 _p4.pColl = pP4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -745,7 +745,7 @@ pOp.cnt = 0;
             {
                 union_p4 _p4 = new union_p4();
                 _p4.pKeyInfo = pP4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -755,7 +755,7 @@ pOp.cnt = 0;
                 Debug.Assert(pP4 != null);
                 union_p4 _p4 = new union_p4();
                 _p4.pVtab = pP4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
@@ -796,7 +796,7 @@ pOp.cnt = 0;
             {
                 union_p4 _p4 = new union_p4();
                 _p4.i = p4;
-                int addr = this.sqlite3VdbeAddOp3(op, p1, p2, p3);
+                int addr = this.AddOpp3(op, p1, p2, p3);
                 this.sqlite3VdbeChangeP4(addr, _p4, P4Usage.P4_INT32);
                 return addr;
             }
@@ -959,7 +959,7 @@ pOp.cnt = 0;
                     this.lOp[addr].p3 = val;
                 }
             }
-            public void sqlite3VdbeChangeP5(u8 val)
+            public void ChangeP5(u8 val)
             {
                 Debug.Assert(this != null);
                 if (this.lOp != null)
@@ -970,7 +970,7 @@ pOp.cnt = 0;
             }
             public void sqlite3VdbeChangeP5(OpFlag val)
             {
-                sqlite3VdbeChangeP5((u8)val);
+                ChangeP5((u8)val);
             }
             public void sqlite3VdbeChangeP5(OpCode val)
             {
@@ -1254,7 +1254,7 @@ pOp.cnt = 0;
                     //      }
                     for (n = 0; n < pIdx.nColumn; n++)
                     {
-                        pIdx_zColAff.Append(pTab.aCol[pIdx.aiColumn[n]].affinity);
+                        pIdx_zColAff.Append(pTab.aCol[pIdx.ColumnIdx[n]].affinity);
                     }
                     pIdx_zColAff.Append(sqliteinth.SQLITE_AFF_NONE);
                     pIdx_zColAff.Append('\0');
@@ -1315,7 +1315,7 @@ pOp.cnt = 0;
 #if !SQLITE_OMIT_FLOATING_POINT
                     if (iReg >= 0 && pTab.aCol[i].affinity == sqliteinth.SQLITE_AFF_REAL)
                     {
-                        this.sqlite3VdbeAddOp1(OpCode.OP_RealAffinity, iReg);
+                        this.AddOpp1(OpCode.OP_RealAffinity, iReg);
                     }
 #endif
                 }
@@ -1349,7 +1349,7 @@ pOp.cnt = 0;
                 else
                 {
                     OpCode op = pTab.IsVirtual() ? OpCode.OP_VColumn : OpCode.OP_Column;
-                    this.sqlite3VdbeAddOp3(op, iTabCur, iCol, regOut);
+                    this.AddOpp3(op, iTabCur, iCol, regOut);
                 }
                 if (iCol >= 0)
                 {
@@ -1402,7 +1402,7 @@ pOp.cnt = 0;
             public void codegenAddParseSchemaOp(int iDb, string zWhere)
             {
                 int j;
-                int addr = this.sqlite3VdbeAddOp3(OpCode.OP_ParseSchema, iDb, 0, 0);
+                int addr = this.AddOpp3(OpCode.OP_ParseSchema, iDb, 0, 0);
                 this.sqlite3VdbeChangeP4(addr, zWhere, P4Usage.P4_DYNAMIC);
                 for (j = 0; j < this.db.BackendCount; j++)
                     vdbeaux.markUsed(this, j);

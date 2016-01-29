@@ -1,6 +1,7 @@
 using Community.CsharpSqlite.Ast;
 using Community.CsharpSqlite.Utils;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -598,6 +599,19 @@ namespace Community.CsharpSqlite
 
 
 
+            public static IEnumerable<Token> process(String zSql)
+            {
+                int i = 0;///Loop counter                 
+
+                while (i < zSql.Length)
+                {
+                    Debug.Assert(i >= 0);
+                    var token = Lexer.GetNextToken(zSql, i);
+                    i += token.Length;//CHECK:i>mxSqlLen raise SqlResult.SQLITE_TOOBIG                    
+
+                    yield return token;
+                }
+            }
         }
 
     }

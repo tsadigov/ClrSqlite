@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite.Metadata
                 ///constraint for a CREATE TABLE.  The index should have already
                 ///been created when we processed the CREATE TABLE.  All we have
                 ///to do here is record the root page number for that index.
-                var pIndex = IndexBuilder.sqlite3FindIndex(db, argv[0], db.Backends[iDb].Name);
+                var pIndex = IndexBuilder.FindByName(db, argv[0], db.Backends[iDb].Name);
                 if (pIndex == null)
                 {
                     ///This can occur if there exists an index on a TEMP table which
@@ -246,7 +246,7 @@ namespace Community.CsharpSqlite.Metadata
 
         public static T FindInBackendsSchemas<T>(this Connection db, string zName, string zDb, Func<Schema, Hash<T>> prop) where T : class
         {
-            T p = null;
+            T result = null;
             int nName = StringExtensions.Strlen30(zName);
             ///All mutexes are required for schema access.  Make sure we hold them. 
             Debug.Assert(zDb != null || Sqlite3.sqlite3BtreeHoldsAllMutexes(db));
@@ -258,10 +258,10 @@ namespace Community.CsharpSqlite.Metadata
                     )
                     .Select(b => { Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, b, null)); return b; })//Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));)
                     .FirstOrDefault(//Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, j, null));
-                        b => null != (p = prop(b.pSchema).Find(zName, nName))
+                        b => null != (result = prop(b.pSchema).Find(zName, nName))
                     );
 
-            return p;
+            return result;
         }
     }
 }

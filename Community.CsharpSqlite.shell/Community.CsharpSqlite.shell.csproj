@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRUE WIN32 _MSC_VER NDEBUG NO_TCL SQLITE_ASCII SQLITE_DISABLE_LFS SQLITE_HAS_CODEC SQLITE_MEM_POOL SQLITE_MUTEX_OMIT SQLITE_OMIT_AUTHORIZATION SQLITE_OMIT_DEPRECATED SQLITE_OMIT_GET_TABLE SQLITE_OMIT_INCRBLOB SQLITE_OMIT_LOOKASIDE SQLITE_OMIT_SHARED_CACHE SQLITE_OMIT_UTF16 SQLITE_OMIT_WAL SQLITE_OS_WIN SQLITE_SYSTEM_MALLOC VDBE_PROFILE_OFF </DefineConstants>
+    <DefineConstants>NDEBUG TRUE WIN32 _MSC_VER NDEBUG NO_TCL SQLITE_ASCII SQLITE_DISABLE_LFS SQLITE_HAS_CODEC SQLITE_MEM_POOL SQLITE_MUTEX_OMIT SQLITE_OMIT_AUTHORIZATION SQLITE_OMIT_DEPRECATED SQLITE_OMIT_GET_TABLE SQLITE_OMIT_INCRBLOB SQLITE_OMIT_LOOKASIDE SQLITE_OMIT_SHARED_CACHE SQLITE_OMIT_UTF16 SQLITE_OMIT_WAL SQLITE_OS_WIN SQLITE_SYSTEM_MALLOC VDBE_PROFILE_OFF </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0168 ; 0169; 0414; 0618; 0649</NoWarn>
@@ -317,17 +317,24 @@
     <Compile Include="src\Compiler\Ast\ExprExtensions.cs" />
     <Compile Include="src\Compiler\Ast\IdentifierList.cs" />
     <Compile Include="src\Compiler\Ast\InLoop.cs" />
+    <Compile Include="src\Compiler\Ast\LikeOp.cs" />
+    <Compile Include="src\Compiler\Ast\LimitVal.cs" />
     <Compile Include="src\Compiler\Ast\select.cs" />
     <Compile Include="src\Compiler\Ast\SelectDest.cs" />
     <Compile Include="src\Compiler\Ast\SelectExtensions.cs" />
     <Compile Include="src\Compiler\Ast\SelectResultType.cs" />
     <Compile Include="src\Compiler\Ast\SqcList.cs" />
     <Compile Include="src\Compiler\Ast\Token.cs" />
+    <Compile Include="src\Compiler\Ast\TrigEvent.cs" />
     <Compile Include="src\Compiler\Ast\WalkerExtensions.cs" />
     <Compile Include="src\Compiler\Ast\Where.cs" />
     <Compile Include="src\Auth\AuthRelaed.cs" />
     <Compile Include="src\BackupExtensions.cs" />
+    <Compile Include="src\Compiler\CodeGeneration\Select.cs" />
     <Compile Include="src\Compiler\Parser\VdbeFacade.cs" />
+    <Compile Include="src\Compiler\Parser\yyMinorType.cs" />
+    <Compile Include="src\Compiler\Parser\yymsp.cs" />
+    <Compile Include="src\Compiler\Parser\yyStackEntry.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Text.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\TheRest.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Transaction.cs" />

@@ -17,7 +17,7 @@ namespace Community.CsharpSqlite
         ///<summary>
         ///Put saved Parse.zAuthContext here 
         ///</summary>
-        public Sqlite3.Parse pParse;
+        public Sqlite3.ParseState pParse;
         ///
         ///<summary>
         ///The Parse structure 

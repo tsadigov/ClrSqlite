@@ -30,21 +30,23 @@ namespace Community.CsharpSqlite.Ast {
 			public dxExprCallback xExprCallback;
 			//)(Walker*, Expr);     /* Callback for expressions */
 			public dxSelectCallback xSelectCallback;
-			//)(Walker*,Select);  /* Callback for SELECTs */
-			public Sqlite3.Parse pParse;
-			///
-			///<summary>
-			///Parser context.  
-			///</summary>
-			public struct uw {
-            ///<summary>
-            ///Extra data for callback 
-            ///</summary>
+        //)(Walker*,Select);  /* Callback for SELECTs */
+
+        ///<summary>
+        ///Parser context.  
+        ///</summary>
+        public Sqlite3.ParseState ParseState;
+
+        ///<summary>
+        ///Extra data for callback 
+        ///</summary>
+        public struct uw {
+            
 
             ///<summary>
             ///Naming context 
             ///</summary>
-            public NameContext pNC;
+            public NameContext NameContext;
 
             ///<summary>
             ///Integer value 
@@ -98,7 +100,7 @@ namespace Community.CsharpSqlite.Ast {
         /// and WRC.WRC_Continue to continue.
         ///
         ///</summary>
-        public WRC sqlite3WalkExpr(ref Expr pExpr) {
+        public WRC WalkExpression(ref Expr pExpr) {
 				WRC rc;
 				if(pExpr==null)
                     return WRC.WRC_Continue;
@@ -108,9 +110,9 @@ namespace Community.CsharpSqlite.Ast {
             rc =this.xExprCallback(this,pExpr);
                 if (rc == WRC.WRC_Continue && !pExpr.ExprHasAnyProperty(ExprFlags.EP_TokenOnly))
                 {
-					if(this.sqlite3WalkExpr(ref pExpr.pLeft)!=0)
+					if(this.WalkExpression(ref pExpr.pLeft)!=0)
                         return WRC.WRC_Abort;
-					if(this.sqlite3WalkExpr(ref pExpr.pRight)!=0)
+					if(this.WalkExpression(ref pExpr.pRight)!=0)
                         return WRC.WRC_Abort;
 					if(pExpr.HasProperty(ExprFlags.EP_xIsSelect)) {
 						if(this.sqlite3WalkSelect(pExpr.x.pSelect)!=0)
@@ -130,13 +132,11 @@ namespace Community.CsharpSqlite.Ast {
             ///</summary>
 			public
 			WRC sqlite3WalkExprList(ExprList p) {
-				int i;
-				ExprList_item pItem;
 				if(p!=null) {
-					for(i=p.Count;i>0;i--) {
+					for(var i=p.Count;i>0;i--) {
 						//, pItem++){
-						pItem=p.a[p.Count-i];
-						if(this.sqlite3WalkExpr(ref pItem.pExpr)!=0)
+						var pItem=p.a[p.Count-i];
+						if(this.WalkExpression(ref pItem.pExpr)!=0)
                             return WRC.WRC_Abort;
 					}
 				}
@@ -154,17 +154,17 @@ namespace Community.CsharpSqlite.Ast {
 			public	WRC sqlite3WalkSelectExpr(Select p) {
 				if(this.sqlite3WalkExprList(p.ResultingFieldList)!=0)
                     return WRC.WRC_Abort;
-				if(this.sqlite3WalkExpr(ref p.pWhere)!=0)
+				if(this.WalkExpression(ref p.pWhere)!=0)
                     return WRC.WRC_Abort;
 				if(this.sqlite3WalkExprList(p.pGroupBy)!=0)
                     return WRC.WRC_Abort;
-				if(this.sqlite3WalkExpr(ref p.pHaving)!=0)
+				if(this.WalkExpression(ref p.pHaving)!=0)
                     return WRC.WRC_Abort;
 				if(this.sqlite3WalkExprList(p.pOrderBy)!=0)
                     return WRC.WRC_Abort;
-				if(this.sqlite3WalkExpr(ref p.pLimit)!=0)
+				if(this.WalkExpression(ref p.pLimit)!=0)
                     return WRC.WRC_Abort;
-				if(this.sqlite3WalkExpr(ref p.pOffset)!=0)
+				if(this.WalkExpression(ref p.pOffset)!=0)
                     return WRC.WRC_Abort;
                 return WRC.WRC_Continue;
 			}
@@ -177,14 +177,11 @@ namespace Community.CsharpSqlite.Ast {
 			///
 			///</summary>
 			WRC sqlite3WalkSelectFrom(Select p) {
-				SrcList pSrc;
-				int i;
-				SrcList_item pItem;
-				pSrc=p.pSrc;
+				var pSrc=p.FromSource;
 				if(Sqlite3.ALWAYS(pSrc)) {
-					for(i=pSrc.Count;i>0;i--)// pItem++ )
+					for(var i=pSrc.Count;i>0;i--)// pItem++ )
 					 {
-						pItem=pSrc.a[pSrc.Count-i];
+						var pItem=pSrc.a[pSrc.Count-i];
 						if(this.sqlite3WalkSelect(pItem.pSelect)!=0) {
                             return WRC.WRC_Abort;
 						}
