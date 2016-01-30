@@ -430,7 +430,7 @@ return r;
             /// Two NULL values are considered equal by this function.
             ///
             ///</summary>
-            public static int sqlite3MemCompare(Mem pMem1, Mem pMem2, CollSeq pColl)
+            public static ThreeState sqlite3MemCompare(Mem pMem1, Mem pMem2, CollSeq pColl)
             {
                 int rc;
                 MemFlags f1, f2;
@@ -447,7 +447,7 @@ return r;
                 ///</summary>
                 if ((combined_flags & MemFlags.MEM_Null) != 0)
                 {
-                    return (f2 & MemFlags.MEM_Null) - (f1 & MemFlags.MEM_Null);
+                    return (ThreeState) ((f2 & MemFlags.MEM_Null) - (f1 & MemFlags.MEM_Null));
                 }
                 ///
                 ///<summary>
@@ -460,11 +460,11 @@ return r;
                 {
                     if ((f1 & (MemFlags.MEM_Int | MemFlags.MEM_Real)) == 0)
                     {
-                        return 1;
+                        return ThreeState.Positive;
                     }
                     if ((f2 & (MemFlags.MEM_Int | MemFlags.MEM_Real)) == 0)
                     {
-                        return -1;
+                        return ThreeState.Negative;
                     }
                     if ((f1 & f2 & MemFlags.MEM_Int) == 0)
                     {
@@ -486,20 +486,20 @@ return r;
                             r2 = pMem2.AsReal;
                         }
                         if (r1 < r2)
-                            return -1;
+                            return ThreeState.Negative;
                         if (r1 > r2)
-                            return 1;
-                        return 0;
+                            return ThreeState.Positive;
+                        return ThreeState.Neutral;
                     }
                     else
                     {
                         Debug.Assert((f1 & MemFlags.MEM_Int) != 0);
                         Debug.Assert((f2 & MemFlags.MEM_Int) != 0);
                         if (pMem1.u.AsInteger < pMem2.u.AsInteger)
-                            return -1;
+                            return ThreeState.Negative;
                         if (pMem1.u.AsInteger > pMem2.u.AsInteger)
-                            return 1;
-                        return 0;
+                            return ThreeState.Positive;
+                        return ThreeState.Neutral;
                     }
                 }
                 ///
@@ -512,11 +512,11 @@ return r;
                 {
                     if ((f1 & MemFlags.MEM_Str) == 0)
                     {
-                        return 1;
+                        return ThreeState.Positive;
                     }
                     if ((f2 & MemFlags.MEM_Str) == 0)
                     {
-                        return -1;
+                        return ThreeState.Negative;
                     }
                     Debug.Assert(pMem1.enc == pMem2.enc);
                     Debug.Assert(pMem1.enc == SqliteEncoding.UTF8 || pMem1.enc == SqliteEncoding.UTF16LE || pMem1.enc == SqliteEncoding.UTF16BE);
@@ -532,12 +532,9 @@ return r;
                     {
                         if (pMem1.enc == pColl.enc)
                         {
-                            ///
-                            ///<summary>
                             ///The strings are already in the correct encoding.  Call the
                             ///comparison function directly 
-                            ///</summary>
-                            return pColl.xCmp(pColl.pUser, pMem1.CharacterCount, pMem1.AsString, pMem2.CharacterCount, pMem2.AsString);
+                            return (ThreeState)pColl.xCmp(pColl.pUser, pMem1.CharacterCount, pMem1.AsString, pMem2.CharacterCount, pMem2.AsString);
                         }
                         else
                         {
@@ -558,14 +555,11 @@ return r;
                             rc = pColl.xCmp(pColl.pUser, n1, v1, n2, v2);
                             c1.Release();
                             c2.Release();
-                            return rc;
+                            return (ThreeState)rc;
                         }
                     }
-                    ///
-                    ///<summary>
                     ///If a NULL pointer was passed as the collate function, fall through
                     ///to the blob case and use memcmp().  
-                    ///</summary>
                 }
                 ///
                 ///<summary>
@@ -582,7 +576,7 @@ return r;
                 {
                     rc = pMem1.CharacterCount - pMem2.CharacterCount;
                 }
-                return rc;
+                return (ThreeState)rc;
             }
             ///<summary>
             /// Move data out of a btree key or data field and into a Mem structure.

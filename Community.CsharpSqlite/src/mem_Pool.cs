@@ -373,7 +373,7 @@ namespace Community.CsharpSqlite
             {
             }
 
-            public static tree.BtCursor sqlite3MemMallocBtCursor(BtCursor dummy)
+            public static tree.BtCursor AllocBtCursor(BtCursor dummy)
             {
                 return new BtCursor();
             }

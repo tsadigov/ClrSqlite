@@ -9623,7 +9623,7 @@ return pParser.yyidxMax;
 			//#line 409 "parse.y"
 			{
 				if(offsettedStackList[0].minor.yy387_Select!=null) {
-					offsettedStackList[0].minor.yy387_Select.tk_op=(u8)offsettedStackList[-1].minor.yy4_Int;
+					offsettedStackList[0].minor.yy387_Select.TokenOp=(TokenType)offsettedStackList[-1].minor.yy4_Int;
 					offsettedStackList[0].minor.yy387_Select.pPrior=offsettedStackList[-2].minor.yy387_Select;
 				}
 				else {
@@ -11496,7 +11496,7 @@ return pParser.yyidxMax;
 			///</summary>
 			//#line 1329 "parse.y"
 			{
-                pParse.sqlite3Reindex(offsettedStackList[-1].minor.yy0Token, offsettedStackList[0].minor.yy0Token);
+                pParse.codegenReindex(offsettedStackList[-1].minor.yy0Token, offsettedStackList[0].minor.yy0Token);
 			}
 			//#line 3492 "parse.c"
 			break;

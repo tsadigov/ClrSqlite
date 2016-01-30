@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using u8 = System.Byte;
 using i64 = System.Int64;
+using Community.CsharpSqlite.Utils;
 
 namespace Community.CsharpSqlite.Engine
 {
@@ -68,7 +69,7 @@ namespace Community.CsharpSqlite.Engine
 
         public Vdbe vdbe;
         public OnConstraintError errorAction;
-        public int iCompare;
+        public ThreeState iCompare;
 
         public i64 lastRowid;
         ///Saved value of the last insert ROWID 

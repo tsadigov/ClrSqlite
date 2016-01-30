@@ -1388,15 +1388,14 @@ pBt.isExclusive = (u8)(wrflag>1);
                 BtCursor p;
                 this.Enter();
                 for (p = this.pBt.pCursor; p != null; p = p.pNext)
-                {
-                    int i;
+                {                    
                     p.sqlite3BtreeClearCursor();
                     p.State = BtCursorState.CURSOR_FAULT;
-                    p.skipNext = (int)errCode;
-                    for (i = 0; i <= p.iPage; i++)
+                    p.skipNext = (ThreeState)errCode;
+                    for (var i = 0; i <= p.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(p.apPage[i]);
-                        p.apPage[i] = null;
+                        BTreeMethods.releasePage(p.PageStack[i]);
+                        p.PageStack[i] = null;
                     }
                 }
                 this.Exit();
@@ -1503,38 +1502,23 @@ sqlite3BtreeTripAllCursors(p, rc);
                 }
                 return rc;
             }
-            public SqlResult btreeCursor(///
-                ///<summary>
-                ///The btree 
-                ///</summary>
-            int iTable,///
-                ///<summary>
-                ///Root page of table to open 
-                ///</summary>
-            CursorMode wrFlag,///
-                ///<summary>
-                ///</summary>
-                ///<param name="1 to write. 0 read">only </param>
-            KeyInfo pKeyInfo,///
-                ///<summary>
-                ///First arg to comparison function 
-                ///</summary>
-            BtCursor pCur///
-                ///<summary>
-                ///Space for new cursor 
-                ///</summary>
+
+            public SqlResult btreeCursor(
+                int rootPageOfTableToOpen,///Root page of table to open 
+                CursorMode wrFlag,///<param name="1 to write. 0 read">only </param>
+                KeyInfo pKeyInfo,///First arg to comparison function 
+                BtCursor pCur///Space for new cursor 
             )
             {
-                BtShared pBt = this.pBt;
-                ///<param name="Shared b">tree handle </param>
+                BtShared pBt = this.pBt;///<param name="Shared b">tree handle </param>
                 Debug.Assert(Sqlite3.sqlite3BtreeHoldsMutex(this));
                 Debug.Assert(wrFlag == CursorMode.ReadOnly || wrFlag == CursorMode.ReadWrite);
                 ///The following Debug.Assert statements verify that if this is a sharable
                 ///<param name="b">tree database, the connection is holding the required table locks,</param>
                 ///<param name="and that no other connection has any open cursor that conflicts with">and that no other connection has any open cursor that conflicts with</param>
                 ///<param name="this lock.  ">this lock.  </param>
-                Debug.Assert(this.hasSharedCacheTableLock((u32)iTable, pKeyInfo != null ? 1 : 0, (int)wrFlag + 1));
-                Debug.Assert(wrFlag == 0 || !this.hasReadConflicts((u32)iTable));
+                Debug.Assert(this.hasSharedCacheTableLock((u32)rootPageOfTableToOpen, pKeyInfo != null ? 1 : 0, (int)wrFlag + 1));
+                Debug.Assert(wrFlag == 0 || !this.hasReadConflicts((u32)rootPageOfTableToOpen));
                 ///Assert that the caller has opened the required transaction. 
                 Debug.Assert(this.inTrans > TransType.TRANS_NONE);
                 Debug.Assert(wrFlag == 0 || this.inTrans == TransType.TRANS_WRITE);
@@ -1543,14 +1527,14 @@ sqlite3BtreeTripAllCursors(p, rc);
                 {
                     return SqlResult.SQLITE_READONLY;
                 }
-                if (iTable == 1 && pBt.btreePagecount() == 0)
+                if (rootPageOfTableToOpen == 1 && pBt.btreePagecount() == 0)
                 {
                     return SqlResult.SQLITE_EMPTY;
                 }
                 ///Now that no other errors can occur, finish filling in the BtCursor
                 ///variables and link the cursor into the BtShared list.  
-                pCur.pgnoRoot = (Pgno)iTable;
-                pCur.iPage = -1;
+                pCur.pgnoRoot = (Pgno)rootPageOfTableToOpen;
+                pCur.pageStackIndex = -1;
                 pCur.pKeyInfo = pKeyInfo;
                 pCur.pBtree = this;
                 pCur.pBt = pBt;
@@ -1565,30 +1549,16 @@ sqlite3BtreeTripAllCursors(p, rc);
                 pCur.cachedRowid = 0;
                 return SqlResult.SQLITE_OK;
             }
-            public SqlResult sqlite3BtreeCursor(///
-                ///<summary>
-                ///The btree 
-                ///</summary>
-            int iTable,///
-                ///<summary>
-                ///Root page of table to open 
-                ///</summary>
-            CursorMode wrFlag,///
-                ///<summary>
-                ///</summary>
-                ///<param name="1 to write. 0 read">only </param>
-            KeyInfo pKeyInfo,///
-                ///<summary>
-                ///First arg to xCompare() 
-                ///</summary>
-            BtCursor pCur///
-                ///<summary>
-                ///Write new cursor here 
-                ///</summary>
+
+            public SqlResult sqlite3BtreeCursor(
+                int rootPageOfTableToOpen,///Root page of table to open 
+                CursorMode wrFlag,///<param name="1 to write. 0 read">only </param>
+                KeyInfo pKeyInfo,///First arg to xCompare() 
+                BtCursor pCur///Write new cursor here 
             )
             {           
                 using (this.scope())
-                    return this.btreeCursor(iTable, wrFlag, pKeyInfo, pCur);
+                    return this.btreeCursor(rootPageOfTableToOpen, wrFlag, pKeyInfo, pCur);
             }
             public Pager sqlite3BtreePager()
             {

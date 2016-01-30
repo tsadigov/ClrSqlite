@@ -231,30 +231,22 @@ namespace Community.CsharpSqlite.Ast {
 			public void sqlite3WhereEnd() {
 				ParseState pParse=this.pParse;
 				Vdbe v=pParse.pVdbe;
-				int i;
-				WhereLevel pLevel;
 				SrcList pTabList=this.pTabList;
 				Connection db=pParse.db;
-				///
-				///<summary>
 				///Generate loop termination code.
-				///
-				///</summary>
 				pParse.sqlite3ExprCacheClear();
-				for(i=this.nLevel-1;i>=0;i--) {
-					pLevel=this.a[i];
+				for(var i=this.nLevel-1;i>=0;i--) {
+					var pLevel=this.a[i];
 					v.sqlite3VdbeResolveLabel(pLevel.addrCont);
 					if(pLevel.op!=OpCode.OP_Noop) {
 						v.sqlite3VdbeAddOp2(pLevel.op,pLevel.p1,pLevel.p2);
 						v.ChangeP5(pLevel.p5);
 					}
 					if((pLevel.plan.wsFlags&wherec.WHERE_IN_ABLE)!=0&&pLevel.u._in.nIn>0) {
-						InLoop pIn;
-						int j;
 						v.sqlite3VdbeResolveLabel(pLevel.addrNxt);
-						for(j=pLevel.u._in.nIn;j>0;j--)//, pIn--)
+						for(var j=pLevel.u._in.nIn;j>0;j--)//, pIn--)
 						 {
-							pIn=pLevel.u._in.aInLoop[j-1];
+							var pIn=pLevel.u._in.aInLoop[j-1];
 							v.sqlite3VdbeJumpHere(pIn.addrInTop+1);
 							v.sqlite3VdbeAddOp2( OpCode.OP_Next,pIn.iCur,pIn.addrInTop);
 							v.sqlite3VdbeJumpHere(pIn.addrInTop-1);
@@ -281,22 +273,14 @@ namespace Community.CsharpSqlite.Ast {
 						v.sqlite3VdbeJumpHere(addr);
 					}
 				}
-				///
-				///<summary>
 				///The "break" point is here, just past the end of the outer loop.
 				///Set it.
-				///
-				///</summary>
 				v.sqlite3VdbeResolveLabel(this.iBreak);
-				///
-				///<summary>
 				///Close all of the cursors that were opened by sqlite3WhereBegin.
-				///
-				///</summary>
 				Debug.Assert(this.nLevel==1||this.nLevel==pTabList.Count);
-				for(i=0;i<this.nLevel;i++)//  for(i=0, pLevel=pWInfo.a; i<pWInfo.nLevel; i++, pLevel++){
+				for(var i=0;i<this.nLevel;i++)//  for(i=0, pLevel=pWInfo.a; i<pWInfo.nLevel; i++, pLevel++){
 				 {
-					pLevel=this.a[i];
+					var pLevel=this.a[i];
 					SrcList_item pTabItem=pTabList.a[pLevel.iFrom];
 					Table pTab=pTabItem.TableReference;
 					Debug.Assert(pTab!=null);
@@ -325,21 +309,19 @@ namespace Community.CsharpSqlite.Ast {
 					///reference the index.
 					///
 					///</summary>
-					if((pLevel.plan.wsFlags&wherec.WHERE_INDEXED)!=0)///* && 0 == db.mallocFailed */ )
+					if((pLevel.plan.wsFlags&wherec.WHERE_INDEXED)!=0)
 					 {
-						int k,j,last;
-						VdbeOp pOp;
 						Index pIdx=pLevel.plan.u.pIdx;
 						Debug.Assert(pIdx!=null);
-						//pOp = sqlite3VdbeGetOp( v, pWInfo.iTop );
-						last=v.sqlite3VdbeCurrentAddr();
-						for(k=this.iTop;k<last;k++)//, pOp++ )
+						var last=v.sqlite3VdbeCurrentAddr();
+						for(var k=this.iTop;k<last;k++)
 						 {
-							pOp=v.sqlite3VdbeGetOp(k);
+							var pOp=v.sqlite3VdbeGetOp(k);
 							if(pOp.p1!=pLevel.iTabCur)
 								continue;
 							if(pOp.OpCode==OpCode.OP_Column) {
-								for(j=0;j<pIdx.nColumn;j++) {
+                                int j = 0;
+								for(;j<pIdx.nColumn;j++) {
 									if(pOp.p2==pIdx.ColumnIdx[j]) {
 										pOp.p2=j;
 										pOp.p1=pLevel.iIdxCur;
@@ -356,11 +338,7 @@ namespace Community.CsharpSqlite.Ast {
 						}
 					}
 				}
-				///
-				///<summary>
 				///Final cleanup
-				///
-				///</summary>
 				pParse.nQueryLoop=this.savedNQueryLoop;
 				db.whereInfoFree(this);
 				return;

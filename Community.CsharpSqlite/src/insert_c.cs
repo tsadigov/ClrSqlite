@@ -896,10 +896,10 @@ namespace Community.CsharpSqlite
 			iDbSrc = pParse.db.indexOfBackendWithSchema( pSrc.pSchema);
 			v = pParse.sqlite3GetVdbe ();
 			build.sqlite3CodeVerifySchema (pParse, iDbSrc);
-			iSrc = pParse.nTab++;
-			iDest = pParse.nTab++;
+			iSrc = pParse.AllocatedCursorCount++;
+			iDest = pParse.AllocatedCursorCount++;
 			regAutoinc = pParse.autoIncBegin (iDbDest, pDest);
-            pParse.sqlite3OpenTable(iDest, iDbDest, pDest, OpCode.OP_OpenWrite);
+            pParse.codegenOpenTable(iDest, iDbDest, pDest, OpCode.OP_OpenWrite);
 			if ((pDest.iPKey < 0 && pDest.pIndex != null) || destHasUniqueIdx) {
 				///
 ///<summary>
@@ -922,7 +922,7 @@ namespace Community.CsharpSqlite
 			else {
 				emptyDestTest = 0;
 			}
-            pParse.sqlite3OpenTable(iSrc, iDbSrc, pSrc, OpCode.OP_OpenRead);
+            pParse.codegenOpenTable(iSrc, iDbSrc, pSrc, OpCode.OP_OpenRead);
             emptySrcTest = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iSrc, 0);
 			regData = pParse.allocTempReg ();
 			regRowid = pParse.allocTempReg ();
@@ -955,12 +955,12 @@ namespace Community.CsharpSqlite
                 v.sqlite3VdbeAddOp2(OpCode.OP_Close, iSrc, 0);
                 v.sqlite3VdbeAddOp2(OpCode.OP_Close, iDest, 0);
                 pKey = pSrcIdx.GetKeyinfo(pParse);
-				v.sqlite3VdbeAddOp4 ( OpCode.OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey,  P4Usage.P4_KEYINFO_HANDOFF);
+				v.sqlite3VdbeAddOp4 ( OpCode.OP_OpenRead, iSrc, pSrcIdx.tnum, iDbSrc, pKey);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pSrcIdx.zName );
 #endif
                 pKey = pDestIdx.GetKeyinfo(pParse);
-                v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey, P4Usage.P4_KEYINFO_HANDOFF);
+                v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iDest, pDestIdx.tnum, iDbDest, pKey);
 				#if SQLITE_DEBUG
 																																																																																				        VdbeComment( v, "%s", pDestIdx.zName );
 #endif

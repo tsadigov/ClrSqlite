@@ -1158,7 +1158,7 @@ else
 																				Table pTab;
 																				if(SqlResult.SQLITE_OK!= pParse.sqlite3ReadSchema())
 																					goto pragma_out;
-																				pIdx=IndexBuilder.FindByName(db,zRight,zDb);
+																				pIdx=IndexBuilder.FindByName(db, zDb, zRight);
 																				if(pIdx!=null) {
 																					int i;
 																					pTab=pIdx.pTable;
@@ -1975,3 +1975,4 @@ sqlite3_activate_cerod(&zRight[6]);
     }
 #endif
 }
+

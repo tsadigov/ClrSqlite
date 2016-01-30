@@ -84,7 +84,7 @@ sqlite3ValueFree(ref pTmp);
 				SqliteEncoding.UTF8
 			};
 			for(i=0;i<3;i++) {
-				pColl2=db.sqlite3FindCollSeq(aEnc[i],z,0);
+				pColl2=db.FindCollSeq(aEnc[i],z,0);
 				if(pColl2.xCmp!=null) {
 					pColl=pColl2.Copy();
 					//memcpy(pColl, pColl2, sizeof(CollSeq));
@@ -133,7 +133,7 @@ sqlite3ValueFree(ref pTmp);
 			CollSeq p;
 			p=pColl;
 			if(p==null) {
-				p=db.sqlite3FindCollSeq(enc,zName,0);
+				p=db.FindCollSeq(enc,zName,0);
 			}
 			if(p==null||p.xCmp==null) {
 				///
@@ -143,7 +143,7 @@ sqlite3ValueFree(ref pTmp);
 				///
 				///</summary>
 				callCollNeeded(db,enc,zName);
-                p = db.sqlite3FindCollSeq(enc, zName, 0);
+                p = db.FindCollSeq(enc, zName, 0);
 			}
 			if(p!=null&&p.xCmp==null&&synthCollSeq(db,p)!=0) {
 				p=null;

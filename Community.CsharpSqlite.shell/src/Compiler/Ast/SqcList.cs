@@ -569,7 +569,7 @@ namespace Community.CsharpSqlite.Ast
                         pStr2.u.zToken = pStr2.u.zToken.Substring(0, StringExtensions.Strlen30(pStr2.u.zToken) - 1) + (char)(c + 1);
                         // pC = c + 1;
                     }
-                    pColl = db.sqlite3FindCollSeq( SqliteEncoding.UTF8, noCase ? "NOCASE" : "BINARY", 0);
+                    pColl = db.FindCollSeq( SqliteEncoding.UTF8, noCase ? "NOCASE" : "BINARY", 0);
                     pNewExpr1 = pParse.sqlite3PExpr(TokenType.TK_GE, exprc.Duplicate(db, pLeft, 0).sqlite3ExprSetColl(pColl), pStr1, 0);
                     idxNew1 = pWC.whereClauseInsert(pNewExpr1, WhereTermFlags.TERM_VIRTUAL | WhereTermFlags.TERM_DYNAMIC);
                     sqliteinth.testcase(idxNew1 == 0);

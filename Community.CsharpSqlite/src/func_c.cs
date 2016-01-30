@@ -73,43 +73,36 @@ namespace Community.CsharpSqlite.Metadata {
             {
                 return context.pColl;
             }
+
             ///<summary>
             /// Implementation of the non-aggregate min() and max() functions
-            ///
             ///</summary>
             static void minmaxFunc(sqlite3_context context, int argc, sqlite3_value[] argv)
             {
-                int i;
-                int mask;
-                ///
-                ///<summary>
                 ///0 for min() or 0xffffffff for max() 
-                ///</summary>
-                int iBest;
-                CollSeq pColl;
                 Debug.Assert(argc > 1);
-                mask = (int)vdbeapi.sqlite3_user_data(context) == 0 ? 0 : -1;
-                pColl = sqlite3GetFuncCollSeq(context);
+                var mask = (int)vdbeapi.sqlite3_user_data(context) == 0 ? 0 : -1;
+                var pColl = sqlite3GetFuncCollSeq(context);
                 Debug.Assert(pColl != null);
                 Debug.Assert(mask == -1 || mask == 0);
                 sqliteinth.testcase(mask == 0);
-                iBest = 0;
+                var iBest = 0;
                 if (vdbeapi.sqlite3_value_type(argv[0]) == FoundationalType.SQLITE_NULL)
                     return;
-                for (i = 1; i < argc; i++)
+                for (var i = 1; i < argc; i++)
                 {
                     if (vdbeapi.sqlite3_value_type(argv[i]) == FoundationalType.SQLITE_NULL)
                         return;
-                    if ((vdbemem_cs.sqlite3MemCompare(argv[iBest], argv[i], pColl) ^ mask) >= 0)
+                    if ((((int)vdbemem_cs.sqlite3MemCompare(argv[iBest], argv[i], pColl) ^ mask)) >= 0)
                     {
                         iBest = i;
                     }
                 }
                 context.sqlite3_result_value(argv[iBest]);
             }
+
             ///<summary>
             /// Return the type of the argument.
-            ///
             ///</summary>
             static void typeofFunc(sqlite3_context context, int NotUsed, sqlite3_value[] argv)
             {
@@ -1838,22 +1831,17 @@ Debug.Assert( argc == 1 || p == null || p.n > 0x7fffffff
                 //if ( pBest == null ) return;
                 if (pBest.flags != 0)
                 {
-                    bool max;
-                    int cmp;
                     CollSeq pColl = sqlite3GetFuncCollSeq(context);
-                    ///
-                    ///<summary>
                     ///This step function is used for both the min() and max() aggregates,
                     ///the only difference between the two being that the sense of the
                     ///comparison is inverted. For the max() aggregate, the
-                    ///</summary>
                     ///<param name="vdbeapi.sqlite3_context_db_handle() function returns (void *)">1. For min() it</param>
                     ///<param name="returns (void *)db, where db is the sqlite3* database pointer.">returns (void *)db, where db is the sqlite3* database pointer.</param>
                     ///<param name="Therefore the next statement sets variable 'max' to 1 for the max()">Therefore the next statement sets variable 'max' to 1 for the max()</param>
                     ///<param name="aggregate, or 0 for min().">aggregate, or 0 for min().</param>
                     ///<param name=""></param>
-                    max = vdbeapi.sqlite3_context_db_handle(context) != null && (int)vdbeapi.sqlite3_user_data(context) != 0;
-                    cmp = vdbemem_cs.sqlite3MemCompare(pBest, pArg, pColl);
+                    var max = vdbeapi.sqlite3_context_db_handle(context) != null && (int)vdbeapi.sqlite3_user_data(context) != 0;
+                    var cmp = vdbemem_cs.sqlite3MemCompare(pBest, pArg, pColl);
                     if ((max && cmp < 0) || (!max && cmp > 0))
                     {
                         vdbemem_cs.sqlite3VdbeMemCopy(pBest, pArg);

@@ -1638,7 +1638,7 @@ return null;
                                         pItem.pFunc = FuncDefTraverse.FindFunction(pParse.db, pExpr.u.zToken, StringExtensions.Strlen30(pExpr.u.zToken), pExpr.x.pList != null ? pExpr.x.pList.Count : 0, enc, 0);
                                         if ((pExpr.Flags & ExprFlags.EP_Distinct) != 0)
                                         {
-                                            pItem.iDistinct = pParse.nTab++;
+                                            pItem.iDistinct = pParse.AllocatedCursorCount++;
                                         }
                                         else
                                         {

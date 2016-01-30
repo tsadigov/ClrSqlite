@@ -82,7 +82,7 @@ namespace Community.CsharpSqlite.tree {
             ///<summary>
             ///Size of pKey, or last integer key 
             ///</summary>
-            public int skipNext;
+            public ThreeState skipNext;
         ///
         ///<summary>
         ///Prev() is noop if negative. Next() is noop if positive 
@@ -125,17 +125,20 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
             ///<summary>
             ///Index of current page in apPage 
             ///</summary>
-            public i16 iPage;
-            
-            public u16[] aiIdx = new u16[Limits.BTCURSOR_MAX_DEPTH];
-            ///<summary>
-            ///Current index in apPage[i]
-            ///</summary>
-            public MemPage[] apPage = new MemPage[Limits.BTCURSOR_MAX_DEPTH];
-            ///<summary>
-            ///Pages from root to current page
-            ///</summary>
-            public void Clear()
+            public i16 pageStackIndex;
+
+
+        ///<summary>
+        ///Current index in apPage[i]
+        ///</summary>
+        public u16[] indexInPage = new u16[Limits.BTCURSOR_MAX_DEPTH];
+
+        ///<summary>
+        ///Pages from root to current page
+        ///</summary>
+        public MemPage[] PageStack = new MemPage[Limits.BTCURSOR_MAX_DEPTH];
+
+        public void Clear()
             {
                 pNext = null;
                 pPrev = null;
@@ -154,7 +157,7 @@ public bool isIncrblobHandle;   /* True if this cursor is an incr. io handle */
 																																																																																																isIncrblobHandle=false;
 aOverflow= null;
 #endif
-                iPage = 0;
+                pageStackIndex = 0;
             }
             public BtCursor Copy()
             {
@@ -185,7 +188,7 @@ aOverflow= null;
                 ///table, then malloc space for and store the pCur.nKey bytes of key
                 ///data.
                 ///</summary>
-                if (false == this.apPage[0].intKey)
+                if (false == this.PageStack[0].intKey)
                 {
                     byte[] pKey = malloc_cs.sqlite3Malloc((int)this.nKey);
                     //if( pKey !=null){
@@ -201,16 +204,16 @@ aOverflow= null;
                     //  rc = SQLITE_NOMEM;
                     //}
                 }
-                Debug.Assert(false == this.apPage[0].intKey || null == this.pKey);
+                Debug.Assert(false == this.PageStack[0].intKey || null == this.pKey);
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     int i;
-                    for (i = 0; i <= this.iPage; i++)
+                    for (i = 0; i <= this.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(this.apPage[i]);
-                        this.apPage[i] = null;
+                        BTreeMethods.releasePage(this.PageStack[i]);
+                        this.PageStack[i] = null;
                     }
-                    this.iPage = -1;
+                    this.pageStackIndex = -1;
                     this.eState = BtCursorState.CURSOR_REQUIRESEEK;
                 }
                 BTreeMethods.invalidateOverflowCache(this);
@@ -230,8 +233,8 @@ aOverflow= null;
                     ///Bias search to the high end 
                 int bias,///
                     ///Write search results here 
-                ref int pRes///
-                
+                ref ThreeState pRes///
+
             )
             {
                 SqlResult rc;
@@ -356,7 +359,7 @@ aOverflow= null;
                     ///<param name="If this is a leaf page or the tree is not an int">key tree, then</param>
                     ///<param name="this page contains countable entries. Increment the entry counter">this page contains countable entries. Increment the entry counter</param>
                     ///<param name="accordingly.">accordingly.</param>
-                    var pPage = this.apPage[this.iPage];
+                    var pPage = this.PageStack[this.pageStackIndex];
                     if (pPage.IsLeaf != false || false == pPage.intKey)
                     {
                         nEntry += pPage.nCell;
@@ -375,7 +378,7 @@ aOverflow= null;
                     {
                         do
                         {
-                            if (this.iPage == 0)
+                            if (this.pageStackIndex == 0)
                             {
                                 ///All pages of the b-tree have been visited. Return successfully. 
                                 pnEntry = nEntry;
@@ -383,21 +386,21 @@ aOverflow= null;
                             }
                             this.moveToParent();
                         }
-                        while (this.aiIdx[this.iPage] >= this.apPage[this.iPage].nCell);
-                        this.aiIdx[this.iPage]++;
-                        pPage = this.apPage[this.iPage];
+                        while (this.indexInPage[this.pageStackIndex] >= this.PageStack[this.pageStackIndex].nCell);
+                        this.indexInPage[this.pageStackIndex]++;
+                        pPage = this.PageStack[this.pageStackIndex];
                     }
 
                     ///Descend to the child node of the cell that the cursor currently
                     ///points at. This is the right child if (iIdx==pPage.nCell).
-                    iIdx = this.aiIdx[this.iPage];
+                    iIdx = this.indexInPage[this.pageStackIndex];
                     if (iIdx == pPage.nCell)
                     {
                         rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8));
                     }
                     else
                     {
-                        rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(iIdx)));
+                        rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCellAddress(iIdx)));
                     }
                 }
                 ///
@@ -436,7 +439,7 @@ aOverflow= null;
                 Debug.Assert(this.wrFlag != 0);
                 Debug.Assert(p.hasSharedCacheTableLock(this.pgnoRoot, this.pKeyInfo != null ? 1 : 0, 2));
                 Debug.Assert(!p.hasReadConflicts(this.pgnoRoot));
-                if (NEVER(this.aiIdx[this.iPage] >= this.apPage[this.iPage].nCell) || NEVER(this.eState != BtCursorState.CURSOR_VALID))
+                if (NEVER(this.indexInPage[this.pageStackIndex] >= this.PageStack[this.pageStackIndex].nCell) || NEVER(this.eState != BtCursorState.CURSOR_VALID))
                 {
                     return SqlResult.SQLITE_ERROR;
                     ///<summary>
@@ -450,10 +453,10 @@ aOverflow= null;
                 {
                     p.invalidateIncrblobCursors(this.info.nKey, 0);
                 }
-                iCellDepth = this.iPage;
-                iCellIdx = this.aiIdx[iCellDepth];
-                pPage = this.apPage[iCellDepth];
-                pCell = pPage.findCell(iCellIdx);
+                iCellDepth = this.pageStackIndex;
+                iCellIdx = this.indexInPage[iCellDepth];
+                pPage = this.PageStack[iCellDepth];
+                pCell = pPage.findCellAddress(iCellIdx);
                 ///
                 ///<summary>
                 ///If the page containing the entry to delete is not a leaf page, move
@@ -466,7 +469,7 @@ aOverflow= null;
                 ///<param name="balancing the tree following the delete operation easier.  ">balancing the tree following the delete operation easier.  </param>
                 if (false == pPage.IsLeaf)
                 {
-                    int notUsed = 0;
+                    ThreeState notUsed = 0;
                     rc = this.sqlite3BtreePrevious(ref notUsed);
                     if (rc != 0)
                         return rc;
@@ -499,11 +502,11 @@ aOverflow= null;
                 ///<param name="node to replace the deleted cell.  ">node to replace the deleted cell.  </param>
                 if (false == pPage.IsLeaf)
                 {
-                    MemPage pLeaf = this.apPage[this.iPage];
+                    MemPage pLeaf = this.PageStack[this.pageStackIndex];
                     int nCell;
-                    Pgno n = this.apPage[iCellDepth + 1].pgno;
+                    Pgno n = this.PageStack[iCellDepth + 1].pgno;
                     //byte[] pTmp;
-                    pCell = pLeaf.findCell(pLeaf.nCell - 1);
+                    pCell = pLeaf.findCellAddress(pLeaf.nCell - 1);
                     nCell = pLeaf.cellSizePtr(pCell);
                     Debug.Assert(pBt.MX_CELL_SIZE >= nCell);
                     //allocateTempSpace(pBt);
@@ -536,11 +539,11 @@ aOverflow= null;
                 ///well.  
                 ///</summary>
                 rc = this.balance();
-                if (rc == SqlResult.SQLITE_OK && this.iPage > iCellDepth)
+                if (rc == SqlResult.SQLITE_OK && this.pageStackIndex > iCellDepth)
                 {
-                    while (this.iPage > iCellDepth)
+                    while (this.pageStackIndex > iCellDepth)
                     {
-                        BTreeMethods.releasePage(this.apPage[this.iPage--]);
+                        BTreeMethods.releasePage(this.PageStack[this.pageStackIndex--]);
                     }
                     rc = this.balance();
                 }
@@ -567,22 +570,15 @@ aOverflow= null;
                 ///<summary>
                 ///The data of the new record 
                 ///</summary>
-            int nZero,///
-                ///<summary>
-                ///Number of extra 0 bytes to append to data 
+            int nZero,///Number of extra 0 bytes to append to data 
                 ///</summary>
-            int appendBias,///
-                ///<summary>
-                ///True if this is likely an append 
-                ///</summary>
-            int seekResult///
-                ///<summary>
-                ///Result of prior MovetoUnpacked() call 
-                ///</summary>
+            int appendBias,///True if this is likely an append 
+
+            ThreeState seekResult///Result of prior MovetoUnpacked() call 
             )
             {
                 SqlResult rc;
-                int loc = seekResult;
+                ThreeState loc = seekResult;
                 ///1: before desired location  +1: after 
                 int szNew = 0;
                 int idx;
@@ -634,7 +630,7 @@ aOverflow= null;
                         return rc;
                 }
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID || (this.State == BtCursorState.CURSOR_INVALID && loc != 0));
-                pPage = this.apPage[this.iPage];
+                pPage = this.PageStack[this.pageStackIndex];
                 Debug.Assert(pPage.intKey != false || nKey >= 0);
                 Debug.Assert(pPage.IsLeaf != false || false == pPage.intKey);
                 Log.TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
@@ -647,7 +643,7 @@ aOverflow= null;
                     goto end_insert;
                 Debug.Assert(szNew == pPage.cellSizePtr(newCell));
                 Debug.Assert(szNew <= pBt.MX_CELL_SIZE);
-                idx = this.aiIdx[this.iPage];
+                idx = this.indexInPage[this.pageStackIndex];
                 if (loc == 0)
                 {
                     u16 szOld;
@@ -657,7 +653,7 @@ aOverflow= null;
                     {
                         goto end_insert;
                     }
-                    oldCell = pPage.findCell(idx);
+                    oldCell = pPage.findCellAddress(idx);
                     if (false == pPage.IsLeaf)
                     {
                         //memcpy(newCell, oldCell, 4);
@@ -676,7 +672,7 @@ aOverflow= null;
                     if (loc < 0 && pPage.nCell > 0)
                     {
                         Debug.Assert(pPage.IsLeaf != false);
-                        idx = ++this.aiIdx[this.iPage];
+                        idx = ++this.indexInPage[this.pageStackIndex];
                     }
                     else
                     {
@@ -719,10 +715,10 @@ aOverflow= null;
                     ///Also, set the cursor state to invalid. This stops saveCursorPosition()
                     ///from trying to save the current position of the cursor.  
                     ///</summary>
-                    this.apPage[this.iPage].nOverflow = 0;
+                    this.PageStack[this.pageStackIndex].nOverflow = 0;
                     this.State = BtCursorState.CURSOR_INVALID;
                 }
-                Debug.Assert(this.apPage[this.iPage].nOverflow == 0);
+                Debug.Assert(this.PageStack[this.pageStackIndex].nOverflow == 0);
             end_insert:
                 return rc;
             }
@@ -740,8 +736,8 @@ aOverflow= null;
 #endif
                 do
                 {
-                    int iPage = this.iPage;
-                    MemPage pPage = this.apPage[iPage];
+                    int iPage = this.pageStackIndex;
+                    MemPage pPage = this.PageStack[iPage];
                     if (iPage == 0)
                     {
                         if (pPage.nOverflow != 0)
@@ -755,13 +751,13 @@ aOverflow= null;
                             ///<param name="next iteration of the do">loop will balance the child page.</param>
                             ///<param name=""></param>
                             Debug.Assert((balance_deeper_called++) == 0);
-                            rc = pPage.balance_deeper(ref this.apPage[1]);
+                            rc = pPage.balance_deeper(ref this.PageStack[1]);
                             if (rc == SqlResult.SQLITE_OK)
                             {
-                                this.iPage = 1;
-                                this.aiIdx[0] = 0;
-                                this.aiIdx[1] = 0;
-                                Debug.Assert(this.apPage[1].nOverflow != 0);
+                                this.pageStackIndex = 1;
+                                this.indexInPage[0] = 0;
+                                this.indexInPage[1] = 0;
+                                Debug.Assert(this.PageStack[1].nOverflow != 0);
                             }
                         }
                         else
@@ -776,8 +772,8 @@ aOverflow= null;
                         }
                         else
                         {
-                            MemPage pParent = this.apPage[iPage - 1];
-                            int iIdx = this.aiIdx[iPage - 1];
+                            MemPage pParent = this.PageStack[iPage - 1];
+                            int iIdx = this.indexInPage[iPage - 1];
                             rc = PagerMethods.sqlite3PagerWrite(pParent.pDbPage);
                             if (rc == SqlResult.SQLITE_OK)
                             {
@@ -852,7 +848,7 @@ aOverflow= null;
                             ///</summary>
                             ///<param name="The next iteration of the do">loop balances the parent page. </param>
                             BTreeMethods.releasePage(pPage);
-                            this.iPage--;
+                            this.pageStackIndex--;
                         }
                 }
                 while (rc == SqlResult.SQLITE_OK);
@@ -862,7 +858,7 @@ aOverflow= null;
                 //}
                 return rc;
             }
-            public SqlResult sqlite3BtreePrevious(ref int pRes)
+            public SqlResult sqlite3BtreePrevious(ref ThreeState pRes)
             {
                 SqlResult rc;
                 MemPage pPage;
@@ -875,22 +871,22 @@ aOverflow= null;
                 this.atLast = 0;
                 if (BtCursorState.CURSOR_INVALID == this.eState)
                 {
-                    pRes = 1;
+                    pRes = ThreeState.Positive;
                     return SqlResult.SQLITE_OK;
                 }
                 if (this.skipNext < 0)
                 {
                     this.skipNext = 0;
-                    pRes = 0;
+                    pRes = ThreeState.Neutral;
                     return SqlResult.SQLITE_OK;
                 }
                 this.skipNext = 0;
-                pPage = this.apPage[this.iPage];
+                pPage = this.PageStack[this.pageStackIndex];
                 Debug.Assert(pPage.isInit != false);
                 if (false == pPage.IsLeaf)
                 {
-                    int idx = this.aiIdx[this.iPage];
-                    rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(idx)));
+                    int idx = this.indexInPage[this.pageStackIndex];
+                    rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.findCellAddress(idx)));
                     if (rc != 0)
                     {
                         return rc;
@@ -899,20 +895,20 @@ aOverflow= null;
                 }
                 else
                 {
-                    while (this.aiIdx[this.iPage] == 0)
+                    while (this.indexInPage[this.pageStackIndex] == 0)
                     {
-                        if (this.iPage == 0)
+                        if (this.pageStackIndex == 0)
                         {
                             this.State = BtCursorState.CURSOR_INVALID;
-                            pRes = 1;
+                            pRes = ThreeState.Positive;
                             return SqlResult.SQLITE_OK;
                         }
                         this.moveToParent();
                     }
                     this.info.nSize = 0;
                     this.validNKey = false;
-                    this.aiIdx[this.iPage]--;
-                    pPage = this.apPage[this.iPage];
+                    this.indexInPage[this.pageStackIndex]--;
+                    pPage = this.PageStack[this.pageStackIndex];
                     if (pPage.intKey != false && false == pPage.IsLeaf)
                     {
                         rc = this.sqlite3BtreePrevious(ref pRes);
@@ -922,16 +918,13 @@ aOverflow= null;
                         rc = SqlResult.SQLITE_OK;
                     }
                 }
-                pRes = 0;
+                pRes = ThreeState.Neutral;
                 return rc;
             }
-            public SqlResult sqlite3BtreeNext(ref int pRes)
+            public SqlResult sqlite3BtreeNext(ref ThreeState pRes)
             {
-                SqlResult rc;
-                int idx;
-                MemPage pPage;
                 Debug.Assert(this.cursorHoldsMutex());
-                rc = this.restoreCursorPosition();
+                var rc = this.restoreCursorPosition();
                 if (rc != SqlResult.SQLITE_OK)
                 {
                     return rc;
@@ -939,7 +932,7 @@ aOverflow= null;
                 // Not needed in C# // Debug.Assert( pRes != 0 );
                 if (BtCursorState.CURSOR_INVALID == this.eState)
                 {
-                    pRes = 1;
+                    pRes = ThreeState.Positive;
                     return SqlResult.SQLITE_OK;
                 }
                 if (this.skipNext > 0)
@@ -949,18 +942,18 @@ aOverflow= null;
                     return SqlResult.SQLITE_OK;
                 }
                 this.skipNext = 0;
-                pPage = this.apPage[this.iPage];
-                idx = ++this.aiIdx[this.iPage];
+                var pPage = this.PageStack[this.pageStackIndex];
+                var idx = ++this.indexInPage[this.pageStackIndex];
                 Debug.Assert(pPage.isInit != false);
                 Debug.Assert(idx <= pPage.nCell);
                 this.info.nSize = 0;
                 this.validNKey = false;
                 if (idx >= pPage.nCell)
                 {
-                    if (false == pPage.IsLeaf)
+                    if ( ! pPage.IsLeaf )
                     {
-                        rc = this.moveToChild(Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8));
-                        if (rc != 0)
+                        rc = this.moveToChild(pPage.ChildPageNo);
+                        if (rc != SqlResult.SQLITE_OK)
                             return rc;
                         rc = this.moveToLeftmost();
                         pRes = 0;
@@ -968,16 +961,16 @@ aOverflow= null;
                     }
                     do
                     {
-                        if (this.iPage == 0)
+                        if (this.pageStackIndex == 0)
                         {
-                            pRes = 1;
+                            pRes = ThreeState.Positive;
                             this.State = BtCursorState.CURSOR_INVALID;
                             return SqlResult.SQLITE_OK;
                         }
                         this.moveToParent();
-                        pPage = this.apPage[this.iPage];
+                        pPage = this.PageStack[this.pageStackIndex];
                     }
-                    while (this.aiIdx[this.iPage] >= pPage.nCell);
+                    while (this.indexInPage[this.pageStackIndex] >= pPage.nCell);
                     pRes = 0;
                     if (pPage.intKey != false)
                     {
@@ -1024,7 +1017,7 @@ aOverflow= null;
                 ///<summary>
                 ///If true, bias the search to the high end 
                 ///</summary>
-            ref int pRes///
+            ref ThreeState pRes///
                 ///<summary>
                 ///Write search results here 
                 ///</summary>
@@ -1040,7 +1033,7 @@ aOverflow= null;
                 ///If the cursor is already positioned at the point we are trying
                 ///to move to, then just return without doing any work 
                 ///</summary>
-                if (this.State == BtCursorState.CURSOR_VALID && this.validNKey && this.apPage[0].intKey != false)
+                if (this.State == BtCursorState.CURSOR_VALID && this.validNKey && this.PageStack[0].intKey != false)
                 {
                     if (this.info.nKey == intKey)
                     {
@@ -1049,7 +1042,7 @@ aOverflow= null;
                     }
                     if (this.atLast != 0 && this.info.nKey < intKey)
                     {
-                        pRes = -1;
+                        pRes = ThreeState.Negative;
                         return SqlResult.SQLITE_OK;
                     }
                 }
@@ -1058,22 +1051,22 @@ aOverflow= null;
                 {
                     return rc;
                 }
-                Debug.Assert(this.apPage[this.iPage] != null);
-                Debug.Assert(this.apPage[this.iPage].isInit != false);
-                Debug.Assert(this.apPage[this.iPage].nCell > 0 || this.State == BtCursorState.CURSOR_INVALID);
+                Debug.Assert(this.PageStack[this.pageStackIndex] != null);
+                Debug.Assert(this.PageStack[this.pageStackIndex].isInit != false);
+                Debug.Assert(this.PageStack[this.pageStackIndex].nCell > 0 || this.State == BtCursorState.CURSOR_INVALID);
                 if (this.State == BtCursorState.CURSOR_INVALID)
                 {
-                    pRes = -1;
-                    Debug.Assert(this.apPage[this.iPage].nCell == 0);
+                    pRes = ThreeState.Negative;
+                    Debug.Assert(this.PageStack[this.pageStackIndex].nCell == 0);
                     return SqlResult.SQLITE_OK;
                 }
-                Debug.Assert(this.apPage[0].intKey != false || pIdxKey != null);
+                Debug.Assert(this.PageStack[0].intKey != false || pIdxKey != null);
                 for (; ; )
                 {
                     int lwr, upr, idx;
                     Pgno chldPg;
-                    MemPage pPage = this.apPage[this.iPage];
-                    int c;
+                    MemPage pPage = this.PageStack[this.pageStackIndex];
+                    ThreeState c;
                     ///
                     ///<summary>
                     ///</summary>
@@ -1089,11 +1082,11 @@ aOverflow= null;
                     upr = pPage.nCell - 1;
                     if (biasRight != 0)
                     {
-                        this.aiIdx[this.iPage] = (u16)(idx = upr);
+                        this.indexInPage[this.pageStackIndex] = (u16)(idx = upr);
                     }
                     else
                     {
-                        this.aiIdx[this.iPage] = (u16)(idx = (upr + lwr) / 2);
+                        this.indexInPage[this.pageStackIndex] = (u16)(idx = (upr + lwr) / 2);
                     }
                     for (; ; )
                     {
@@ -1102,9 +1095,9 @@ aOverflow= null;
                         ///<summary>
                         ///Pointer to current cell in pPage 
                         ///</summary>
-                        Debug.Assert(idx == this.aiIdx[this.iPage]);
+                        Debug.Assert(idx == this.indexInPage[this.pageStackIndex]);
                         this.info.nSize = 0;
-                        pCell = pPage.findCell(idx) + pPage.childPtrSize;
+                        pCell = pPage.findCellAddress(idx) + pPage.childPtrSize;
                         if (pPage.intKey != false)
                         {
                             i64 nCellKey = 0;
@@ -1121,12 +1114,12 @@ aOverflow= null;
                             else
                                 if (nCellKey < intKey)
                                 {
-                                    c = -1;
+                                    c = ThreeState.Negative;
                                 }
                                 else
                                 {
                                     Debug.Assert(nCellKey > intKey);
-                                    c = +1;
+                                    c = ThreeState.Positive;
                                 }
                             this.validNKey = true;
                             this.info.nKey = nCellKey;
@@ -1230,7 +1223,7 @@ aOverflow= null;
                         {
                             break;
                         }
-                        this.aiIdx[this.iPage] = (u16)(idx = (lwr + upr) / 2);
+                        this.indexInPage[this.pageStackIndex] = (u16)(idx = (lwr + upr) / 2);
                     }
                     Debug.Assert(lwr == upr + 1);
                     Debug.Assert(pPage.isInit != false);
@@ -1245,16 +1238,16 @@ aOverflow= null;
                         }
                         else
                         {
-                            chldPg = Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(lwr));
+                            chldPg = Converter.sqlite3Get4byte(pPage.aData, pPage.findCellAddress(lwr));
                         }
                     if (chldPg == 0)
                     {
-                        Debug.Assert(this.aiIdx[this.iPage] < this.apPage[this.iPage].nCell);
+                        Debug.Assert(this.indexInPage[this.pageStackIndex] < this.PageStack[this.pageStackIndex].nCell);
                         pRes = c;
                         rc = SqlResult.SQLITE_OK;
                         goto moveto_finish;
                     }
-                    this.aiIdx[this.iPage] = (u16)lwr;
+                    this.indexInPage[this.pageStackIndex] = (u16)lwr;
                     this.info.nSize = 0;
                     this.validNKey = false;
                     rc = this.moveToChild(chldPg);
@@ -1264,14 +1257,11 @@ aOverflow= null;
             moveto_finish:
                 return rc;
             }
-            public SqlResult sqlite3BtreeLast(ref int pRes)
+            public SqlResult sqlite3BtreeLast(ref ThreeState pRes)
             {
                 SqlResult rc;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.pBtree.db.mutex.sqlite3_mutex_held());
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="If the cursor already points to the last entry, this is a no">op. </param>
                 if (BtCursorState.CURSOR_VALID == this.State && this.atLast != 0)
                 {
@@ -1293,20 +1283,20 @@ aOverflow= null;
                 {
                     if (BtCursorState.CURSOR_INVALID == this.State)
                     {
-                        Debug.Assert(this.apPage[this.iPage].nCell == 0);
-                        pRes = 1;
+                        Debug.Assert(this.PageStack[this.pageStackIndex].nCell == 0);
+                        pRes = ThreeState.Positive;
                     }
                     else
                     {
                         Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                        pRes = 0;
+                        pRes = ThreeState.Neutral;
                         rc = this.moveToRightmost();
                         this.atLast = (u8)(rc == SqlResult.SQLITE_OK ? 1 : 0);
                     }
                 }
                 return rc;
             }
-            public SqlResult sqlite3BtreeFirst(ref int pRes)
+            public SqlResult sqlite3BtreeFirst(ref ThreeState pRes)
             {
                 SqlResult rc;
                 Debug.Assert(this.cursorHoldsMutex());
@@ -1317,13 +1307,13 @@ aOverflow= null;
                 {
                     if (this.State == BtCursorState.CURSOR_INVALID)
                     {
-                        Debug.Assert(this.apPage[this.iPage].nCell == 0);
-                        pRes = 1;
+                        Debug.Assert(this.PageStack[this.pageStackIndex].nCell == 0);
+                        pRes = ThreeState.Positive;
                     }
                     else
                     {
-                        Debug.Assert(this.apPage[this.iPage].nCell > 0);
-                        pRes = 0;
+                        Debug.Assert(this.PageStack[this.pageStackIndex].nCell > 0);
+                        pRes = ThreeState.Neutral;
                         rc = this.moveToLeftmost();
                     }
                 }
@@ -1336,15 +1326,15 @@ aOverflow= null;
                 MemPage pPage = null;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).IsLeaf)
+                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.PageStack[this.pageStackIndex]).IsLeaf)
                 {
                     pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.hdrOffset + 8);
-                    this.aiIdx[this.iPage] = pPage.nCell;
+                    this.indexInPage[this.pageStackIndex] = pPage.nCell;
                     rc = this.moveToChild(pgno);
                 }
                 if (rc == SqlResult.SQLITE_OK)
                 {
-                    this.aiIdx[this.iPage] = (u16)(pPage.nCell - 1);
+                    this.indexInPage[this.pageStackIndex] = (u16)(pPage.nCell - 1);
                     this.info.nSize = 0;
                     this.validNKey = false;
                 }
@@ -1352,19 +1342,27 @@ aOverflow= null;
             }
             public SqlResult moveToLeftmost()
             {
-                Pgno pgno;
                 var rc = SqlResult.SQLITE_OK;
-                MemPage pPage;
+                
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                while (rc == SqlResult.SQLITE_OK && false == (pPage = this.apPage[this.iPage]).IsLeaf)
+
+                while (   rc == SqlResult.SQLITE_OK &&   
+                        ! this.CurrentPage.IsLeaf   )
                 {
-                    Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
-                    pgno = Converter.sqlite3Get4byte(pPage.aData, pPage.findCell(this.aiIdx[this.iPage]));
+                    var cellIndex = CurrentIndex;
+                    Debug.Assert(cellIndex< this.CurrentPage.nCell);                    
+                    var pgno = Converter.sqlite3Get4byte(this.CurrentPage.aData, this.CurrentPage.findCellAddress(cellIndex));
                     rc = this.moveToChild(pgno);
                 }
                 return rc;
             }
+        public u16 CurrentIndex {
+            get { return this.indexInPage[this.pageStackIndex]; }
+        }
+        public MemPage CurrentPage {
+            get { return this.PageStack[this.pageStackIndex]; }
+        }
             public SqlResult moveToRoot()
             {
                 MemPage pRoot;
@@ -1384,24 +1382,24 @@ aOverflow= null;
                     }
                     this.sqlite3BtreeClearCursor();
                 }
-                if (this.iPage >= 0)
+                if (this.pageStackIndex >= 0)
                 {
                     int i;
-                    for (i = 1; i <= this.iPage; i++)
+                    for (i = 1; i <= this.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(this.apPage[i]);
+                        BTreeMethods.releasePage(this.PageStack[i]);
                     }
-                    this.iPage = 0;
+                    this.pageStackIndex = 0;
                 }
                 else
                 {
-                    rc = BTreeMethods.getAndInitPage(pBt, this.pgnoRoot, ref this.apPage[0]);
+                    rc = BTreeMethods.getAndInitPage(pBt, this.pgnoRoot, ref this.PageStack[0]);
                     if (rc != SqlResult.SQLITE_OK)
                     {
                         this.State = BtCursorState.CURSOR_INVALID;
                         return rc;
                     }
-                    this.iPage = 0;
+                    this.pageStackIndex = 0;
                     ///
                     ///<summary>
                     ///If pCur.pKeyInfo is not NULL, then the caller that opened this cursor
@@ -1409,8 +1407,8 @@ aOverflow= null;
                     ///<param name="expected to open it on an index b">tree. Otherwise, if pKeyInfo is</param>
                     ///<param name="NULL, the caller expects a table b">tree. If this is not the case,</param>
                     ///<param name="return an SQLITE_CORRUPT error.  ">return an SQLITE_CORRUPT error.  </param>
-                    Debug.Assert(this.apPage[0].intKey == false || this.apPage[0].intKey == false);
-                    if ((this.pKeyInfo == null) != (this.apPage[0].intKey != false))
+                    Debug.Assert(this.PageStack[0].intKey == false || this.PageStack[0].intKey == false);
+                    if ((this.pKeyInfo == null) != (this.PageStack[0].intKey != false))
                     {
                         return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
@@ -1424,10 +1422,10 @@ aOverflow= null;
                 ///<param name="if the assumption were not true, and it is not possible for the flags">if the assumption were not true, and it is not possible for the flags</param>
                 ///<param name="byte to have been modified while this cursor is holding a reference">byte to have been modified while this cursor is holding a reference</param>
                 ///<param name="to the page.  ">to the page.  </param>
-                pRoot = this.apPage[0];
+                pRoot = this.PageStack[0];
                 Debug.Assert(pRoot.pgno == this.pgnoRoot);
                 Debug.Assert(pRoot.isInit != false && (this.pKeyInfo == null) == (pRoot.intKey != false));
-                this.aiIdx[0] = 0;
+                this.indexInPage[0] = 0;
                 this.info.nSize = 0;
                 this.atLast = 0;
                 this.validNKey = false;
@@ -1450,36 +1448,35 @@ aOverflow= null;
             {
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                Debug.Assert(this.iPage > 0);
-                Debug.Assert(this.apPage[this.iPage] != null);
-                this.apPage[this.iPage - 1].assertParentIndex(this.aiIdx[this.iPage - 1], this.apPage[this.iPage].pgno);
-                BTreeMethods.releasePage(this.apPage[this.iPage]);
-                this.iPage--;
+                Debug.Assert(this.pageStackIndex > 0);
+                Debug.Assert(this.PageStack[this.pageStackIndex] != null);
+                this.PageStack[this.pageStackIndex - 1].assertParentIndex(this.indexInPage[this.pageStackIndex - 1], this.PageStack[this.pageStackIndex].pgno);
+                BTreeMethods.releasePage(this.PageStack[this.pageStackIndex]);
+                this.pageStackIndex--;
                 this.info.nSize = 0;
                 this.validNKey = false;
             }
             public SqlResult moveToChild(u32 newPgno)
             {
-                SqlResult rc;
-                int i = this.iPage;
+                int stackIdx = this.pageStackIndex;
                 MemPage pNewPage = new MemPage();
                 BtShared pBt = this.pBt;
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                Debug.Assert(this.iPage < Limits.BTCURSOR_MAX_DEPTH);
-                if (this.iPage >= (Limits.BTCURSOR_MAX_DEPTH - 1))
+                Debug.Assert(this.pageStackIndex < Limits.BTCURSOR_MAX_DEPTH);
+                if (this.pageStackIndex >= (Limits.BTCURSOR_MAX_DEPTH - 1))
                 {
                     return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
-                rc = BTreeMethods.getAndInitPage(pBt, newPgno, ref pNewPage);
+                var rc = BTreeMethods.getAndInitPage(pBt, newPgno, ref pNewPage);
                 if (rc != 0)
                     return rc;
-                this.apPage[i + 1] = pNewPage;
-                this.aiIdx[i + 1] = 0;
-                this.iPage++;
+                this.PageStack[stackIdx + 1] = pNewPage;
+                this.indexInPage[stackIdx + 1] = 0;
+                this.pageStackIndex++;
                 this.info.nSize = 0;
                 this.validNKey = false;
-                if (pNewPage.nCell < 1 || pNewPage.intKey != this.apPage[i].intKey)
+                if (pNewPage.nCell < 1 || pNewPage.intKey != this.PageStack[stackIdx].intKey)
                 {
                     return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
@@ -1519,15 +1516,15 @@ aOverflow= null;
             {
                 u32 nKey;
                 u32 nLocal;
-                Debug.Assert(this != null && this.iPage >= 0 && this.apPage[this.iPage] != null);
+                Debug.Assert(this != null && this.pageStackIndex >= 0 && this.PageStack[this.pageStackIndex] != null);
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
                 Debug.Assert(this.cursorHoldsMutex());
                 outOffset = -1;
-                var pPage = this.apPage[this.iPage];
-                Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
+                var pPage = this.PageStack[this.pageStackIndex];
+                Debug.Assert(this.indexInPage[this.pageStackIndex] < pPage.nCell);
                 if (NEVER(this.info.nSize == 0))
                 {
-                    this.apPage[this.iPage].btreeParseCell(this.aiIdx[this.iPage], ref this.info);
+                    this.PageStack[this.pageStackIndex].btreeParseCell(this.indexInPage[this.pageStackIndex], ref this.info);
                 }
                 //aPayload = pCur.info.pCell;
                 //aPayload += pCur.info.nHeader;
@@ -1570,8 +1567,8 @@ return SQLITE_ABORT;
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                    Debug.Assert(this.iPage >= 0 && this.apPage[this.iPage] != null);
-                    Debug.Assert(this.aiIdx[this.iPage] < this.apPage[this.iPage].nCell);
+                    Debug.Assert(this.pageStackIndex >= 0 && this.PageStack[this.pageStackIndex] != null);
+                    Debug.Assert(this.indexInPage[this.pageStackIndex] < this.PageStack[this.pageStackIndex].nCell);
                     rc = this.accessPayload(offset, amt, pBuf, 0);
                 }
                 return rc;
@@ -1580,8 +1577,8 @@ return SQLITE_ABORT;
             {
                 Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                Debug.Assert(this.iPage >= 0 && this.apPage[this.iPage] != null);
-                Debug.Assert(this.aiIdx[this.iPage] < this.apPage[this.iPage].nCell);
+                Debug.Assert(this.pageStackIndex >= 0 && this.PageStack[this.pageStackIndex] != null);
+                Debug.Assert(this.indexInPage[this.pageStackIndex] < this.PageStack[this.pageStackIndex].nCell);
                 return this.accessPayload(offset, amt, pBuf, 0);
             }
             public SqlResult accessPayload(///
@@ -1611,7 +1608,7 @@ return SQLITE_ABORT;
                 SqlResult rc = SqlResult.SQLITE_OK;
                 u32 nKey;
                 int iIdx = 0;
-                MemPage pPage = this.apPage[this.iPage];
+                MemPage pPage = this.PageStack[this.pageStackIndex];
                 ///
                 ///<summary>
                 ///Btree page of current entry 
@@ -1623,7 +1620,7 @@ return SQLITE_ABORT;
                 ///</summary>
                 Debug.Assert(pPage != null);
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
-                Debug.Assert(this.aiIdx[this.iPage] < pPage.nCell);
+                Debug.Assert(this.indexInPage[this.pageStackIndex] < pPage.nCell);
                 Debug.Assert(this.cursorHoldsMutex());
                 this.getCellInfo();
                 aPayload = this.info.pCell;
@@ -1791,8 +1788,8 @@ nextPage = pCur.aOverflow[iIdx+1];
             {
                 if (this.info.nSize == 0)
                 {
-                    int iPage = this.iPage;
-                    this.apPage[iPage].btreeParseCell(this.aiIdx[iPage], ref this.info);
+                    int iPage = this.pageStackIndex;
+                    this.PageStack[iPage].btreeParseCell(this.indexInPage[iPage], ref this.info);
                     this.validNKey = true;
                 }
                 else
@@ -1821,9 +1818,9 @@ nextPage = pCur.aOverflow[iIdx+1];
                     {
                         this.pNext.pPrev = this.pPrev;
                     }
-                    for (i = 0; i <= this.iPage; i++)
+                    for (i = 0; i <= this.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(this.apPage[i]);
+                        BTreeMethods.releasePage(this.PageStack[i]);
                     }
                     BTreeMethods.unlockBtreeIfUnused(pBt);
                     BTreeMethods.invalidateOverflowCache(this);

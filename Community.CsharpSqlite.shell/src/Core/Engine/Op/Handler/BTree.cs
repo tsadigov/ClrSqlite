@@ -8,6 +8,7 @@ using u16 = System.UInt16;
 using i64 = System.Int64;
 using Community.CsharpSqlite.Engine;
 using Community.CsharpSqlite.Utils;
+using Community.CsharpSqlite.Engine.Core.Runtime;
 
 namespace Community.CsharpSqlite.Engine.Op
 {
@@ -95,7 +96,7 @@ namespace Community.CsharpSqlite.Engine.Op
                 case OpCode.OP_SeekGt:
                     {
                         ///jump, in3 
-                        int res;
+                        ThreeState res= ThreeState.Neutral;
                         OpCode oc;
                         VdbeCursor pC;
                         UnpackedRecord r;
@@ -105,7 +106,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///<summary>
                         ///The rowid we are to seek to 
                         ///</summary>
-                        res = 0;
+                        
                         r = new UnpackedRecord();
                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
                         Debug.Assert(pOp.p2 != 0);
@@ -147,7 +148,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                     {
                                         ///The P3 value is too large in magnitude to be expressed as an
                                         ///integer. 
-                                        res = 1;
+                                        res = ThreeState.Positive;
                                         if (pIn3.AsReal < 0)
                                         {
                                             if (oc >= OpCode.OP_SeekGe)
@@ -289,7 +290,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                     ///see if vdbe is the case.
                                     ///
                                     ///</summary>
-                                    res = pC.pCursor.sqlite3BtreeEof() ? 1 : 0;
+                                    res = pC.pCursor.sqlite3BtreeEof() ? ThreeState.Positive : ThreeState.Neutral;
                                 }
                             }
                             Debug.Assert(pOp.p2 > 0);

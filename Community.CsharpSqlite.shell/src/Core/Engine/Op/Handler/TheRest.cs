@@ -22,6 +22,7 @@ using Community.CsharpSqlite.Utils;
 
 namespace Community.CsharpSqlite.Engine.Op
 {
+    using Core.Runtime;
     using Operation = VdbeOp;
     using sqlite3_value = Engine.Mem;
 
@@ -600,28 +601,17 @@ namespace Community.CsharpSqlite.Engine.Op
                 ///</summary>
                 case OpCode.OP_Found:
                     {
-                        ///
-                        ///<summary>
                         ///jump, in3 
-                        ///</summary>
-                        int alreadyExists;
-                        VdbeCursor pC;
-                        int res = 0;
+                        ThreeState res = 0;
                         UnpackedRecord pIdxKey;
                         UnpackedRecord r = new UnpackedRecord();
                         UnpackedRecord aTempRec = new UnpackedRecord();
                         //char aTempRec[ROUND8(sizeof(UnpackedRecord)) + sizeof(Mem)*3 + 7];
-#if SQLITE_TEST
-#if !TCLSH
-																																																																																																																																				              sqlite3_found_count++;
-#else
-																																																																																																																																				              sqlite3_found_count.iValue++;
-#endif
-#endif
-                        alreadyExists = 0;
+
+                        var alreadyExists = 0;
                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
                         Debug.Assert(pOp.p4type == P4Usage.P4_INT32);
-                        pC = vdbe.OpenCursors[pOp.p1];
+                        var pC = vdbe.OpenCursors[pOp.p1];
                         Debug.Assert(pC != null);
                         pIn3 = aMem[pOp.p3];
                         if (Sqlite3.ALWAYS(pC.pCursor != null))
@@ -635,9 +625,6 @@ namespace Community.CsharpSqlite.Engine.Op
                                 for (int i = 0; i < r.aMem.Length; i++)
                                 {
                                     r.aMem[i] = aMem[pOp.p3 + i];
-#if SQLITE_DEBUG
-																																																																																																																																																																																																															                    Debug.Assert( memIsValid( r.aMem[i] ) );
-#endif
                                 }
                                 r.flags = UnpackedRecordFlags.UNPACKED_PREFIX_MATCH;
                                 pIdxKey = r;
@@ -646,10 +633,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             {
                                 Debug.Assert((pIn3.flags & MemFlags.MEM_Blob) != 0);
                                 Debug.Assert((pIn3.flags & MemFlags.MEM_Zero) == 0);
-                                ///
-                                ///<summary>
                                 ///zeroblobs already expanded 
-                                ///</summary>
                                 pIdxKey = vdbeaux.sqlite3VdbeRecordUnpack(pC.pKeyInfo, pIn3.CharacterCount, pIn3.zBLOB, aTempRec, 0);
                                 //sizeof( aTempRec ) );
                                 if (pIdxKey == null)
@@ -787,19 +771,12 @@ namespace Community.CsharpSqlite.Engine.Op
                     Debug.Assert( memIsValid( r.aMem[i] ) );
                 }
 #endif
-                            ///
-                            ///<summary>
                             ///Extract the value of R from register P3. 
-                            ///</summary>
-
                             pIn3.Integerify();
                             R = pIn3.u.AsInteger;
-                            ///
-                            ///<summary>
-                            ///</summary>
-                            ///<param name="Search the B">Tree index. If no conflicting record is found, jump</param>
-                            ///<param name="to P2. Otherwise, copy the rowid of the conflicting record to">to P2. Otherwise, copy the rowid of the conflicting record to</param>
-                            ///<param name="register P3 and fall through to the next instruction.  ">register P3 and fall through to the next instruction.  </param>
+                            ///Search the B-Tree index. If no conflicting record is found, jump
+                            ///to P2. Otherwise, copy the rowid of the conflicting record to
+                            ///register P3 and fall through to the next instruction.
                             rc = pCrsr.sqlite3BtreeMovetoUnpacked(r, 0, 0, ref pCx.seekResult);
                             if ((r.flags & UnpackedRecordFlags.UNPACKED_PREFIX_SEARCH) != 0 || r.rowid == R)
                             {
@@ -837,7 +814,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///</summary>
                         VdbeCursor pC;
                         BtCursor pCrsr;
-                        int res;
+                        
                         i64 iKey;
                         pIn3 = aMem[pOp.p3];
                         Debug.Assert((pIn3.flags & MemFlags.MEM_Int) != 0);
@@ -849,7 +826,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         pCrsr = pC.pCursor;
                         if (pCrsr != null)
                         {
-                            res = 0;
+                            ThreeState res = ThreeState.Neutral;
                             iKey = pIn3.u.AsInteger;
                             rc = pCrsr.sqlite3BtreeMovetoUnpacked(null, (long)iKey, 0, ref res);
                             pC.lastRowid = pIn3.u.AsInteger;
@@ -901,22 +878,13 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///</summary>
                         ///<param name="out2">prerelease </param>
-                        i64 v;
-                        ///The new rowid 
-                        VdbeCursor pC;
-                        ///Cursor of table to get the new rowid 
-                        int res;
-                        ///Result of an sqlite3BtreeLast() 
-                        int cnt;
-                        ///Counter to limit the number of searches 
-                        Mem pMem;
-                        ///Register holding largest rowid for AUTOINCREMENT 
-                        VdbeFrame rootFrame;
-                        ///Root frame of VDBE 
-                        v = 0;
-                        res = 0;
+                        int cnt;///Counter to limit the number of searches 
+                        Mem pMem;///Register holding largest rowid for AUTOINCREMENT 
+                        VdbeFrame rootFrame;///Root frame of VDBE 
+                        i64 v = 0;///The new rowid 
+                        var res = ThreeState.Neutral;///Result of an sqlite3BtreeLast() 
                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < vdbe.nCursor);
-                        pC = vdbe.OpenCursors[pOp.p1];
+                        var pC = vdbe.OpenCursors[pOp.p1];///Cursor of table to get the new rowid 
                         Debug.Assert(pC != null);
                         if (Sqlite3.NEVER(pC.pCursor == null))
                         {
@@ -963,10 +931,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                     if (res != 0)
                                     {
                                         v = 1;
-                                        ///
-                                        ///<summary>
-                                        ///</summary>
-                                        ///<param name="IMP: R">48074 </param>
+                                        ///IMP: R-48074 
                                     }
                                     else
                                     {
@@ -1984,7 +1949,7 @@ break;
             ///the number of columns is stored in the VdbeCursor.nField element.
 
             ///number of fields in the record 
-            int nField = vdbeCursor.nField;
+            int nField = vdbeCursor.FieldCount;
 
             ///The BTree cursor 
             BtCursor btCursor = vdbeCursor.pCursor;
@@ -2407,7 +2372,7 @@ break;
         }
 
 
-        private static void OCode_Compare(Vdbe vdbe,Operation pOp, List<Mem> aMem, ref int iCompare, ref int[] aPermute)
+        private static void OCode_Compare(Vdbe vdbe,Operation pOp, List<Mem> aMem, ref ThreeState iCompare, ref int[] aPermute)
         {
             int n;
             int i;
@@ -2461,7 +2426,7 @@ break;
                 if (iCompare != 0)
                 {
                     if (bRev != 0)
-                        iCompare = -iCompare;
+                        iCompare = (ThreeState)( -(int)iCompare);
                     break;
                 }
             }

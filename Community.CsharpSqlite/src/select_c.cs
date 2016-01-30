@@ -1094,7 +1094,7 @@ static void SelectMethods.explainComposite(Parse v, int w,int x,int y,bool z) {}
                 regRow = pParse.allocTempReg();
                 if (eDest == SelectResultType.Output || eDest == SelectResultType.Coroutine)
                 {
-                    pseudoTab = pParse.nTab++;
+                    pseudoTab = pParse.AllocatedCursorCount++;
                     v.AddOpp3(OpCode.OP_OpenPseudo, pseudoTab, regRow, nColumn);
                     regRowid = 0;
                 }
@@ -2208,7 +2208,7 @@ break;
                 ///Implement the main merge loop
                 v.sqlite3VdbeResolveLabel(labelCmpr);
                 v.sqlite3VdbeAddOp4(OpCode.OP_Permutation, 0, 0, 0, aPermute,  P4Usage.P4_INTARRAY);
-                v.sqlite3VdbeAddOp4(OpCode.OP_Compare, destA.iMem, destB.iMem, nOrderBy, pKeyMerge,  P4Usage.P4_KEYINFO_HANDOFF);
+                v.sqlite3VdbeAddOp4(OpCode.OP_Compare, destA.iMem, destB.iMem, nOrderBy, pKeyMerge);
                 v.AddOpp3(OpCode.OP_Jump, addrAltB, addrAeqB, addrAgtB);
                 ///Release temporary registers
                 if (regPrev != 0)
@@ -3122,7 +3122,7 @@ break;
                         else
                         {
                             KeyInfo pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, pE.x.pList);
-                            v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, pFunc.iDistinct, 0, 0, pKeyInfo, P4Usage.P4_KEYINFO_HANDOFF);
+                            v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, pFunc.iDistinct, 0, 0, pKeyInfo);
                         }
                     }
                 }

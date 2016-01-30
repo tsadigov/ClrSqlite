@@ -116,7 +116,7 @@ namespace Community.CsharpSqlite.Metadata
                 ///constraint for a CREATE TABLE.  The index should have already
                 ///been created when we processed the CREATE TABLE.  All we have
                 ///to do here is record the root page number for that index.
-                var pIndex = IndexBuilder.FindByName(db, argv[0], db.Backends[iDb].Name);
+                var pIndex = IndexBuilder.FindByName(db, db.Backends[iDb].Name, argv[0]);
                 if (pIndex == null)
                 {
                     ///This can occur if there exists an index on a TEMP table which

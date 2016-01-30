@@ -233,7 +233,7 @@ goto begin_table_error;
                     }
                     goto begin_table_error;
                 }
-                if (IndexBuilder.FindByName(db, zName, zDb) != null)
+                if (IndexBuilder.FindByName(db, zDb, zName) != null)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "there is already an index named %s", zName);
                     goto begin_table_error;
@@ -821,7 +821,6 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                 ///file instead of into the main database file.
                 if (! db.init.IsBusy)
                 {
-                    int n;
                     String zType = "";
                     ///"view" or "table" 
                     String zType2 = "";
@@ -861,11 +860,11 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
 
                     if (pSelect != null)
                     {
-                        Debug.Assert(parseState.nTab == 1);
+                        Debug.Assert(parseState.AllocatedCursorCount == 1);
                         vdbe.AddOpp3(OpCode.OP_OpenWrite, 1, parseState.regRoot, iDb);
                         vdbe.ChangeP5(1);
                         SelectDest dest = new SelectDest();
-                        parseState.nTab = 2;
+                        parseState.AllocatedCursorCount = 2;
                         dest.Init(SelectResultType.Table, 1);
                         Compiler.CodeGeneration.ForSelect.codegenSelect(parseState, pSelect, ref dest);
                         vdbe.AddOpp1(OpCode.OP_Close, 1);
@@ -883,6 +882,7 @@ destroyRootPage( pParse, pIdx.tnum, iDb );
                         }
                     }
 
+                int n;
                 String zStmt = "";///Text of the CREATE TABLE or CREATE VIEW statement
                 ///Compute the complete text of the CREATE statement 
                 if (pSelect != null)

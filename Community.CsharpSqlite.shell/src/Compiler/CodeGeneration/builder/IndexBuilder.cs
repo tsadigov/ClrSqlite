@@ -36,18 +36,14 @@ namespace Community.CsharpSqlite.builder
         /// for duplicate index names is done.)  The search order is
         /// TEMP first, then MAIN, then any auxiliary databases added
         /// using the ATTACH command.
-        ///
         ///</summary>
-        public static Index FindByName(Connection db, string zName, string zDb)
+        public static Index FindByName(Connection db, string zDb, string zName)
         {
             return db.FindInBackendsSchemas(zName,zDb,schema=>schema.Indexes);
         }
 
-        
-
         ///<summary>
         /// Reclaim the memory used by an index
-        ///
         ///</summary>
         public static void freeIndex(this Connection db, ref Index p)
         {
@@ -57,6 +53,7 @@ namespace Community.CsharpSqlite.builder
             db.DbFree(ref p.zColAff);
             db.DbFree(ref p);
         }
+
         ///<summary>
         /// For the index called zIdxName which is found in the database iDb,
         /// unlike that index from its Table then remove the index from
@@ -130,8 +127,6 @@ namespace Community.CsharpSqlite.builder
         }
 #endif
 
-
-
         ///<summary>
         /// Generate code for the REINDEX command.
         ///
@@ -149,9 +144,9 @@ namespace Community.CsharpSqlite.builder
         // OVERLOADS, so I don't need to rewrite parse.c
         public static void sqlite3Reindex(this Community.CsharpSqlite.Sqlite3.ParseState pParse, int null_2, int null_3)
         {
-            sqlite3Reindex(pParse, null, null);
+            codegenReindex(pParse, null, null);
         }
-        public static void sqlite3Reindex(this Community.CsharpSqlite.Sqlite3.ParseState pParse, Token pName1, Token pName2)
+        public static void codegenReindex(this Community.CsharpSqlite.Sqlite3.ParseState pParse, Token pName1, Token pName2)
         {
             ///Read the database schema. If an error occurs, leave an error message
             ///and code in pParse and return NULL. 
@@ -159,34 +154,35 @@ namespace Community.CsharpSqlite.builder
             {
                 return;
             }
+
+            #region reindex databases
             if (pName1 == null)
             {
-                reindexDatabases(pParse, null);
+                codegenReindexDatabases(pParse, null);
                 return;
-            }
-            //else
+            }//WHY there is no connection.DbFree(ref zColl);
+             //else
 
-            CollSeq pColl;
-            ///Collating sequence to be reindexed, or NULL 
+
             Connection connection = pParse.db;
             ///The database connection 
 
             if (Sqlite3.NEVER(pName2 == null) || pName2.zRestSql == null || pName2.zRestSql.Length == 0)
                 {
-                    string zColl;
                     Debug.Assert(pName1.zRestSql != null);
-                    zColl = build.Token2Name(pParse.db, pName1);
+                    var zColl = build.Token2Name(pParse.db, pName1);
                     if (zColl == null)
                         return;
-                    pColl = connection.sqlite3FindCollSeq(sqliteinth.ENC(connection), zColl, 0);
+                    var pColl = connection.FindCollSeq(sqliteinth.ENC(connection), zColl, 0);
                     if (pColl != null)
                     {
-                        reindexDatabases(pParse, zColl);
+                        codegenReindexDatabases(pParse, zColl);
                         connection.DbFree(ref zColl);
                         return;
                     }
                     connection.DbFree(ref zColl);
                 }
+            #endregion
 
             Token pObjName = new Token();///Name of the table or index to be reindexed 
             var iDb = build.sqlite3TwoPartName(pParse, pName1, pName2, ref pObjName);//The database index number 
@@ -195,17 +191,17 @@ namespace Community.CsharpSqlite.builder
             var nameOfTableOrIndex = build.Token2Name(connection, pObjName);///Name of a table or index 
             if (nameOfTableOrIndex == null)
                 return;
-            var  zDb = connection.Backends[iDb].Name;///Name of the database
+            var  dbName = connection.Backends[iDb].Name;///Name of the database
             //IF
-            var pTab = TableBuilder.FindByName(connection, zDb, nameOfTableOrIndex);///A table in the database
+            var pTab = TableBuilder.FindByName(connection, dbName, nameOfTableOrIndex);///A table in the database
             if (pTab != null)
             {
-                reindexTable(pParse, pTab, null);
+                codegenReindexTable(pParse, pTab, null);
                 connection.DbFree(ref nameOfTableOrIndex);
                 return;
             }
             //ELSE
-            var pIndex = IndexBuilder.FindByName(connection, nameOfTableOrIndex, zDb);///An index associated with pTab 
+            var pIndex = IndexBuilder.FindByName(connection, dbName, nameOfTableOrIndex);///An index associated with pTab 
             connection.DbFree(ref nameOfTableOrIndex);
             if (pIndex != null)
             {
@@ -222,7 +218,7 @@ namespace Community.CsharpSqlite.builder
         /// If pColl == null then recompute all indices of pTab.
         ///</summary>
 #if !SQLITE_OMIT_REINDEX
-        static void reindexTable(Community.CsharpSqlite.Sqlite3.ParseState pParse, Table pTab, string zColl)
+        static void codegenReindexTable(Community.CsharpSqlite.Sqlite3.ParseState pParse, Table pTab, string zColl)
         {
             ///An index associated with pTab 
             foreach (var pIndex in pTab.pIndex.linkedList())
@@ -242,7 +238,7 @@ namespace Community.CsharpSqlite.builder
         /// all indices everywhere.
         ///</summary>
 #if !SQLITE_OMIT_REINDEX
-        static void reindexDatabases(this Community.CsharpSqlite.Sqlite3.ParseState pParse, string zColl)
+        static void codegenReindexDatabases(this Community.CsharpSqlite.Sqlite3.ParseState pParse, string zColl)
         {
             Connection db = pParse.db;///The database connection 
             Table pTab;///A table in the database 
@@ -254,7 +250,7 @@ namespace Community.CsharpSqlite.builder
                 //HashElem k;///For looping over tables in pDb 
                 pDb.pSchema.Tables.first
                     .linkedList()
-                    .ForEach(k=> reindexTable(pParse, (Table)k.data, zColl));
+                    .ForEach(k=> codegenReindexTable(pParse, (Table)k.data, zColl));
                 //for ( k = sqliteHashFirst( pDb.pSchema.tblHash ) ; k != null ; k = sqliteHashNext( k ) )
             }
         }
@@ -275,16 +271,11 @@ namespace Community.CsharpSqlite.builder
         ///</summary>
         public static void codegenRefillIndex(this ParseState pParse, Index pIndex, int memRootPage)
         {
-            Table pTab = pIndex.pTable;
-            ///The table that is indexed 
-            int iTab = pParse.nTab++;
-            ///Btree cursor used for pTab 
-            int iIdx = pParse.nTab++;
-            ///Btree cursor used for pIndex 
-            int tnum;
-            ///Root page of index
-            Connection db = pParse.db;
-            ///The database connection 
+            Table pTab = pIndex.pTable;///The table that is indexed 
+            int iTab = pParse.AllocatedCursorCount++;///Btree cursor used for pTab 
+            int iIdx = pParse.AllocatedCursorCount++;///Btree cursor used for pIndex 
+            int tnum;///Root page of index
+            Connection db = pParse.db;///The database connection 
             int iDb = db.indexOfBackendWithSchema( pIndex.pSchema);
 #if !SQLITE_OMIT_AUTHORIZATION
 																																																																																	if( sqlite3AuthCheck(pParse, SQLITE_REINDEX, pIndex.zName, 0,
@@ -292,27 +283,27 @@ db.aDb[iDb].zName ) ){
 return;
 }
 #endif
-            ///<param name="Require a write">lock on the table to perform this operation </param>
-            sqliteinth.sqlite3TableLock(pParse, iDb, pTab.tnum, 1, pTab.zName);
-            var v = pParse.sqlite3GetVdbe();///Generate code into this virtual machine 
-            if (v == null)
+            ///Require a write-lock on the table to perform this operation 
+            sqliteinth.TableLock(pParse, iDb, pTab.tnum, 1, pTab.zName);
+            var vdbe = pParse.sqlite3GetVdbe();///Generate code into this virtual machine 
+            if (vdbe == null)
                 return;
             if (memRootPage >= 0)
                 tnum = memRootPage;
             else
             {
                 tnum = pIndex.tnum;
-                v.sqlite3VdbeAddOp2(OpCode.OP_Clear, tnum, iDb);
+                vdbe.sqlite3VdbeAddOp2(OpCode.OP_Clear, tnum, iDb);
             }
             var pKey = pIndex.GetKeyinfo(pParse);///KeyInfo for index
-            v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iIdx, tnum, iDb, pKey, P4Usage.P4_KEYINFO_HANDOFF);
+            vdbe.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iIdx, tnum, iDb, pKey);
             if (memRootPage >= 0)
             {
-                v.ChangeP5(1);
+                vdbe.ChangeP5(1);
             }
-            pParse.sqlite3OpenTable(iTab, iDb, pTab, OpCode.OP_OpenRead);
+            pParse.codegenOpenTable(iTab, iDb, pTab, OpCode.OP_OpenRead);
             ///Address of top of loop 
-            var addr1 = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iTab, 0);
+            var addr1 = vdbe.sqlite3VdbeAddOp2(OpCode.OP_Rewind, iTab, 0);
             ///Register holding assemblied index record 
             var regRecord = pParse.allocTempReg();
             ///Registers containing the index key 
@@ -320,7 +311,7 @@ return;
             if (pIndex.onError != OnConstraintError.OE_None)
             {
                 int regRowid = regIdxKey + pIndex.nColumn;
-                int j2 = v.sqlite3VdbeCurrentAddr() + 2;
+                int j2 = vdbe.sqlite3VdbeCurrentAddr() + 2;
                 int pRegKey = regIdxKey;
                 // SQLITE_INT_TO_PTR( regIdxKey );
                 ///
@@ -332,19 +323,17 @@ return;
                 ///opcode use the values stored within seems dangerous. However, since
                 ///we can be sure that no other temp registers have been allocated
                 ///since sqlite3ReleaseTempRange() was called, it is safe to do so.
-                v.sqlite3VdbeAddOp4(OpCode.OP_IsUnique, iIdx, j2, regRowid, pRegKey, P4Usage.P4_INT32);
+                vdbe.sqlite3VdbeAddOp4(OpCode.OP_IsUnique, iIdx, j2, regRowid, pRegKey, P4Usage.P4_INT32);
                 build.sqlite3HaltConstraint(pParse, OnConstraintError.OE_Abort, "indexed columns are not unique", P4Usage.P4_STATIC);
             }
-            v.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, iIdx, regRecord);
-            v.sqlite3VdbeChangeP5(OpFlag.OPFLAG_USESEEKRESULT);
+            vdbe.sqlite3VdbeAddOp2(OpCode.OP_IdxInsert, iIdx, regRecord);
+            vdbe.sqlite3VdbeChangeP5(OpFlag.OPFLAG_USESEEKRESULT);
             pParse.deallocTempReg(regRecord);
-            v.sqlite3VdbeAddOp2(OpCode.OP_Next, iTab, addr1 + 1);
-            v.sqlite3VdbeJumpHere(addr1);
-            v.AddOpp1(OpCode.OP_Close, iTab);
-            v.AddOpp1(OpCode.OP_Close, iIdx);
+            vdbe.sqlite3VdbeAddOp2(OpCode.OP_Next, iTab, addr1 + 1);
+            vdbe.sqlite3VdbeJumpHere(addr1);
+            vdbe.AddOpp1(OpCode.OP_Close, iTab);
+            vdbe.AddOpp1(OpCode.OP_Close, iIdx);
         }
-
-
 
         ///<summary>
         /// Create a new index for an SQL table.  pName1.pName2 is the name of the index
@@ -521,7 +510,7 @@ return;
                         goto exit_create_index;
                     }
                 }
-                if (IndexBuilder.FindByName(db, zName, pDb.Name) != null)
+                if (IndexBuilder.FindByName(db, pDb.Name, zName) != null)
                 {
                     if (ifNotExist == 0)
                     {
@@ -843,7 +832,5 @@ goto exit_create_index;
             return pRet;
         }
 
-            
- 
     }
 }

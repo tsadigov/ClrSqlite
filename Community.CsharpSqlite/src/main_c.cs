@@ -1915,7 +1915,7 @@ return z;
 			///Check if this call is removing or replacing an existing collation
 			///sequence. If so, and there are active VMs, return busy. If there
 			///are no active VMs, invalidate any pre-compiled statements.
-			pColl=db.sqlite3FindCollSeq(enc2,zName,0);
+			pColl=db.FindCollSeq(enc2,zName,0);
 			if(pColl!=null&&pColl.xCmp!=null) {
 				if(db.activeVdbeCnt!=0) {
 					utilc.sqlite3Error(db, SqlResult.SQLITE_BUSY, "unable to delete/modify collation sequence due to active statements");
@@ -1945,7 +1945,7 @@ return z;
 					}
 				}
 			}
-			pColl=db.sqlite3FindCollSeq(enc2,zName,1);
+			pColl=db.FindCollSeq(enc2,zName,1);
 			//if ( pColl == null )
 			//  return SQLITE_NOMEM;
 			pColl.xCmp=xCompare;
@@ -2450,7 +2450,7 @@ return z;
 			//{
 			//  goto opendb_out;
 			//}
-			connection.pDfltColl=connection.sqlite3FindCollSeq(SqliteEncoding.UTF8,"BINARY",0);
+			connection.pDfltColl=connection.FindCollSeq(SqliteEncoding.UTF8,"BINARY",0);
 			Debug.Assert(connection.pDfltColl!=null);
 			///<param name="Also add a UTF">insensitive collation sequence. </param>
 			createCollation(connection,"NOCASE",SqliteEncoding.UTF8,CollationType.NOCASE,0,nocaseCollatingFunc,null);

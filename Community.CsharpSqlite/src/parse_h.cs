@@ -115,22 +115,22 @@ using yDbMask = System.Int64;
             ///<summary>
             ///Number of errors seen 
             ///</summary>
-            public int nTab;
-            ///
+
             ///<summary>
             ///Number of previously allocated VDBE cursors 
             ///</summary>
+            public int AllocatedCursorCount { get; set; }
 
-            public int nSet;
-            ///
             ///<summary>
             ///Number of sets used so far 
             ///</summary>
-            public int ckBase;
-            ///
+            public int UsedSetCount;
+
             ///<summary>
             ///Base register of data during check constraints 
             ///</summary>
+            public int ckBase;
+            
 
             public int iCacheCnt;
             ///
@@ -260,22 +260,24 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
             ///Above is constant between recursions.  Below is reset before and after
             ///each recursion 
             ///</summary>
-            public int nVar;
-            ///
+             
             ///<summary>
             ///Number of '?' variables seen in the SQL so far 
+            ///</summary>
+            public int VariableParameterCount;
+
+            ///<summary>
+            ///Number of available slots in azVar[] 
             ///</summary>
             public int nzVar {
                 get { return azVar.Count; }
             }
-            ///<summary>
-            ///Number of available slots in azVar[] 
-            ///</summary>
-            public MyCollection<string> azVar = new MyCollection<string>();
-            ///
+
             ///<summary>
             ///Pointers to names of parameters 
             ///</summary>
+            public MyCollection<string> azVar = new MyCollection<string>();
+            
 
 
             ///<summary>
@@ -413,7 +415,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
             }
             public void ResetMembers()// Need to clear all the following variables during each recursion
             {
-                nVar = 0;
+                VariableParameterCount = 0;
                 azVar = new MyCollection<string>();
                 nAlias = 0;
                 nAliasAlloc = 0;
@@ -440,7 +442,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
             public void RestoreMembers()// Need to clear all the following variables during each recursion
             {
                 if (SaveBuf[nested] != null) {
-                    nVar = SaveBuf[nested].nVar;
+                    VariableParameterCount = SaveBuf[nested].VariableParameterCount;
                     azVar = SaveBuf[nested].azVar;
                     nAlias = SaveBuf[nested].nAlias;
                     nAliasAlloc = SaveBuf[nested].nAliasAlloc;
@@ -467,7 +469,7 @@ public TableLock[] aTableLock; /* Required table locks for shared-cache mode */
             public void SaveMembers()// Need to clear all the following variables during each recursion
             {
                 SaveBuf[nested] = new ParseState();
-                SaveBuf[nested].nVar = nVar;
+                SaveBuf[nested].VariableParameterCount = VariableParameterCount;
                 SaveBuf[nested].azVar = azVar;
                 SaveBuf[nested].nAlias = nAlias;
                 SaveBuf[nested].nAliasAlloc = nAliasAlloc;
@@ -726,7 +728,7 @@ return;
                 ///Check that a table or index named 'zName' does not already exist
                 ///in database iDb. If so, this is an error.
                 //RULE
-                if (TableBuilder.FindByName(db, zDb, NewNameOfTheTable) != null || IndexBuilder.FindByName(db, NewNameOfTheTable, zDb) != null) {
+                if (TableBuilder.FindByName(db, zDb, NewNameOfTheTable) != null || IndexBuilder.FindByName(db, zDb, NewNameOfTheTable) != null) {
                     utilc.sqlite3ErrorMsg(this, "there is already another table or index with this name: %s", NewNameOfTheTable);
                     goto exit_rename_table;
                 }
@@ -1004,7 +1006,7 @@ goto exit_rename_table;
                         ///entire contents of the table. 
                         ///</summary>
                         aRoot[i] = pStat.tnum;
-                        sqliteinth.sqlite3TableLock(this, iDb, aRoot[i], 1, zTab);
+                        sqliteinth.TableLock(this, iDb, aRoot[i], 1, zTab);
                         if (!String.IsNullOrEmpty(zWhere)) {
                             build.sqlite3NestedParse(this, "DELETE FROM %Q.%s WHERE %s=%Q", pDb.Name, zTab, zWhereType, zWhere);
                         }
@@ -1098,8 +1100,8 @@ return;
 }
 #endif
                 ///<param name="Establish a read">cache level. </param>
-                sqliteinth.sqlite3TableLock(this, iDb, pTab.tnum, 0, pTab.zName);
-                iIdxCur = this.nTab++;
+                sqliteinth.TableLock(this, iDb, pTab.tnum, 0, pTab.zName);
+                iIdxCur = this.AllocatedCursorCount++;
                 v.sqlite3VdbeAddOp4(OpCode.OP_String8, 0, regTabname, 0, pTab.zName, 0);
                 for (pIdx = pTab.pIndex; pIdx != null; pIdx = pIdx.pNext) {
                     int nCol;
@@ -1113,7 +1115,7 @@ return;
                     }
                     ///Open a cursor to the index to be analyzed. 
                     Debug.Assert(iDb == db.indexOfBackendWithSchema(pIdx.pSchema));
-                    v.sqlite3VdbeAddOp4(OpCode.OP_OpenRead, iIdxCur, pIdx.tnum, iDb, pKey, P4Usage.P4_KEYINFO_HANDOFF);
+                    v.sqlite3VdbeAddOp4(OpCode.OP_OpenRead, iIdxCur, pIdx.tnum, iDb, pKey);
                     v.VdbeComment("%s", pIdx.zName);
                     ///Populate the registers containing the index names. 
                     v.sqlite3VdbeAddOp4(OpCode.OP_String8, 0, regIdxname, 0, pIdx.zName, 0);
@@ -1343,8 +1345,8 @@ return;
                 int iStatCur;
                 int iMem;
                 build.sqlite3BeginWriteOperation(this, 0, iDb);
-                iStatCur = this.nTab;
-                this.nTab += 2;
+                iStatCur = this.AllocatedCursorCount;
+                this.AllocatedCursorCount += 2;
                 this.openStatTable(iDb, iStatCur, null, null);
                 iMem = this.UsedCellCount + 1;
                 Debug.Assert(sqlite3SchemaMutexHeld(db, iDb, null));
@@ -1370,8 +1372,8 @@ return;
                 Debug.Assert(sqlite3BtreeHoldsAllMutexes(this.db));
                 iDb = this.db.indexOfBackendWithSchema(pTab.pSchema);
                 build.sqlite3BeginWriteOperation(this, 0, iDb);
-                iStatCur = this.nTab;
-                this.nTab += 2;
+                iStatCur = this.AllocatedCursorCount;
+                this.AllocatedCursorCount += 2;
                 if (pOnlyIdx != null) {
                     this.openStatTable(iDb, iStatCur, pOnlyIdx.zName, "idx");
                 }
@@ -1428,7 +1430,7 @@ return;
                     else {
                         var name = build.Token2Name(db, pName1);
                         if (name != null) {
-                            if ((pIdx = IndexBuilder.FindByName(db, name, null)) != null) {
+                            if ((pIdx = IndexBuilder.FindByName(db, null, name)) != null) {
                                 this.analyzeTable(pIdx.pTable, pIdx);
                             }
                             else
@@ -1447,7 +1449,7 @@ return;
                         var zDb = db.Backends[iDb].Name;
                         var z = build.Token2Name(db, pTableName);
                         if (z != null) {
-                            if ((pIdx = IndexBuilder.FindByName(db, z, zDb)) != null) {
+                            if ((pIdx = IndexBuilder.FindByName(db, zDb, z)) != null) {
                                 this.analyzeTable(pIdx.pTable, pIdx);
                             }
                             else
@@ -1859,7 +1861,7 @@ goto attach_end;
 
                 Vdbe v = this.sqlite3GetVdbe();
                 ///Vdbe to add code to 				
-                int iCur = this.nTab - 1;
+                int iCur = this.AllocatedCursorCount - 1;
                 ///Cursor number to use 
                 int iOk = v.sqlite3VdbeMakeLabel();
                 ///jump here if parent key found 
@@ -1903,7 +1905,7 @@ goto attach_end;
                         if (pTab == pFKey.pFrom && nIncr == 1) {
                             v.AddOpp3(OpCode.OP_Eq, regData, iOk, regTemp);
                         }
-                        this.sqlite3OpenTable(iCur, iDb, pTab, OpCode.OP_OpenRead);
+                        this.codegenOpenTable(iCur, iDb, pTab, OpCode.OP_OpenRead);
                         v.AddOpp3(OpCode.OP_NotExists, iCur, 0, regTemp);
                         v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, iOk);
                         v.sqlite3VdbeJumpHere(v.sqlite3VdbeCurrentAddr() - 2);
@@ -2416,8 +2418,8 @@ goto attach_end;
                     ///<param name="Take a shared">lock on the parent table. Allocate </param>
                     ///<param name="a cursor to use to search the unique index on the parent key columns ">a cursor to use to search the unique index on the parent key columns </param>
                     ///<param name="in the parent table.  ">in the parent table.  </param>
-                    sqliteinth.sqlite3TableLock(this, iDb, pTo.tnum, 0, pTo.zName);
-                    this.nTab++;
+                    sqliteinth.TableLock(this, iDb, pTo.tnum, 0, pTo.zName);
+                    this.AllocatedCursorCount++;
                     if (regOld != 0) {
                         ///
                         ///<summary>
@@ -2480,7 +2482,7 @@ goto attach_end;
                         pItem.TableReference = pFKey.pFrom;
                         pItem.zName = pFKey.pFrom.zName;
                         pItem.TableReference.nRef++;
-                        pItem.iCursor = this.nTab++;
+                        pItem.iCursor = this.AllocatedCursorCount++;
                         if (regNew != 0) {
                             this.fkScanChildren(pSrc, pTab, pIdx, pFKey, aiCol, regNew, -1);
                         }
@@ -2918,7 +2920,7 @@ goto attach_end;
 
                     Debug.Assert(this.pNewTable == null);
                     Debug.Assert(this.pNewTrigger == null);
-                    Debug.Assert(this.nVar == 0);
+                    Debug.Assert(this.VariableParameterCount == 0);
                     Debug.Assert(this.nzVar == 0);
                     Debug.Assert(this.azVar == null);
                     enableLookaside = db.lookaside.bEnabled;
@@ -3319,7 +3321,7 @@ isView = false;
 						///Label "L" 
 						int addrIf;
 						///Address of jump to M 
-						srcTab=this.nTab++;
+						srcTab=this.AllocatedCursorCount++;
 						regRec=this.allocTempReg();
 						regTempRowid=this.allocTempReg();
                         v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, srcTab, nColumn);
@@ -3414,7 +3416,7 @@ isView = false;
 				///If this is not a view, open the table and and all indices 
 				if(!isView) {
 					int nIdx;
-					baseCur=this.nTab;
+					baseCur=this.AllocatedCursorCount;
                     nIdx = this.sqlite3OpenTableAndIndices(refTable, baseCur, OpCode.OP_OpenWrite);
 					aRegIdx=new int[nIdx+1];
 					// sqlite3DbMallocRaw( db, sizeof( int ) * ( nIdx + 1 ) );
@@ -3785,7 +3787,7 @@ isView = false;
 					pDb=db.Backends[p.iDb];
 					memId=p.regCtr;
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pDb.pSchema));
-					this.sqlite3OpenTable(0,p.iDb,pDb.pSchema.pSeqTab,OpCode.OP_OpenRead);
+					this.codegenOpenTable(0,p.iDb,pDb.pSchema.pSeqTab,OpCode.OP_OpenRead);
 					addr=v.sqlite3VdbeCurrentAddr();
 					v.sqlite3VdbeAddOp4(OpCode.OP_String8,0,memId-1,0,p.pTab.zName,0);
                     v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, 0, addr + 9);
@@ -3812,7 +3814,7 @@ isView = false;
 					int memId=p.regCtr;
 					iRec=this.allocTempReg();
 					Debug.Assert(sqlite3SchemaMutexHeld(db,0,pDb.pSchema));
-                    this.sqlite3OpenTable(0, p.iDb, pDb.pSchema.pSeqTab, OpCode.OP_OpenWrite);
+                    this.codegenOpenTable(0, p.iDb, pDb.pSchema.pSeqTab, OpCode.OP_OpenWrite);
 					j1=v.AddOpp1(OpCode.OP_NotNull,memId+1);
                     j2 = v.sqlite3VdbeAddOp0(OpCode.OP_Rewind);
 					j3=v.AddOpp3( OpCode.OP_Column,0,0,iRec);
@@ -4336,17 +4338,17 @@ isView = false;
 				iDb= this.db.indexOfBackendWithSchema(pTab.pSchema);
 				v=this.sqlite3GetVdbe();
 				Debug.Assert(v!=null);
-				this.sqlite3OpenTable(baseCur,iDb,pTab,op);
+				this.codegenOpenTable(baseCur,iDb,pTab,op);
 				for(i=1,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
                     KeyInfo pKey = pIdx.GetKeyinfo(this);
 					Debug.Assert(pIdx.pSchema==pTab.pSchema);
-					v.sqlite3VdbeAddOp4(op,i+baseCur,pIdx.tnum,iDb,pKey, P4Usage.P4_KEYINFO_HANDOFF);
+					v.sqlite3VdbeAddOp4(op,i+baseCur,pIdx.tnum,iDb,pKey);
 					#if SQLITE_DEBUG
 																																																																																																																																			        VdbeComment( v, "%s", pIdx.zName );
 #endif
 				}
-				if(this.nTab<baseCur+i) {
-					this.nTab=baseCur+i;
+				if(this.AllocatedCursorCount<baseCur+i) {
+					this.AllocatedCursorCount=baseCur+i;
 				}
 				return i-1;
 			}
@@ -4416,7 +4418,7 @@ isView = false;
 				}
 				return false;
 			}
-			public void sqlite3OpenTable(
+			public void codegenOpenTable(
 			    int iCur,///The cursor number of the table 
 			    int iDb,///The database index in sqlite3.aDb[] 
 			    Table pTab,///The table to be opened 
@@ -4426,88 +4428,40 @@ isView = false;
 					return;
 				var vdbe=this.sqlite3GetVdbe();
 				Debug.Assert(opcode== OpCode.OP_OpenWrite||opcode== OpCode.OP_OpenRead);
-                sqliteinth.sqlite3TableLock(this, iDb, pTab.tnum, (opcode == OpCode.OP_OpenWrite) ? (byte)1 : (byte)0, pTab.zName);
+                sqliteinth.TableLock(this, iDb, pTab.tnum, (opcode == OpCode.OP_OpenWrite) ? (byte)1 : (byte)0, pTab.zName);
 				vdbe.AddOpp3(opcode,iCur,pTab.tnum,iDb);
 				vdbe.sqlite3VdbeChangeP4(-1,(pTab.nCol), P4Usage.P4_INT32);
 				//SQLITE_INT_TO_PTR( pTab.nCol ),  P4Usage.P4_INT32 );
 				vdbe.VdbeComment("%s",pTab.zName);
 			}
-			public void sqlite3Update(///
-			///<summary>
-			///The parser context 
-			///</summary>
-			SrcList pTabList,///
-			///<summary>
-			///The table in which we should change things 
-			///</summary>
-			ExprList pChanges,///
-			///<summary>
-			///Things to be changed 
-			///</summary>
-			Expr pWhere,///
-			///<summary>
-			///The WHERE clause.  May be null 
-			///</summary>
-			OnConstraintError onError///
-			///<summary>
-			///How to handle constraint errors 
-			///</summary>
+			public void sqlite3Update(
+                SrcList pTabList,///The table in which we should change things 
+			    ExprList pChanges,///Things to be changed 
+			    Expr pWhere,///The WHERE clause.  May be null 
+			    OnConstraintError onError///How to handle constraint errors 
 			) {
 				int i,j;
-				///
-				///<summary>
 				///Loop counters 
-				///</summary>
 				Table pTab;
-				///
-				///<summary>
 				///The table to be updated 
-				///</summary>
 				int addr=0;
-				///
-				///<summary>
 				///VDBE instruction address of the start of the loop 
-				///</summary>
 				WhereInfo pWInfo;
-				///
-				///<summary>
 				///Information about the WHERE clause 
-				///</summary>
-				Vdbe v;
-				///
-				///<summary>
-				///The virtual database engine 
-				///</summary>
+				
+				
 				Index pIdx;
-				///
-				///<summary>
 				///For looping over indices 
-				///</summary>
 				int nIdx;
-				///
-				///<summary>
 				///Number of indices that need updating 
-				///</summary>
 				int iCur;
-				///
-				///<summary>
 				///VDBE Cursor number of pTab 
-				///</summary>
 				Connection db;
-				///
-				///<summary>
 				///The database structure 
-				///</summary>
 				int[] aRegIdx=null;
-				///
-				///<summary>
 				///One register assigned to each index to be updated 
-				///</summary>
 				int[] aXRef=null;
-				///
-				///<summary>
 				///aXRef[i] is the index in pChanges.a[] of the
-				///</summary>
 				///<param name="an expression for the i">th column of the table.</param>
 				///<param name="aXRef[i]==">th column is not changed. </param>
 				bool chngRowid;
@@ -4651,9 +4605,9 @@ isView = false;
 				///allocate enough space, just in case.
 				///
 				///</summary>
-				pTabList.a[0].iCursor=iCur=this.nTab++;
+				pTabList.a[0].iCursor=iCur=this.AllocatedCursorCount++;
 				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-					this.nTab++;
+					this.AllocatedCursorCount++;
 				}
 				///
 				///<summary>
@@ -4748,7 +4702,8 @@ aXRef[j] = -1;
 				///<summary>
 				///Begin generating code. 
 				///</summary>
-				v=this.sqlite3GetVdbe();
+				var v=this.sqlite3GetVdbe();
+                var facade = new VdbeFacade(v);
 				if(v==null)
 					goto update_cleanup;
 				if(this.nested==0)
@@ -4853,7 +4808,7 @@ aXRef[j] = -1;
 					///
 					///</summary>
 					if(!okOnePass)
-                        this.sqlite3OpenTable(iCur, iDb, pTab, OpCode.OP_OpenWrite);
+                        this.codegenOpenTable(iCur, iDb, pTab, OpCode.OP_OpenWrite);
 					if(onError==OnConstraintError.OE_Replace) {
 						openAll=true;
 					}
@@ -4869,8 +4824,8 @@ aXRef[j] = -1;
 					for(i=0,pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext,i++) {
 						if(openAll||aRegIdx[i]>0) {
                             KeyInfo pKey = pIdx.GetKeyinfo(this);
-                            v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iCur + i + 1, pIdx.tnum, iDb, pKey, P4Usage.P4_KEYINFO_HANDOFF);
-							Debug.Assert(this.nTab>iCur+i+1);
+                            v.sqlite3VdbeAddOp4(OpCode.OP_OpenWrite, iCur + i + 1, pIdx.tnum, iDb, pKey);
+							Debug.Assert(this.AllocatedCursorCount>iCur+i+1);
 						}
 					}
 				}
@@ -4964,7 +4919,7 @@ aXRef[j] = -1;
 								sqliteinth.testcase(i==31);
 								sqliteinth.testcase(i==32);
 								v.AddOpp3( OpCode.OP_Column,iCur,i,regNew+i);
-								v.codegenColumnDefault(pTab,i,regNew+i);
+								facade.codegenColumnDefault(pTab,i,regNew+i);
 							}
 					}
 				}
@@ -4995,7 +4950,7 @@ aXRef[j] = -1;
 					for(i=0;i<pTab.nCol;i++) {
 						if(aXRef[i]<0&&i!=pTab.iPKey) {
 							v.AddOpp3( OpCode.OP_Column,iCur,i,regNew+i);
-							v.codegenColumnDefault(pTab,i,regNew+i);
+							facade.codegenColumnDefault(pTab,i,regNew+i);
 						}
 					}
 				}
@@ -5092,99 +5047,28 @@ aXRef[j] = -1;
 				exprc.Delete(db,ref pWhere);
 				return;
 			}
-			public void updateVirtualTable(///
-			///<summary>
-			///The parsing context 
-			///</summary>
-			SrcList pSrc,///
-			///<summary>
-			///The virtual table to be modified 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///The virtual table 
-			///</summary>
-			ExprList pChanges,///
-			///<summary>
-			///The columns to change in the UPDATE statement 
-			///</summary>
-			Expr pRowid,///
-			///<summary>
-			///Expression used to recompute the rowid 
-			///</summary>
-			int[] aXRef,///
-			///<summary>
-			///Mapping from columns of pTab to entries in pChanges 
-			///</summary>
-			Expr pWhere,///
-			///<summary>
-			///WHERE clause of the UPDATE statement 
-			///</summary>
-			OnConstraintError onError///
-			///<summary>
-			///ON CONFLICT strategy 
-			///</summary>
+
+            public void updateVirtualTable(
+			    SrcList pSrc,///The virtual table to be modified 
+			    Table pTab,///The virtual table 
+			    ExprList pChanges,///The columns to change in the UPDATE statement 
+			    Expr pRowid,///Expression used to recompute the rowid 
+			    int[] aXRef,///Mapping from columns of pTab to entries in pChanges 
+			    Expr pWhere,///WHERE clause of the UPDATE statement 
+			    OnConstraintError onError///ON CONFLICT strategy 
 			) {
-				Vdbe v=this.pVdbe;
-				///
-				///<summary>
-				///Virtual machine under construction 
-				///</summary>
-				ExprList pEList=null;
-				///
-				///<summary>
-				///The result set of the SELECT statement 
-				///</summary>
-				Select pSelect=null;
-				///
-				///<summary>
-				///The SELECT statement 
-				///</summary>
-				Expr pExpr;
-				///
-				///<summary>
-				///Temporary expression 
-				///</summary>
-				int ephemTab;
-				///
-				///<summary>
-				///Table holding the result of the SELECT 
-				///</summary>
-				int i;
-				///
-				///<summary>
-				///Loop counter 
-				///</summary>
-				int addr;
-				///
-				///<summary>
-				///Address of top of loop 
-				///</summary>
-				int iReg;
-				///
-				///<summary>
-				///First register in set passed to  OpCode.OP_VUpdate 
-				///</summary>
-				Connection db=this.db;
-				///
-				///<summary>
-				///Database connection 
-				///</summary>
-                VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
-				SelectDest dest=new SelectDest();
-				///
-				///<summary>
-				///Construct the SELECT statement that will find the new values for
+				Vdbe v=this.pVdbe;///Virtual machine under construction 				
+				Connection db=this.db;///Database connection 
+                ///Construct the SELECT statement that will find the new values for
 				///all updated rows.
-				///
-				///</summary>
-				pEList=CollectionExtensions.Append(null,exprc.sqlite3Expr(db,TokenType.TK_ID,"_rowid_"));
-				if(pRowid!=null) {
+				var pEList=CollectionExtensions.Append(null,exprc.sqlite3Expr(db,TokenType.TK_ID,"_rowid_"));///The result set of the SELECT statement 
+				if (pRowid!=null) {
 					pEList=pEList.Append(exprc.Duplicate(db,pRowid,0));
 				}
 				Debug.Assert(pTab.iPKey<0);
-				for(i=0;i<pTab.nCol;i++) {
-					if(aXRef[i]>=0) {
+				for(var i=0;i<pTab.nCol;i++) {
+                    Expr pExpr;///Temporary expression 
+					if (aXRef[i]>=0) {
 						pExpr=exprc.Duplicate(db,pChanges.a[aXRef[i]].pExpr,0);
 					}
 					else {
@@ -5192,37 +5076,30 @@ aXRef[j] = -1;
 					}
 					pEList=pEList.Append(pExpr);
 				}
-				pSelect=Select.Create(this,pEList,pSrc,pWhere,null,null,null,0,null,null);
-				///
-				///<summary>
-				///Create the ephemeral table into which the update results will
-				///be stored.
-				///
-				///</summary>
-				Debug.Assert(v!=null);
-				ephemTab=this.nTab++;
+				var pSelect=Select.Create(this,pEList,pSrc,pWhere,null,null,null,0,null,null);///The SELECT statement 
+                ///Create the ephemeral table into which the update results will
+                ///be stored.
+                Debug.Assert(v!=null);
+				var ephemTab=this.AllocatedCursorCount++;///Table holding the result of the SELECT 				
                 v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, ephemTab, pTab.nCol + 1 + ((pRowid != null) ? 1 : 0));
 				v.ChangeP5(BTREE_UNORDERED);
-				///
-				///<summary>
-				///fill the ephemeral table
-				///
-				///</summary>
+
+                var dest = new SelectDest();
+                ///fill the ephemeral table
                 dest.Init(SelectResultType.Table, ephemTab);
                 Compiler.CodeGeneration.ForSelect.codegenSelect(this,pSelect,ref dest);
-				///
-				///<summary>
 				///Generate code to scan the ephemeral table and call VUpdate. 
-				///</summary>
-				iReg=++this.UsedCellCount;
+				var iReg=++this.UsedCellCount;///First register in set passed to  OpCode.OP_VUpdate 
 				this.UsedCellCount+=pTab.nCol+1;
-                addr = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, ephemTab, 0);
+                var addr = v.sqlite3VdbeAddOp2(OpCode.OP_Rewind, ephemTab, 0);
 				v.AddOpp3( OpCode.OP_Column,ephemTab,0,iReg);
 				v.AddOpp3( OpCode.OP_Column,ephemTab,(pRowid!=null?1:0),iReg+1);
-				for(i=0;i<pTab.nCol;i++) {
+				for(var i=0;i<pTab.nCol;i++) {
 					v.AddOpp3( OpCode.OP_Column,ephemTab,i+1+((pRowid!=null)?1:0),iReg+2+i);
 				}
 				this.sqlite3VtabMakeWritable(pTab);
+
+                VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
                 v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 0, pTab.nCol + 2, iReg, pVTab,  P4Usage.P4_VTAB);
 				v.ChangeP5((byte)(onError==OnConstraintError.OE_Default?OnConstraintError.OE_Abort:onError));
 				build.sqlite3MayAbort(this);
@@ -5284,198 +5161,73 @@ aXRef[j] = -1;
 				#endif
 				return false;
 			}
-			public void sqlite3MaterializeView(///
-			///<summary>
-			///Parsing context 
-			///</summary>
-			Table pView,///
-			///<summary>
-			///View definition 
-			///</summary>
-			Expr pWhere,///
-			///<summary>
-			///Optional WHERE clause to be added 
-			///</summary>
-			int iCur///
-			///<summary>
-			///VdbeCursor number for ephemerial table 
-			///</summary>
-			) {
-				SelectDest dest=new SelectDest();
-				Select pDup;
-				Connection db=this.db;
-				pDup=exprc.Clone(db,pView.pSelect,0);
-				if(pWhere!=null) {
-					SrcList pFrom;
+			public void sqlite3MaterializeView(
+                Table pView,///View definition 
+			    Expr pWhere,///Optional WHERE clause to be added 
+			    int iCur///VdbeCursor number for ephemerial table 
+			) {				
+                Connection db=this.db;
+                var select = exprc.Clone(db, pView.pSelect, 0);
+                if (pWhere!=null) {					
 					pWhere=exprc.Duplicate(db,pWhere,0);
-					pFrom=build.sqlite3SrcListAppend(db,null,null,null);
-					//if ( pFrom != null )
-					//{
+					var pFrom=build.sqlite3SrcListAppend(db,null,null,null);
 					Debug.Assert(pFrom.Count==1);
 					pFrom.a[0].zAlias=pView.zName;
-					// sqlite3DbStrDup( db, pView.zName );
-					pFrom.a[0].pSelect=pDup;
+					pFrom.a[0].pSelect=select;
 					Debug.Assert(pFrom.a[0].pOn==null);
 					Debug.Assert(pFrom.a[0].pUsing==null);
-					//}
-					//else
-					//{
-					//  SelectMethods.sqlite3SelectDelete( db, ref pDup );
-					//}
-					pDup=Select.Create(this,null,pFrom,pWhere,null,null,null,0,null,null);
+					select=Select.Create(this,null,pFrom,pWhere,null,null,null,0,null,null);
 				}
+                SelectDest dest = new SelectDest();
                 dest.Init( SelectResultType.EphemTab, iCur);
-                Compiler.CodeGeneration.ForSelect.codegenSelect(this,pDup,ref dest);
-				SelectMethods.SelectDestructor(db,ref pDup);
+                Compiler.CodeGeneration.ForSelect.codegenSelect(this,select,ref dest);
+				SelectMethods.SelectDestructor(db,ref select);
 			}
-			public void sqlite3DeleteFrom(///
-			///<summary>
-			///The parser context 
-			///</summary>
-			SrcList pTabList,///
-			///<summary>
-			///The table from which we should delete things 
-			///</summary>
-			Expr pWhere///
-			///<summary>
-			///The WHERE clause.  May be null 
-			///</summary>
-			) {
-				Vdbe v;
-				///
-				///<summary>
-				///The virtual database engine 
-				///</summary>
-				Table pTab;
-				///
-				///<summary>
-				///The table from which records will be deleted 
-				///</summary>
-				string zDb;
-				///
-				///<summary>
-				///Name of database holding pTab 
-				///</summary>
-				int end,addr=0;
-				///
-				///<summary>
-				///A couple addresses of generated code 
-				///</summary>
-				int i;
-				///
-				///<summary>
-				///Loop counter 
-				///</summary>
-				WhereInfo pWInfo;
-				///
-				///<summary>
-				///Information about the WHERE clause 
-				///</summary>
-				Index pIdx;
-				///
-				///<summary>
-				///For looping over indices of the table 
-				///</summary>
-				int iCur;
-				///
-				///<summary>
-				///VDBE VdbeCursor number for pTab 
-				///</summary>
-				Connection db;
-				///
-				///<summary>
-				///Main database structure 
-				///</summary>
-				AuthContext sContext;
-				///
-				///<summary>
-				///Authorization context 
-				///</summary>
-				NameContext sNC;
-				///
-				///<summary>
-				///Name context to resolve expressions in 
-				///</summary>
-				int iDb;
-				///
-				///<summary>
-				///Database number 
-				///</summary>
-				int memCnt=-1;
-				///
-				///<summary>
-				///Memory cell used for change counting 
-				///</summary>
-				AuthResult rcauth;
-				///
-				///<summary>
-				///Value returned by authorization callback 
-				///</summary>
-				#if !SQLITE_OMIT_TRIGGER
-				bool isView;
-				///
-				///<summary>
-				///True if attempting to delete from a view 
-				///</summary>
-				Trigger pTrigger;
-				///
-				///<summary>
-				///List of table triggers, if required 
-				///</summary>
-				#endif
-				sContext=new AuthContext();
-				//memset(&sContext, 0, sizeof(sContext));
-				db=this.db;
-				if(this.nErr!=0///
-				///<summary>
-				///|| db.mallocFailed != 0 
-				///</summary>
-				) {
+
+			public void sqlite3DeleteFrom(
+			    SrcList pTabList,///The table from which we should delete things 
+			    Expr pWhere///The WHERE clause.  May be null 
+			) {	
+				int end,addr=0;///A couple addresses of generated code 				
+				int i;///Loop counter 				
+				int memCnt=-1;///Memory cell used for change counting 
+				AuthResult rcauth;///Value returned by authorization callback 
+				var sContext=new AuthContext();///Authorization context 
+                var connection =this.db;///Main database structure 
+				if (this.nErr!=0) {
 					goto delete_from_cleanup;
 				}
 				Debug.Assert(pTabList.Count==1);
-				///
-				///<summary>
 				///Locate the table which we want to delete.  This table has to be
 				///put in an SrcList structure because some of the subroutines we
 				///will be calling are designed to work with multiple tables and expect
 				///an SrcList* parameter instead of just a Table* parameter.
-				///
-				///</summary>
-				pTab=this.GetFirstTableInTheList(pTabList);
+				var pTab=this.GetFirstTableInTheList(pTabList);
 				if(pTab==null)
 					goto delete_from_cleanup;
-				///
-				///<summary>
 				///Figure out if we have any triggers and if the table being
 				///deleted from is a view
-				///
-				///</summary>
 				#if !SQLITE_OMIT_TRIGGER
 				TriggerType iDummy;
-				pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_DELETE,null,out iDummy);
-				isView=pTab.pSelect!=null;
-				#else
-																																																																																																					      const Trigger pTrigger = null;
-      bool isView = false;
+				var pTrigger= TriggerParser.sqlite3TriggersExist(this,pTab,TokenType.TK_DELETE,null,out iDummy);///List of table triggers, if required 
+				var isView = pTab.IsView;///True if attempting to delete from a view 
+#else																																																																																																					      
+                const Trigger pTrigger = null;
+                      bool isView = false;
 #endif
-				#if SQLITE_OMIT_VIEW
-																																																																																																					// undef isView
-isView = false;
+#if SQLITE_OMIT_VIEW                                                                                                                                                                                                                                                                                                                                                                                                                    // undef isView
+                    isView = false;
 #endif
-				///
-				///<summary>
-				///If pTab is really a view, make sure it has been initialized.
-				///</summary>
-				if(build.sqlite3ViewGetColumnNames(this,pTab)!=0) {
+                ///If pTab is really a view, make sure it has been initialized.
+                if (build.sqlite3ViewGetColumnNames(this,pTab)!=0) {
 					goto delete_from_cleanup;
 				}
 				if(this.sqlite3IsReadOnly(pTab,(TriggerType)(pTrigger!=null?1:0))) {
 					goto delete_from_cleanup;
 				}
-				iDb=db.indexOfBackendWithSchema(pTab.pSchema);
-				Debug.Assert(iDb<db.BackendCount);
-				zDb=db.Backends[iDb].Name;
+				var iDb=connection.indexOfBackendWithSchema(pTab.pSchema);///Database number 
+				Debug.Assert(iDb<connection.BackendCount);
+				var dbName=connection.Backends[iDb].Name;
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					rcauth = sqlite3AuthCheck(pParse, SQLITE_DELETE, pTab->zName, 0, zDb);
 #else
@@ -5487,16 +5239,10 @@ isView = false;
 				}
                 
 				Debug.Assert(!isView||pTrigger!=null);
-				///
-				///<summary>
 				///Assign  cursor number to the table and all its indices.
-				///
-				///</summary>
 				Debug.Assert(pTabList.Count==1);
-				iCur=pTabList.a[0].iCursor=this.nTab++;
-				for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-					this.nTab++;
-				}
+				var iCur=pTabList.a[0].iCursor=this.AllocatedCursorCount++;///VDBE VdbeCursor number for pTab 								
+                this.AllocatedCursorCount+=pTab.pIndex.linkedList().Count();				
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					/* Start the view context
 */
@@ -5504,204 +5250,145 @@ if( isView ){
 sqlite3AuthContextPush(pParse, sContext, pTab.zName);
 }
 #endif
-				///
-				///<summary>
 				///Begin generating code.
-				///</summary>
-				v=this.sqlite3GetVdbe();
-				if(v==null) {
+				var vdbe=this.sqlite3GetVdbe();
+				if(vdbe==null) {
 					goto delete_from_cleanup;
 				}
 				if(this.nested==0)
-					v.sqlite3VdbeCountChanges();
+					vdbe.sqlite3VdbeCountChanges();
 				build.sqlite3BeginWriteOperation(this,1,iDb);
-				///
-				///<summary>
 				///If we are trying to delete from a view, realize that view into
 				///a ephemeral table.
-				///
-				///</summary>
 				#if !(SQLITE_OMIT_VIEW) && !(SQLITE_OMIT_TRIGGER)
 				if(isView) {
 					this.sqlite3MaterializeView(pTab,pWhere,iCur);
 				}
 				#endif
-				///
-				///<summary>
 				///Resolve the column names in the WHERE clause.
-				///
-				///</summary>
-				sNC=new NameContext();
+				var sNC=new NameContext();
 				// memset( &sNC, 0, sizeof( sNC ) );
 				sNC.ParseState=this;
 				sNC.pSrcList=pTabList;
 				if(ResolveExtensions.ResolveExprNames(sNC,ref pWhere)!=0) {
 					goto delete_from_cleanup;
 				}
-				///
-				///<summary>
 				///Initialize the counter of the number of rows deleted, if
 				///we are counting rows.
-				///</summary>
-                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0)
+                if ((connection.flags & SqliteFlags.SQLITE_CountRows) != 0)
                 {
 					memCnt=++this.UsedCellCount;
-					v.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,memCnt);
+					vdbe.sqlite3VdbeAddOp2(OpCode.OP_Integer,0,memCnt);
 				}
 				#if !SQLITE_OMIT_TRUNCATE_OPTIMIZATION
-				///
-				///<summary>
 				///Special case: A DELETE without a WHERE clause deletes everything.
 				///It is easier just to erase the whole table. Prior to version 3.6.5,
 				///this optimization caused the row change count (the value returned by 
 				///API function sqlite3_count_changes) to be set incorrectly.  
-				///</summary>
 				if(rcauth==AuthResult.SQLITE_OK&&pWhere==null&&null==pTrigger&&!pTab.IsVirtual()&&false==this.sqlite3FkRequired(pTab,null,0)) {
 					Debug.Assert(!isView);
-                    v.sqlite3VdbeAddOp4(OpCode.OP_Clear, pTab.tnum, iDb, memCnt, pTab.zName, P4Usage.P4_STATIC);
-					for(pIdx=pTab.pIndex;pIdx!=null;pIdx=pIdx.pNext) {
-						Debug.Assert(pIdx.pSchema==pTab.pSchema);
-                        v.sqlite3VdbeAddOp2(OpCode.OP_Clear, pIdx.tnum, iDb);
-					}
-				}
+                    vdbe.sqlite3VdbeAddOp4(OpCode.OP_Clear, pTab.tnum, iDb, memCnt, pTab.zName, P4Usage.P4_STATIC);
+                    pTab.pIndex.linkedList().ForEach(
+                        pIdx => {
+                            Debug.Assert(pIdx.pSchema == pTab.pSchema);
+                            vdbe.sqlite3VdbeAddOp2(OpCode.OP_Clear, pIdx.tnum, iDb);
+                        });
+					
+                }
 				else
 				#endif
-				///
-				///<summary>
 				///The usual case: There is a WHERE clause so we have to scan through
 				///the table and pick which records to delete.
-				///</summary>
 				 {
-					int iRowSet=++this.UsedCellCount;
-					///
-					///<summary>
-					///Register for rowset of rows to delete 
-					///</summary>
-					int iRowid=++this.UsedCellCount;
-					///
-					///<summary>
-					///Used for storing rowid values. 
-					///</summary>
-					int regRowid;
-					///
-					///<summary>
-					///Actual register containing rowids 
-					///</summary>
-					///
-					///<summary>
+					int iRowSet=++this.UsedCellCount;///Register for rowset of rows to delete 
+					int iRowid=++this.UsedCellCount;///Used for storing rowid values. 
 					///Collect rowids of every row to be deleted.
-					///</summary>
-                    v.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, iRowSet);
+                    vdbe.sqlite3VdbeAddOp2(OpCode.OP_Null, 0, iRowSet);
 					ExprList elDummy=null;
-					pWInfo=this.sqlite3WhereBegin(pTabList,pWhere,ref elDummy,wherec.WHERE_DUPLICATES_OK);
-					if(pWInfo==null)
-						goto delete_from_cleanup;
-					regRowid=this.sqlite3ExprCodeGetColumn(pTab,-1,iCur,iRowid);
-					v.sqlite3VdbeAddOp2( OpCode.OP_RowSetAdd,iRowSet,regRowid);
-                    if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0)
+					var pWInfo=this.sqlite3WhereBegin(pTabList,pWhere,ref elDummy,wherec.WHERE_DUPLICATES_OK);///Information about the WHERE clause
                     {
-						v.sqlite3VdbeAddOp2(OpCode.OP_AddImm,memCnt,1);
-					}
+                        if (pWInfo == null)
+                            goto delete_from_cleanup;
+                        var regRowid = this.sqlite3ExprCodeGetColumn(pTab, -1, iCur, iRowid);///Actual register containing rowids 
+                        vdbe.sqlite3VdbeAddOp2(OpCode.OP_RowSetAdd, iRowSet, regRowid);
+                        if ((connection.flags & SqliteFlags.SQLITE_CountRows) != 0)
+                        {
+                            vdbe.sqlite3VdbeAddOp2(OpCode.OP_AddImm, memCnt, 1);
+                        }
+                    }
 					pWInfo.sqlite3WhereEnd();
-					///
-					///<summary>
 					///Delete every item whose key was written to the list during the
 					///database scan.  We have to delete items after the scan is complete
 					///because deleting an item can change the scan order. 
-					///</summary>
-					end=v.sqlite3VdbeMakeLabel();
-					///
-					///<summary>
+					end=vdbe.sqlite3VdbeMakeLabel();
 					///Unless this is a view, open cursors for the table we are 
 					///deleting from and all its indices. If this is a view, then the
 					///only effect this statement has is to fire the INSTEAD OF 
 					///triggers.  
-					///</summary>
 					if(!isView) {
                         this.sqlite3OpenTableAndIndices(pTab, iCur, OpCode.OP_OpenWrite);
 					}
-					addr=v.AddOpp3( OpCode.OP_RowSetRead,iRowSet,end,iRowid);
+					addr=vdbe.AddOpp3( OpCode.OP_RowSetRead,iRowSet,end,iRowid);
 					///Delete the row 
 					#if !SQLITE_OMIT_VIRTUALTABLE
 					if(pTab.IsVirtual()) {
-                        VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(db, pTab);
+                        VTable pVTab = VTableMethodsExtensions.sqlite3GetVTable(connection, pTab);
 						this.sqlite3VtabMakeWritable(pTab);
-                        v.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 0, 1, iRowid, pVTab,  P4Usage.P4_VTAB);
-						v.ChangeP5((byte)OnConstraintError.OE_Abort);
+                        vdbe.sqlite3VdbeAddOp4(OpCode.OP_VUpdate, 0, 1, iRowid, pVTab,  P4Usage.P4_VTAB);
+						vdbe.ChangeP5((byte)OnConstraintError.OE_Abort);
 						build.sqlite3MayAbort(this);
 					}
 					else
 					#endif
 					 {
 						int count=(this.nested==0)?1:0;
-						///
-						///<summary>
 						///True to count changes 
-						///</summary>
 						this.codegenRowDelete(pTab,iCur,iRowid,count,pTrigger,OnConstraintError.OE_Default);
 					}
-					///
-					///<summary>
+
 					///End of the delete loop 
-					///</summary>
-					v.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,addr);
-					v.sqlite3VdbeResolveLabel(end);
-					///
-					///<summary>
-					///Close the cursors open on the table and its indexes. 
-					///</summary>
-					if(!isView&&!pTab.IsVirtual()) {
-						for(i=1,pIdx=pTab.pIndex;pIdx!=null;i++,pIdx=pIdx.pNext) {
-                            v.sqlite3VdbeAddOp2(OpCode.OP_Close, iCur + i, pIdx.tnum);
-						}
-						v.AddOpp1(OpCode.OP_Close,iCur);
+					vdbe.sqlite3VdbeAddOp2(OpCode.OP_Goto,0,addr);
+					vdbe.sqlite3VdbeResolveLabel(end);
+					
+					if(!isView&&!pTab.IsVirtual()) {///Close the cursors open on the table and its indexes. 
+                        i = 1;
+                        pTab.pIndex.linkedList().ForEach(
+                            pIdx => vdbe.sqlite3VdbeAddOp2(OpCode.OP_Close, iCur + i, pIdx.tnum)
+                        );
+                        vdbe.AddOpp1(OpCode.OP_Close, iCur);
 					}
 				}
-				///
-				///<summary>
 				///Update the sqlite_sequence table by storing the content of the
 				///maximum rowid counter values recorded while inserting into
 				///autoincrement tables.
-				///
-				///</summary>
 				if(this.nested==0&&this.pTriggerTab==null) {
 					this.sqlite3AutoincrementEnd();
 				}
-				///
-				///<summary>
 				///Return the number of rows that were deleted. If this routine is 
 				///generating code because of a call to build.sqlite3NestedParse(), do not
 				///invoke the callback function.
-				///
-				///</summary>
-                if ((db.flags & SqliteFlags.SQLITE_CountRows) != 0 && 0 == this.nested && null == this.pTriggerTab)
+                if ((connection.flags & SqliteFlags.SQLITE_CountRows) != 0 && 0 == this.nested && null == this.pTriggerTab)
                 {
-					v.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,memCnt,1);
-					v.sqlite3VdbeSetNumCols(1);
-                    v.sqlite3VdbeSetColName(0, ColName.NAME, "rows deleted", SQLITE_STATIC);
+					vdbe.sqlite3VdbeAddOp2(OpCode.OP_ResultRow,memCnt,1);
+					vdbe.sqlite3VdbeSetNumCols(1);
+                    vdbe.sqlite3VdbeSetColName(0, ColName.NAME, "rows deleted", SQLITE_STATIC);
 				}
 				delete_from_cleanup:
 				#if !SQLITE_OMIT_AUTHORIZATION
 																																																																																																					sqlite3AuthContextPop(sContext);
 #endif
-				build.sqlite3SrcListDelete(db,ref pTabList);
-				exprc.Delete(db,ref pWhere);
+				build.sqlite3SrcListDelete(connection,ref pTabList);
+				exprc.Delete(connection,ref pWhere);
 				return;
 			}
 
-			public void codegenRowDelete(///
-			    Table pTab,///
-			    ///Table containing the row to be deleted 
-			    int iCur,///
-			    ///VdbeCursor number for the table 
-			    int iRowid,///
-			    ///Memory cell that contains the rowid to delete 
-			    int count,///
-			    ///<param name="If non">zero, increment the row change counter </param>
-			    Trigger pTrigger,///
-			    ///List of triggers to (potentially) fire 
-			    OnConstraintError onconf///
-			    ///Default ON CONFLICT policy for triggers 
+			public void codegenRowDelete(
+			    Table pTab,///Table containing the row to be deleted 
+			    int iCur,///VdbeCursor number for the table 
+			    int iRowid,///Memory cell that contains the rowid to delete 
+			    int count,///<param name="If non">zero, increment the row change counter </param>
+			    Trigger pTrigger,///List of triggers to (potentially) fire 
+			    OnConstraintError onconf///Default ON CONFLICT policy for triggers 
 			) {
 				Vdbe v=this.pVdbe;
 				///Vdbe 
@@ -5967,41 +5654,25 @@ return;
 					}
 				}
 			}
-			public int sqlite3ExprCodeGetColumn(///
-			///<summary>
-			///Parsing and code generating context 
-			///</summary>
-			Table pTab,///
-			///<summary>
-			///Description of the table we are reading from 
-			///</summary>
-			int iColumn,///
-			///<summary>
-			///Index of the table column 
-			///</summary>
-			int iTable,///
-			///<summary>
-			///The cursor pointing to the table 
-			///</summary>
-			int iReg///
-			///<summary>
-			///Store results here 
-			///</summary>
+			public int sqlite3ExprCodeGetColumn(
+			    Table pTab,///Description of the table we are reading from 
+			    int iColumn,///Index of the table column 
+			    int iTable,///The cursor pointing to the table 
+			    int iReg///Store results here 
 			) {
-				Vdbe v=this.pVdbe;
-				int i;
-				sqliteinth.yColCache p;
-                for (i = 0; i < sqliteinth.SQLITE_N_COLCACHE; i++)
+                for (var i = 0; i < sqliteinth.SQLITE_N_COLCACHE; i++)
                 {
 					// p=pParse.aColCache, p++
-					p=this.aColCache[i];
+					var p=this.aColCache[i];
 					if(p.iReg>0&&p.iTable==iTable&&p.iColumn==iColumn) {
 						p.lru=this.iCacheCnt++;
 						this.sqlite3ExprCachePinRegister(p.iReg);
 						return p.iReg;
 					}
 				}
-				Debug.Assert(v!=null);
+
+                Vdbe v = this.pVdbe;
+                Debug.Assert(v!=null);
 				v.codegenExprCodeGetColumnOfTable(pTab,iTable,iColumn,iReg);
 				this.sqlite3ExprCacheStore(iTable,iColumn,iReg);
 				return iReg;
@@ -6831,7 +6502,7 @@ return;
 				if(z.Length==1) {
 					///Wildcard of the form "?".  Assign the next variable number 
 					Debug.Assert(z[0]=='?');
-					pExpr.iColumn=(ynVar)(++this.nVar);
+					pExpr.iColumn=(ynVar)(++this.VariableParameterCount);
 				}
 				else {
 					ynVar x=0;
@@ -6850,8 +6521,8 @@ return;
 							utilc.sqlite3ErrorMsg(this,"variable number must be between ?1 and ?%d",db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]);
 							x=0;
 						}
-						if(i>this.nVar) {
-							this.nVar=(int)i;
+						if(i>this.VariableParameterCount) {
+							this.VariableParameterCount=(int)i;
 						}
 					}
 					else {
@@ -6866,7 +6537,7 @@ return;
 							}
 						}
 						if(x==0)
-							x=pExpr.iColumn=(ynVar)(++this.nVar);
+							x=pExpr.iColumn=(ynVar)(++this.VariableParameterCount);
 					}
 					if(x>0) {
                         azVar.Count = x;						
@@ -6877,7 +6548,7 @@ return;
 						}
 					}
 				}
-				if(this.nErr==0&&this.nVar>db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]) {
+				if(this.nErr==0&&this.VariableParameterCount>db.aLimit[Globals.SQLITE_LIMIT_VARIABLE_NUMBER]) {
 					utilc.sqlite3ErrorMsg(this,"too many SQL variables");
 				}
 			}
@@ -6993,7 +6664,7 @@ return;
 				if(op==TokenType.TK_VARIABLE) {
 					Vdbe pReprepare=this.pReprepare;
 					int iCol=pRight.iColumn;
-                    pVal = pReprepare.sqlite3VdbeGetValue(iCol, (byte)sqliteinth.SQLITE_AFF_NONE);
+                    pVal = pReprepare.GetValue(iCol, (byte)sqliteinth.SQLITE_AFF_NONE);
                     if (pVal != null && vdbeapi.sqlite3_value_type(pVal) == FoundationalType.SQLITE_TEXT)
                     {
 						z=vdbeapi.sqlite3_value_text(pVal);
@@ -7542,7 +7213,7 @@ return;
 				///</summary>
                 pKeyinfo = pIdx.GetKeyinfo(this);
 				Debug.Assert(pLevel.iIdxCur>=0);
-				v.sqlite3VdbeAddOp4( OpCode.OP_OpenAutoindex,pLevel.iIdxCur,nColumn+1,0,pKeyinfo, P4Usage.P4_KEYINFO_HANDOFF);
+				v.sqlite3VdbeAddOp4( OpCode.OP_OpenAutoindex,pLevel.iIdxCur,nColumn+1,0,pKeyinfo);
 				v.VdbeComment("for %s",pTable.zName);
 				///
 				///<summary>
@@ -9582,7 +9253,7 @@ range_est_fallback:
 					sqliteinth.testcase(bestPlan.plan.wsFlags&wherec.WHERE_INDEXED);
 					sqliteinth.testcase(bestPlan.plan.wsFlags&wherec.WHERE_TEMP_INDEX);
 					if((bestPlan.plan.wsFlags&(wherec.WHERE_INDEXED|wherec.WHERE_TEMP_INDEX))!=0) {
-						pLevel.iIdxCur=this.nTab++;
+						pLevel.iIdxCur=this.AllocatedCursorCount++;
 					}
 					else {
 						pLevel.iIdxCur=-1;
@@ -9697,7 +9368,7 @@ range_est_fallback:
 							#endif
 							if((pLevel.plan.wsFlags&wherec.WHERE_IDX_ONLY)==0&&(wctrlFlags&wherec.WHERE_OMIT_OPEN)==0) {
                                 OpCode op = pWInfo.okOnePass != 0 ? OpCode.OP_OpenWrite :  OpCode.OP_OpenRead;
-								this.sqlite3OpenTable(pTabItem.iCursor,iDb,pTab,op);
+								this.codegenOpenTable(pTabItem.iCursor,iDb,pTab,op);
 								sqliteinth.testcase(pTab.nCol==Globals.BMS-1);
                                 sqliteinth.testcase(pTab.nCol == Globals.BMS);
                                 if (0 == pWInfo.okOnePass && pTab.nCol < Globals.BMS)
@@ -9712,7 +9383,7 @@ range_est_fallback:
 								}
 							}
 							else {
-								sqliteinth.sqlite3TableLock(this,iDb,pTab.tnum,0,pTab.zName);
+								sqliteinth.TableLock(this,iDb,pTab.tnum,0,pTab.zName);
 							}
 					#if !SQLITE_OMIT_AUTOMATIC_INDEX
 					if((pLevel.plan.wsFlags&wherec.WHERE_TEMP_INDEX)!=0) {
@@ -9726,7 +9397,7 @@ range_est_fallback:
 							int iIdxCur=pLevel.iIdxCur;
 							Debug.Assert(pIx.pSchema==pTab.pSchema);
 							Debug.Assert(iIdxCur>=0);
-							v.sqlite3VdbeAddOp4( OpCode.OP_OpenRead,iIdxCur,pIx.tnum,iDb,pKey, P4Usage.P4_KEYINFO_HANDOFF);
+							v.sqlite3VdbeAddOp4( OpCode.OP_OpenRead,iIdxCur,pIx.tnum,iDb,pKey);
 							#if SQLITE_DEBUG
 																																																																																																																																																																																														            VdbeComment( v, "%s", pIx.zName );
 #endif
@@ -10081,7 +9752,7 @@ range_est_fallback:
 				///<summary>
 				///Type of RHS table. IN_INDEX_* 
 				///</summary>
-				int iTab=this.nTab++;
+				int iTab=this.AllocatedCursorCount++;
 				///
 				///<summary>
 				///Cursor of the RHS table 
@@ -10137,7 +9808,7 @@ range_est_fallback:
 					///</summary>
 					iDb=db.indexOfBackendWithSchema(pTab.pSchema);
 					build.sqlite3CodeVerifySchema(this,iDb);
-					sqliteinth.sqlite3TableLock(this,iDb,pTab.tnum,0,pTab.zName);
+					sqliteinth.TableLock(this,iDb,pTab.tnum,0,pTab.zName);
 					///
 					///<summary>
 					///This function is only called from two places. In both cases the vdbe
@@ -10151,7 +9822,7 @@ range_est_fallback:
 						int iAddr;
 						iAddr=v.AddOpp1(OpCode.OP_If,iMem);
 						v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,iMem);
-						this.sqlite3OpenTable(iTab,iDb,pTab,OpCode.OP_OpenRead);
+						this.codegenOpenTable(iTab,iDb,pTab,OpCode.OP_OpenRead);
                         eType = sqliteinth.IN_INDEX_ROWID;
 						v.sqlite3VdbeJumpHere(iAddr);
 					}
@@ -10178,14 +9849,14 @@ range_est_fallback:
 						char aff=pX.comparisonAffinity();
                         bool affinity_ok = (pTab.aCol[iCol].affinity == aff || aff == sqliteinth.SQLITE_AFF_NONE);
 						for(pIdx=pTab.pIndex;pIdx!=null&&eType==0&&affinity_ok;pIdx=pIdx.pNext) {
-							if((pIdx.ColumnIdx[0]==iCol)&&(db.sqlite3FindCollSeq(sqliteinth.ENC(db),pIdx.Collations[0],0)==pReq)&&(mustBeUnique==false||(pIdx.nColumn==1&&pIdx.onError!=OnConstraintError.OE_None))) {
+							if((pIdx.ColumnIdx[0]==iCol)&&(db.FindCollSeq(sqliteinth.ENC(db),pIdx.Collations[0],0)==pReq)&&(mustBeUnique==false||(pIdx.nColumn==1&&pIdx.onError!=OnConstraintError.OE_None))) {
 								int iMem=++this.UsedCellCount;
 								int iAddr;
 								KeyInfo pKey;
                                 pKey = pIdx.GetKeyinfo(this);
 								iAddr=v.AddOpp1(OpCode.OP_If,iMem);
 								v.sqlite3VdbeAddOp2(OpCode.OP_Integer,1,iMem);
-								v.sqlite3VdbeAddOp4( OpCode.OP_OpenRead,iTab,pIdx.tnum,iDb,pKey, P4Usage.P4_KEYINFO_HANDOFF);
+								v.sqlite3VdbeAddOp4( OpCode.OP_OpenRead,iTab,pIdx.tnum,iDb,pKey);
 								#if SQLITE_DEBUG
 																																																																																																																																																																																																				              VdbeComment( v, "%s", pIdx.zName );
 #endif
@@ -10288,7 +9959,7 @@ range_est_fallback:
                     ///<param name="'x' nor the SELECT... statement are columns, then numeric affinity">'x' nor the SELECT... statement are columns, then numeric affinity</param>
                     ///<param name="is used.">is used.</param>
                     ///<param name=""></param>
-                            pExpr.iTable=this.nTab++;
+                            pExpr.iTable=this.AllocatedCursorCount++;
                     var addr = v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, (int)pExpr.iTable, !isRowid);///Address of  OpCode.OP_OpenEphemeral instruction 
                             if (rMayHaveNull==0)
 						v.ChangeP5(BTREE_UNORDERED);
