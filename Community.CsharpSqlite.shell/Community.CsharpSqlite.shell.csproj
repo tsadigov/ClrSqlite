@@ -302,6 +302,7 @@
     <Compile Include="src\Accessories\Utils\Enum.cs" />
     <Compile Include="src\Accessories\Utils\Error.cs" />
     <Compile Include="src\Accessories\Utils\Sync.cs" />
+    <Compile Include="src\Accessories\Utils\ThreeState.cs" />
     <Compile Include="src\Backend\Cache\Comment.cs" />
     <Compile Include="src\Backend\Cache\PCache1.cs" />
     <Compile Include="src\Backend\Cache\PCacheGlobal.cs" />
@@ -315,6 +316,7 @@
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Compiler\Ast\Expr.cs" />
     <Compile Include="src\Compiler\Ast\ExprExtensions.cs" />
+    <Compile Include="src\Compiler\Ast\From.cs" />
     <Compile Include="src\Compiler\Ast\IdentifierList.cs" />
     <Compile Include="src\Compiler\Ast\InLoop.cs" />
     <Compile Include="src\Compiler\Ast\LikeOp.cs" />
@@ -377,6 +379,8 @@
     <Compile Include="src\Core\Engine\VM\VdbeOp.cs" />
     <Compile Include="src\Core\Engine\VM\VdbeOpList.cs" />
     <Compile Include="src\Core\Engine\SortOrder.cs" />
+    <Compile Include="src\Core\Runtime\CursorRuntime.cs" />
+    <Compile Include="src\Core\Runtime\VdbeCursor.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
     <Compile Include="src\Backend\Paging\Delegates.cs" />

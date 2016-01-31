@@ -5,21 +5,21 @@ using System.Text;
 
 namespace Community.CsharpSqlite.Engine
 {
-    
-    
+
+
     using sqlite3_value = Engine.Mem;
     using Metadata;
     using Parse = Community.CsharpSqlite.Sqlite3.ParseState;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
-
-	///<summary>
-	/// A single instruction of the virtual machine has an opcode
-	/// and as many as three operands.  The instruction is recorded
-	/// as an instance of the following structure:
-	///
-	///</summary>
-	public class union_p4
+    using Utils;
+    ///<summary>
+    /// A single instruction of the virtual machine has an opcode
+    /// and as many as three operands.  The instruction is recorded
+    /// as an instance of the following structure:
+    ///
+    ///</summary>
+    public class union_p4
 	{
 		///
 ///<summary>
@@ -249,7 +249,7 @@ public u64 cycles;         /* Total time spend executing this instruction */
                 case OpCode.OP_Column:
 
                     var vdbeCursor = vdbe.OpenCursors[p1];
-                    str =(null==vdbeCursor)?"": ("nField:" + vdbeCursor.nField + "\tpayloadSize" + vdbeCursor.payloadSize + "\taRow:" + vdbeCursor.aRow + "\taOffset:" + (vdbeCursor.aOffset==null?"":String.Join(",", vdbeCursor.aOffset.Select(x => "x" + x.ToString()).ToArray())));
+                    str =(null==vdbeCursor)?"": ("nField:" + vdbeCursor.FieldCount + "\tpayloadSize" + vdbeCursor.payloadSize + "\taRow:" + vdbeCursor.aRow + "\taOffset:" + (vdbeCursor.aOffset==null?"":String.Join(",", vdbeCursor.aOffset.Select(x => "x" + x.ToString()).ToArray())));
                     
                     var pdest = vdbe.aMem[this.p3];
                     str += Environment.NewLine +"\t\t"+ pdest;
@@ -312,7 +312,11 @@ public u64 cycles;         /* Total time spend executing this instruction */
                         int id = 0;
                         id = (int)pC.pCursor.sqlite3BtreeGetCachedRowid();
                         if (0 == id)
-                            pC.pCursor.sqlite3BtreeLast(ref id);
+                        {
+                            ThreeState ts= ThreeState.Neutral;
+                            pC.pCursor.sqlite3BtreeLast(ref ts);
+                            id = (int)ts;
+                        }
                         str = "cached " + id;
                     }
                     break;

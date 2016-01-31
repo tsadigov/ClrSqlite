@@ -705,18 +705,10 @@ static u16 cellSize( MemPage pPage, int iCell )
             /// If an error occurs, then the value ppPage is set to is undefined. It
             /// may remain unchanged, or it may be set to an invalid value.
             ///</summary>
-            public static SqlResult getAndInitPage(BtShared pBt,///
-                ///<summary>
-                ///The database file 
-                ///</summary>
-            Pgno pgno,///
-                ///<summary>
-                ///Number of the page to get 
-                ///</summary>
-            ref MemPage ppPage///
-                ///<summary>
-                ///Write the page pointer here 
-                ///</summary>
+            public static SqlResult getAndInitPage(
+                BtShared pBt,///The database file 
+                Pgno pgno,///Number of the page to get 
+                ref MemPage ppPage///Write the page pointer here 
             )
             {
                 SqlResult rc;
@@ -1235,19 +1227,16 @@ rc = SQLITE_NOTADB;
             ///the database.
             ///</summary>
             public static SqlResult newDatabase(BtShared pBt)
-            {
-                MemPage pP1;
-                byte[] data;
-                SqlResult rc;
+            {   
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 if (pBt.nPage > 0)
                 {
                     return SqlResult.SQLITE_OK;
                 }
-                pP1 = pBt.pPage1;
+                var pP1 = pBt.pPage1;
                 Debug.Assert(pP1 != null);
-                data = pP1.aData;
-                rc = PagerMethods.sqlite3PagerWrite(pP1.pDbPage);
+                var data = pP1.aData;
+                var rc = PagerMethods.sqlite3PagerWrite(pP1.pDbPage);
                 if (rc != 0)
                     return rc;
                 Buffer.BlockCopy(Globals.zMagicHeader, 0, data, 0, 16);
@@ -3240,7 +3229,7 @@ return 1;
                 MemPage pRoot = new MemPage();
                 Pgno pgnoRoot = 0;
                 SqlResult rc;
-                int ptfFlags;
+                PTF ptfFlags;
                 ///
                 ///<summary>
                 ///</summary>
@@ -3458,7 +3447,7 @@ return rc;
                     return rc;
                 for (i = 0; i < pPage.nCell; i++)
                 {
-                    int iCell = pPage.findCell(i);
+                    int iCell = pPage.findCellAddress(i);
                     pCell = pPage.aData;
                     //        pCell = findCell( pPage, i );
                     if (false == pPage.IsLeaf)
@@ -3489,7 +3478,7 @@ return rc;
                 else
                     if ((rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage)) == 0)
                     {
-                        pPage.zeroPage(pPage.aData[0] | PTF.LEAF);
+                        pPage.zeroPage((PTF)pPage.aData[0] | PTF.LEAF);
                     }
             cleardatabasepage_out:
                 BTreeMethods.releasePage(pPage);

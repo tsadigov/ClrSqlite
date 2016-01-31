@@ -11,7 +11,8 @@ namespace Community.CsharpSqlite.Engine.Op
 {
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.tree;
-
+    using Core.Runtime;
+    using Utils;
     public static class Idx
     {
         public static RuntimeException Exec(CPU cpu, OpCode opcode, VdbeOp pOp)
@@ -41,24 +42,21 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///<summary>
                         ///in2 
                         ///</summary>
-                        VdbeCursor pC;
-                        BtCursor pCrsr;
-                        int nKey;
-                        byte[] zKey;
+                        
                         //Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
-                        pC = openCursors[pOp.p1];
+                        var pC = openCursors[pOp.p1];
                         Debug.Assert(pC != null);
                         var pIn2 = aMem[pOp.p2];
                         Debug.Assert((pIn2.flags & MemFlags.MEM_Blob) != 0);
-                        pCrsr = pC.pCursor;
+                        var pCrsr = pC.pCursor;
                         if (Sqlite3.ALWAYS(pCrsr != null))
                         {
                             Debug.Assert(!pC.isTable);
                             pIn2.ExpandBlob();
                             if (cpu.rc == SqlResult.SQLITE_OK)
                             {
-                                nKey = pIn2.CharacterCount;
-                                zKey = (pIn2.flags & MemFlags.MEM_Blob) != 0 ? pIn2.zBLOB : Encoding.UTF8.GetBytes(pIn2.AsString);
+                                var nKey = pIn2.CharacterCount;
+                                var zKey = (pIn2.flags & MemFlags.MEM_Blob) != 0 ? pIn2.zBLOB : Encoding.UTF8.GetBytes(pIn2.AsString);
                                 cpu.rc = pCrsr.sqlite3BtreeInsert(zKey, nKey, null, 0, 0, (pOp.p3 != 0) ? 1 : 0, (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : 0));
                                 Debug.Assert(!pC.deferredMoveto);
                                 pC.cacheStatus = Sqlite3.CACHE_STALE;
@@ -77,18 +75,14 @@ namespace Community.CsharpSqlite.Engine.Op
                 ///</summary>
                 case OpCode.OP_IdxDelete:
                     {
-                        VdbeCursor pC;
-                        BtCursor pCrsr;
-                        int res;
-                        UnpackedRecord r;
-                        res = 0;
-                        r = new UnpackedRecord();
+                        var res = ThreeState.Neutral;
+                        var r = new UnpackedRecord();
                         Debug.Assert(pOp.p3 > 0);
                         //Debug.Assert(pOp.p2 > 0 && pOp.p2 + pOp.p3 <= this.nMem + 1);
                         //Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
-                        pC = openCursors[pOp.p1];
+                        var pC = openCursors[pOp.p1];
                         Debug.Assert(pC != null);
-                        pCrsr = pC.pCursor;
+                        var pCrsr = pC.pCursor;
                         if (Sqlite3.ALWAYS(pCrsr != null))
                         {
                             r.pKeyInfo = pC.pKeyInfo;
@@ -98,9 +92,6 @@ namespace Community.CsharpSqlite.Engine.Op
                             for (int ra = 0; ra < r.nField; ra++)
                             {
                                 r.aMem[ra] = aMem[pOp.p2 + ra];
-#if SQLITE_DEBUG
-																																																																																																																																																																																						                  Debug.Assert( memIsValid( r.aMem[ra] ) );
-#endif
                             }
                             cpu.rc = pCrsr.sqlite3BtreeMovetoUnpacked(r, 0, 0, ref res);
                             if (cpu.rc == SqlResult.SQLITE_OK && res == 0)
@@ -192,9 +183,8 @@ namespace Community.CsharpSqlite.Engine.Op
                     {
                         ///jump 
                         VdbeCursor pC;
-                        int res;
                         UnpackedRecord r;
-                        res = 0;
+                        var res = ThreeState.Neutral;
                         r = new UnpackedRecord();
                         //Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
                         pC = openCursors[pOp.p1];
@@ -227,7 +217,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             cpu.rc = vdbeaux.sqlite3VdbeIdxKeyCompare(pC, r, ref res);
                             if (pOp.OpCode == OpCode.OP_IdxLT)
                             {
-                                res = -res;
+                                res = (ThreeState)(-(int)res);
                             }
                             else
                             {

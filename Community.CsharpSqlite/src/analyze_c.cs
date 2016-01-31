@@ -114,7 +114,7 @@ namespace Community.CsharpSqlite
 				return 0;
 			}
 			if (!String.IsNullOrEmpty (argv [1])) {
-				pIndex = IndexBuilder.FindByName (pInfo.db, argv [1], pInfo.zDatabase);
+				pIndex = IndexBuilder.FindByName(pInfo.db, pInfo.zDatabase, argv[1]);
 			}
 			else {
 				pIndex = null;

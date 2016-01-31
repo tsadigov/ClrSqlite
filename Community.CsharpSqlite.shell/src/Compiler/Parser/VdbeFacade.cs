@@ -586,7 +586,7 @@ namespace Community.CsharpSqlite
                     {
                         Connection db = this.db;
                         zColl = p.TableReference.aCol[j].Collation;
-                        pColl = db.sqlite3FindCollSeq(sqliteinth.ENC(db), zColl, 0);
+                        pColl = db.FindCollSeq(sqliteinth.ENC(db), zColl, 0);
                         pExpr.CollatingSequence = pColl;
                     }
                     break;
@@ -740,6 +740,32 @@ namespace Community.CsharpSqlite
 
         }
 
+        public void codegenColumnDefault(Table pTab, int i, int iReg)
+        {
+            Debug.Assert(pTab != null);
+            if (null == pTab.pSelect)
+            {
+                sqlite3_value pValue = new sqlite3_value();
+                SqliteEncoding enc = sqliteinth.ENC(pVdbe.sqlite3VdbeDb());
+                Column pCol = pTab.aCol[i];
+#if SQLITE_DEBUG
+																																																																																																															        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
+#endif
+                Debug.Assert(i < pTab.nCol);
+                vdbemem_cs.sqlite3ValueFromExpr(pVdbe.sqlite3VdbeDb(), pCol.DefaultValue, enc, pCol.affinity, ref pValue);
+                if (pValue != null)
+                {
+                    pVdbe.sqlite3VdbeChangeP4(-1, pValue, P4Usage.P4_MEM);
+                }
+#if !SQLITE_OMIT_FLOATING_POINT
+                if (iReg >= 0 && pTab.aCol[i].affinity == sqliteinth.SQLITE_AFF_REAL)
+                {
+                    pVdbe.AddOpp1(OpCode.OP_RealAffinity, iReg);
+                }
+#endif
+            }
+        }
+
 
         public int codegenGenerateIndexKey(
              Index pIdx,///The index for which to generate a key 
@@ -749,6 +775,7 @@ namespace Community.CsharpSqlite
           )
         {
             var v = this.pVdbe;
+            var facade = new VdbeFacade(v);
             Table pTab = pIdx.pTable;
             var nCol = pIdx.nColumn;
             var regBase = this.sqlite3GetTempRange(nCol + 1);
@@ -760,7 +787,7 @@ namespace Community.CsharpSqlite
                     v.sqlite3VdbeAddOp2(OpCode.OP_SCopy, regBase + nCol, regBase + j);                
                 else {
                     v.AddOpp3(OpCode.OP_Column, iCur, idx, regBase + j);
-                    v.codegenColumnDefault(pTab, idx, -1);
+                    facade.codegenColumnDefault(pTab, idx, -1);
                 }
             }
             if (doMakeRec)

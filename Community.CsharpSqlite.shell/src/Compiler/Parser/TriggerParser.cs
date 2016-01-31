@@ -840,49 +840,32 @@ return;
         /// least one of the columns in pChanges is being modified.
         ///
         ///</summary>
-        public static Trigger sqlite3TriggersExist(ParseState pParse,///
-            ///<summary>
-            ///Parse context 
-            ///</summary>
-        Table pTab,///
-            ///<summary>
-            ///The table the contains the triggers 
-            ///</summary>
-        TokenType op,///
-            ///<summary>
-            ///one of TokenType.TK_DELETE, TokenType.TK_INSERT, TokenType.TK_UPDATE 
-            ///</summary>
-        ExprList pChanges,///
-            ///<summary>
-            ///Columns that change in an UPDATE statement 
-            ///</summary>
-        out TriggerType pMask///
-            ///<summary>
-            ///OUT: Mask of TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER 
-            ///</summary>
+        public static Trigger sqlite3TriggersExist(ParseState pParse,
+            Table pTab,///The table the contains the triggers 
+            TokenType op,///one of TokenType.TK_DELETE, TokenType.TK_INSERT, TokenType.TK_UPDATE 
+            ExprList pChanges,///Columns that change in an UPDATE statement 
+            out TriggerType pMask///OUT: Mask of TriggerType.TRIGGER_BEFORE|TriggerType.TRIGGER_AFTER 
         )
         {
             TriggerType mask = 0;
             Trigger pList = null;
-            Trigger p;
+            
             if ((pParse.db.flags & SqliteFlags.SQLITE_EnableTrigger) != 0)
             {
                 pList = sqlite3TriggerList(pTab, pParse);
             }
             Debug.Assert(pList == null || pTab.IsVirtual() == false);
-            for (p = pList; p != null; p = p.pNext)
-            {
-                if (p.Operator == op && checkColumnOverlap(p.pColumns, pChanges) != 0)
-                {
-                    mask |= p.tr_tm;
-                }
-            }
+            pList.linkedList()
+                .Where(p=> p.Operator == op && checkColumnOverlap(p.pColumns, pChanges) != 0)
+                .ForEach(p => mask |= p.tr_tm);
+            
             //if ( pMask != 0 )
             {
                 pMask = mask;
             }
             return (mask != 0 ? pList : null);
         }
+
         ///<summary>
         /// Convert the pStep.target token into a SrcList and return a pointer
         /// to that SrcList.
@@ -1095,7 +1078,7 @@ return;
                 pProgram.aOp = v.sqlite3VdbeTakeOpArray(ref pProgram.nOp, ref pTop.nMaxArg);
                 //}
                 pProgram.nMem = pSubParse.UsedCellCount;
-                pProgram.nCsr = pSubParse.nTab;
+                pProgram.nCsr = pSubParse.AllocatedCursorCount;
                 pProgram.token = pTrigger.GetHashCode();
                 pPrg.aColmask[0] = pSubParse.oldmask;
                 pPrg.aColmask[1] = pSubParse.newmask;

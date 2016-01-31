@@ -55,23 +55,24 @@ namespace Community.CsharpSqlite
         using Community.CsharpSqlite.tree;
         using Community.CsharpSqlite.Paging;
         using Community.CsharpSqlite.Utils;
-        using Ast;        ///
-                          ///<summary>
-                          ///An instance of the virtual machine.  This structure contains the complete
-                          ///state of the virtual machine.
-                          ///
-                          ///The "sqlite3_stmt" structure pointer that is returned by sqlite3_prepare()
-                          ///is really a pointer to an instance of this structure.
-                          ///
-                          ///</summary>
-                          ///<param name="The Vdbe.inVtabMethod variable is set to non">zero for the duration of</param>
-                          ///<param name="any virtual table method invocations made by the vdbe program. It is">any virtual table method invocations made by the vdbe program. It is</param>
-                          ///<param name="set to 2 for xDestroy method calls and 1 for all other methods. This">set to 2 for xDestroy method calls and 1 for all other methods. This</param>
-                          ///<param name="variable is used for two purposes: to allow xDestroy methods to execute">variable is used for two purposes: to allow xDestroy methods to execute</param>
-                          ///<param name=""DROP TABLE" statements and to prevent some nasty side effects of">"DROP TABLE" statements and to prevent some nasty side effects of</param>
-                          ///<param name="malloc failure when SQLite is invoked recursively by a virtual table">malloc failure when SQLite is invoked recursively by a virtual table</param>
-                          ///<param name="method function.">method function.</param>
-                          ///<param name=""></param>
+        using Ast;
+        using Core.Runtime;///
+                           ///<summary>
+                           ///An instance of the virtual machine.  This structure contains the complete
+                           ///state of the virtual machine.
+                           ///
+                           ///The "sqlite3_stmt" structure pointer that is returned by sqlite3_prepare()
+                           ///is really a pointer to an instance of this structure.
+                           ///
+                           ///</summary>
+                           ///<param name="The Vdbe.inVtabMethod variable is set to non">zero for the duration of</param>
+                           ///<param name="any virtual table method invocations made by the vdbe program. It is">any virtual table method invocations made by the vdbe program. It is</param>
+                           ///<param name="set to 2 for xDestroy method calls and 1 for all other methods. This">set to 2 for xDestroy method calls and 1 for all other methods. This</param>
+                           ///<param name="variable is used for two purposes: to allow xDestroy methods to execute">variable is used for two purposes: to allow xDestroy methods to execute</param>
+                           ///<param name=""DROP TABLE" statements and to prevent some nasty side effects of">"DROP TABLE" statements and to prevent some nasty side effects of</param>
+                           ///<param name="malloc failure when SQLite is invoked recursively by a virtual table">malloc failure when SQLite is invoked recursively by a virtual table</param>
+                           ///<param name="method function.">method function.</param>
+                           ///<param name=""></param>
         public class Vdbe : CPU, ILinkedListNode<Vdbe>, IBackwardLinkedListNode<Vdbe>
         {
             bool dbg = false;
@@ -741,7 +742,7 @@ pOp.cnt = 0;
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
-            public int sqlite3VdbeAddOp4(OpCode op, int p1, int p2, int p3, KeyInfo pP4, P4Usage p4type)
+            public int sqlite3VdbeAddOp4(OpCode op, int p1, int p2, int p3, KeyInfo pP4, P4Usage p4type=P4Usage.P4_KEYINFO_HANDOFF)
             {
                 union_p4 _p4 = new union_p4();
                 _p4.pKeyInfo = pP4;
@@ -759,18 +760,12 @@ pOp.cnt = 0;
                 this.sqlite3VdbeChangeP4(addr, _p4, p4type);
                 return addr;
             }
-            public int sqlite3VdbeAddOp4Int(///
-                                            ///Add the opcode to this VM 
-            TokenType op,///
-                   ///The new opcode 
-            int p1,///
-                   ///The P1 operand 
-            int p2,///
-                   ///The P2 operand 
-            int p3,///
-                   ///The P3 operand 
-            int p4///
-                  ///The P4 operand as an integer 
+            public int sqlite3VdbeAddOp4Int(
+                TokenType op,///The new opcode 
+                int p1,///The P1 operand 
+                int p2,///The P2 operand 
+                int p3,///The P3 operand 
+                int p4///The P4 operand as an integer 
             )
             {
                 union_p4 _p4 = new union_p4();
@@ -1049,16 +1044,10 @@ pOp.cnt = 0;
             }
             public void sqlite3VdbeChangeP4(int addr, union_p4 _p4, P4Usage n)
             {
-                Operation pOp;
-                Connection db;
                 Debug.Assert(this != null);
-                db = this.db;
+                var db = this.db;
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
-                if (this.lOp == null///
-                                    ///<summary>
-                                    ///|| db.mallocFailed != 0 
-                                    ///</summary>
-                )
+                if (this.lOp == null)
                 {
                     if (n != P4Usage.P4_KEYINFO && n != P4Usage.P4_VTAB)
                     {
@@ -1072,16 +1061,13 @@ pOp.cnt = 0;
                 {
                     addr = this.aOp.Count() - 1;
                 }
-                pOp = this.lOp[addr];
+                var pOp = this.lOp[addr];
                 vdbeaux.freeP4(db, pOp.p4type, pOp.p4.p);
                 pOp.p4.p = null;
                 if (n == P4Usage.P4_INT32)
                 {
-                    ///
-                    ///<summary>
                     ///Note: this cast is safe, because the origin data point was an int
                     ///that was cast to a (string ). 
-                    ///</summary>
                     pOp.p4.i = _p4.i;
                     // SQLITE_PTR_TO_INT(zP4);
                     pOp.p4type = P4Usage.P4_INT32;
@@ -1107,30 +1093,19 @@ pOp.cnt = 0;
                 else
                                 if (n == P4Usage.P4_KEYINFO)
                 {
-                    KeyInfo pKeyInfo;
                     int nField, nByte;
                     nField = _p4.pKeyInfo.nField;
                     //nByte = sizeof(*pKeyInfo) + (nField-1)*sizeof(pKeyInfo.aColl[0]) + nField;
-                    pKeyInfo = new KeyInfo();
-                    //sqlite3DbMallocRaw(0, nByte);
-                    pOp.p4.pKeyInfo = pKeyInfo;
+                    var pKeyInfo = pOp.p4.pKeyInfo = new KeyInfo();                    
+                    
                     if (pKeyInfo != null)
-                    {
-                        //u8 *aSortOrder;
-                        // memcpy((char)pKeyInfo, zP4, nByte - nField);
-                        //aSortOrder = pKeyInfo.aSortOrder;
-                        //if( aSortOrder ){
-                        //  pKeyInfo.aSortOrder = (unsigned char)&pKeyInfo.aColl[nField];
-                        //  memcpy(pKeyInfo.aSortOrder, aSortOrder, nField);
-                        //}
+                    {                        
                         pKeyInfo = _p4.pKeyInfo.Copy();
                         pOp.p4type = P4Usage.P4_KEYINFO;
                     }
                     else
-                    {
-                        //p.db.mallocFailed = 1;
                         pOp.p4type = P4Usage.P4_NOTUSED;
-                    }
+
                     pOp.p4.pKeyInfo = _p4.pKeyInfo;
                     pOp.p4type = P4Usage.P4_KEYINFO;
                 }
@@ -1200,11 +1175,8 @@ pOp.cnt = 0;
             }
             public VdbeOp sqlite3VdbeGetOp(int addr)
             {
-                ///
-                ///<summary>
                 ///C89 specifies that the constant "dummy" will be initialized to all
                 ///zeros, which is correct.  MSVC generates a warning, nevertheless. 
-                ///</summary>
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
                 if (addr < 0)
                 {
@@ -1231,8 +1203,6 @@ pOp.cnt = 0;
             {
                 if (pIdx.zColAff == null || pIdx.zColAff[0] == '\0')
                 {
-                    ///
-                    ///<summary>
                     ///The first time a column affinity string for a particular index is
                     ///required, it is allocated and populated here. It is then stored as
                     ///a member of the Index structure for subsequent use.
@@ -1240,8 +1210,6 @@ pOp.cnt = 0;
                     ///The column affinity string will eventually be deleted by
                     ///sqliteDeleteIndex() when the Index structure itself is cleaned
                     ///up.
-                    ///
-                    ///</summary>
                     int n;
                     Table pTab = pIdx.pTable;
                     Connection db = this.sqlite3VdbeDb();
@@ -1295,53 +1263,15 @@ pOp.cnt = 0;
                 }
                 this.sqlite3VdbeChangeP4(-1, pTab.zColAff, P4Usage.P4_TRANSIENT);
             }
-            public void codegenColumnDefault(Table pTab, int i, int iReg)
-            {
-                Debug.Assert(pTab != null);
-                if (null == pTab.pSelect)
-                {
-                    sqlite3_value pValue = new sqlite3_value();
-                    SqliteEncoding enc = sqliteinth.ENC(this.sqlite3VdbeDb());
-                    Column pCol = pTab.aCol[i];
-#if SQLITE_DEBUG
-																																																																																																															        VdbeComment( v, "%s.%s", pTab.zName, pCol.zName );
-#endif
-                    Debug.Assert(i < pTab.nCol);
-                    vdbemem_cs.sqlite3ValueFromExpr(this.sqlite3VdbeDb(), pCol.DefaultValue, enc, pCol.affinity, ref pValue);
-                    if (pValue != null)
-                    {
-                        this.sqlite3VdbeChangeP4(-1, pValue, P4Usage.P4_MEM);
-                    }
-#if !SQLITE_OMIT_FLOATING_POINT
-                    if (iReg >= 0 && pTab.aCol[i].affinity == sqliteinth.SQLITE_AFF_REAL)
-                    {
-                        this.AddOpp1(OpCode.OP_RealAffinity, iReg);
-                    }
-#endif
-                }
-            }
-            public void codegenExprCodeGetColumnOfTable(///
-                                                        ///<summary>
-                                                        ///The VDBE under construction 
-                                                        ///</summary>
-            Table pTab,///
-                       ///<summary>
-                       ///The table containing the value 
-                       ///</summary>
-            int iTabCur,///
-                        ///<summary>
-                        ///The cursor for this table 
-                        ///</summary>
-            int iCol,///
-                     ///<summary>
-                     ///Index of the column to extract 
-                     ///</summary>
-            int regOut///
-                      ///<summary>
-                      ///Extract the value into this register 
-                      ///</summary>
+            
+            public void codegenExprCodeGetColumnOfTable(
+                Table pTab,///The table containing the value 
+                int iTabCur,///The cursor for this table 
+                int iCol,///Index of the column to extract 
+                int regOut///Extract the value into this register 
             )
             {
+                var facade = new VdbeFacade(this);
                 if (iCol < 0 || iCol == pTab.iPKey)
                 {
                     this.sqlite3VdbeAddOp2(OpCode.OP_Rowid, iTabCur, regOut);
@@ -1353,7 +1283,7 @@ pOp.cnt = 0;
                 }
                 if (iCol >= 0)
                 {
-                    this.codegenColumnDefault(pTab, iCol, regOut);
+                    facade.codegenColumnDefault(pTab, iCol, regOut);
                 }
             }
             public bool vdbeSafety()
@@ -1419,16 +1349,9 @@ pOp.cnt = 0;
 #endif
                 Debug.Assert(this != null);
                 Debug.Assert(this.magic == VdbeMagic.VDBE_MAGIC_INIT);
-                ///
-                ///<summary>
                 ///There should be at least one opcode.
-                ///
-                ///</summary>
                 Debug.Assert(this.aOp.Count() > 0);
-                ///
-                ///<summary>
                 ///Set the magic to VdbeMagic.VDBE_MAGIC_RUN sooner rather than later. 
-                ///</summary>
                 this.magic = VdbeMagic.VDBE_MAGIC_RUN;
 #if SQLITE_DEBUG
 																																																																															      for(i=1; i<p.nMem; i++){
@@ -1950,7 +1873,7 @@ fclose(out);
             {
                 return this.db;
             }
-            public sqlite3_value sqlite3VdbeGetValue(int iVar, u8 aff)
+            public sqlite3_value GetValue(int iVar, u8 aff)
             {
                 Debug.Assert(iVar > 0);
                 if (this != null)
@@ -3098,18 +3021,11 @@ start = sqlite3Hwtime();
                                         ///</summary>
                                         int alreadyExists;
                                         VdbeCursor pC;
-                                        int res = 0;
+                                        var res = ThreeState.Neutral;
                                         UnpackedRecord pIdxKey;
                                         UnpackedRecord r = new UnpackedRecord();
                                         UnpackedRecord aTempRec = new UnpackedRecord();
                                         //char aTempRec[ROUND8(sizeof(UnpackedRecord)) + sizeof(Mem)*3 + 7];
-#if SQLITE_TEST
-#if !TCLSH
-																																																																																																																																				              sqlite3_found_count++;
-#else
-																																																																																																																																				              sqlite3_found_count.iValue++;
-#endif
-#endif
                                         alreadyExists = 0;
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
                                         Debug.Assert(pOp.p4type == P4Usage.P4_INT32);
@@ -3206,48 +3122,28 @@ start = sqlite3Hwtime();
                                 ///<param name=""></param>
                                 case OpCode.OP_IsUnique:
                                     {
-                                        ///
-                                        ///<summary>
                                         ///jump, in3 
-                                        ///</summary>
                                         u16 ii;
                                         VdbeCursor pCx = new VdbeCursor();
                                         BtCursor pCrsr;
                                         u16 nField;
                                         Mem[] aMx;
-                                        UnpackedRecord r;
-                                        ///
-                                        ///<summary>
-                                        ///</summary>
-                                        ///<param name="B">Tree index search key </param>
                                         i64 R;
-                                        ///
-                                        ///<summary>
                                         ///Rowid stored in register P3 
-                                        ///</summary>
-                                        r = new UnpackedRecord();
+                                        var r = new UnpackedRecord();///<param name="B">Tree index search key </param>
                                         pIn3 = aMem[pOp.p3];
                                         //aMx = aMem[pOp->p4.i];
-                                        ///
-                                        ///<summary>
                                         ///Assert that the values of parameters P1 and P4 are in range. 
-                                        ///</summary>
                                         Debug.Assert(pOp.p4type == P4Usage.P4_INT32);
                                         Debug.Assert(pOp.p4.i > 0 && pOp.p4.i <= this.aMem.Count());
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
-                                        ///
-                                        ///<summary>
                                         ///Find the index cursor. 
-                                        ///</summary>
                                         pCx = this.OpenCursors[pOp.p1];
                                         Debug.Assert(!pCx.deferredMoveto);
                                         pCx.seekResult = 0;
                                         pCx.cacheStatus = Sqlite3.CACHE_STALE;
                                         pCrsr = pCx.pCursor;
-                                        ///
-                                        ///<summary>
                                         ///If any of the values are NULL, take the jump. 
-                                        ///</summary>
                                         nField = pCx.pKeyInfo.nField;
                                         aMx = new Mem[nField + 1];
                                         for (ii = 0; ii < nField; ii++)
@@ -3264,10 +3160,7 @@ start = sqlite3Hwtime();
                                         //Debug.Assert( ( aMx[nField].flags & MEM.MEM_Null ) == 0 );
                                         if (pCrsr != null)
                                         {
-                                            ///
-                                            ///<summary>
                                             ///Populate the index search key. 
-                                            ///</summary>
                                             r.pKeyInfo = pCx.pKeyInfo;
                                             r.nField = (ushort)(nField + 1);
                                             r.flags = UnpackedRecordFlags.UNPACKED_PREFIX_SEARCH;
@@ -3279,16 +3172,9 @@ start = sqlite3Hwtime();
                     Debug.Assert( memIsValid( r.aMem[i] ) );
                 }
 #endif
-                                            ///
-                                            ///<summary>
                                             ///Extract the value of R from register P3. 
-                                            ///</summary>
-
                                             pIn3.Integerify();
                                             R = pIn3.u.AsInteger;
-                                            ///
-                                            ///<summary>
-                                            ///</summary>
                                             ///<param name="Search the B">Tree index. If no conflicting record is found, jump</param>
                                             ///<param name="to P2. Otherwise, copy the rowid of the conflicting record to">to P2. Otherwise, copy the rowid of the conflicting record to</param>
                                             ///<param name="register P3 and fall through to the next instruction.  ">register P3 and fall through to the next instruction.  </param>
@@ -3323,26 +3209,19 @@ start = sqlite3Hwtime();
                                 ///</summary>
                                 case OpCode.OP_NotExists:
                                     {
-                                        ///
-                                        ///<summary>
-                                        ///jump, in3 
-                                        ///</summary>
-                                        VdbeCursor pC;
-                                        BtCursor pCrsr;
-                                        int res;
-                                        i64 iKey;
+                                        ///jump, in3   
                                         pIn3 = aMem[pOp.p3];
                                         Debug.Assert((pIn3.flags & MemFlags.MEM_Int) != 0);
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
-                                        pC = this.OpenCursors[pOp.p1];
+                                        var pC = this.OpenCursors[pOp.p1];
                                         Debug.Assert(pC != null);
                                         Debug.Assert(pC.isTable);
                                         Debug.Assert(pC.pseudoTableReg == 0);
-                                        pCrsr = pC.pCursor;
+                                        var pCrsr = pC.pCursor;
                                         if (pCrsr != null)
                                         {
-                                            res = 0;
-                                            iKey = pIn3.u.AsInteger;
+                                            var res = ThreeState.Neutral;
+                                            var iKey = pIn3.u.AsInteger;
                                             rc = pCrsr.sqlite3BtreeMovetoUnpacked(null, (long)iKey, 0, ref res);
                                             pC.lastRowid = pIn3.u.AsInteger;
                                             pC.rowidIsValid = res == 0 ? true : false;
@@ -3397,7 +3276,7 @@ start = sqlite3Hwtime();
                                         ///The new rowid 
                                         VdbeCursor pC;
                                         ///Cursor of table to get the new rowid 
-                                        int res;
+                                        ThreeState  res;
                                         ///Result of an sqlite3BtreeLast() 
                                         int cnt;
                                         ///Counter to limit the number of searches 
@@ -3406,7 +3285,7 @@ start = sqlite3Hwtime();
                                         VdbeFrame rootFrame;
                                         ///Root frame of VDBE 
                                         v = 0;
-                                        res = 0;
+                                        res = ThreeState.Neutral;
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
                                         pC = this.OpenCursors[pOp.p1];
                                         Debug.Assert(pC != null);
@@ -3452,13 +3331,10 @@ start = sqlite3Hwtime();
                                                     {
                                                         goto abort_due_to_error;
                                                     }
-                                                    if (res != 0)
+                                                    if (res != ThreeState.Negative)
                                                     {
                                                         v = 1;
-                                                        ///
-                                                        ///<summary>
-                                                        ///</summary>
-                                                        ///<param name="IMP: R">48074 </param>
+                                                        ///IMP: R-48074 
                                                     }
                                                     else
                                                     {
@@ -3557,7 +3433,7 @@ start = sqlite3Hwtime();
                                                 ///</summary>
                                                 ///<param name="ensure non">zero </param>
                                                 cnt = 0;
-                                                while (((rc = pC.pCursor.sqlite3BtreeMovetoUnpacked(null, v, 0, ref res)) == SqlResult.SQLITE_OK) && (res == 0) && (++cnt < 100))
+                                                while (((rc = pC.pCursor.sqlite3BtreeMovetoUnpacked(null, v, 0, ref res)) == SqlResult.SQLITE_OK) && (res == ThreeState.Neutral) && (++cnt < 100))
                                                 {
                                                     ///<param name="collision "> try another random rowid </param>
                                                     Sqlite3.sqlite3_randomness(sizeof(i64), ref v);
@@ -3649,16 +3525,11 @@ start = sqlite3Hwtime();
                                 ///</summary>
                                 case OpCode.OP_Insert:
                                 case OpCode.OP_InsertInt:
-                                    {
+                                    {///MEM cell holding data for the record to be inserted 
                                         Mem pData = aMem[pOp.p2];
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
                                         Debug.Assert(pData.memIsValid());
-
-                                        ///MEM cell holding data for the record to be inserted 
-                                        Mem pKey;
-                                        ///MEM cell holding key  for the record 
-                                        i64 iKey;
-                                        ///The integer ROWID or key for the record to be inserted 
+                                        i64 iKey;///The integer ROWID or key for the record to be inserted 
                                         VdbeCursor pC = this.OpenCursors[pOp.p1];
                                         Debug.Assert(pC != null);
                                         Debug.Assert(pC.pCursor != null);
@@ -3666,22 +3537,12 @@ start = sqlite3Hwtime();
                                         Debug.Assert(pC.isTable);
 
                                         ///Cursor to table into which insert is written 
-                                        int nZero;
-                                        ///<param name="Number of zero">bytes to append </param>
-                                        int seekResult;
-                                        ///Result of prior seek or 0 if no USESEEKRESULT flag 
-                                        string zDb;
-                                        ///<param name="database name "> used by the update hook </param>
-                                        string zTbl;
-                                        ///<param name="Table name "> used by the opdate hook </param>
-                                        AuthTarget op;
-                                        ///Opcode for update hook: SQLITE_UPDATE or SQLITE_INSERT 
-
-
+                                        int nZero;///<param name="Number of zero">bytes to append </param>
+                                        
                                         Sqlite3.REGISTER_TRACE(this, pOp.p2, pData);
                                         if (pOp.OpCode == OpCode.OP_Insert)
                                         {
-                                            pKey = aMem[pOp.p3];
+                                            var pKey = aMem[pOp.p3];///MEM cell holding key  for the record 
                                             Debug.Assert((pKey.flags & MemFlags.MEM_Int) != 0);
                                             Debug.Assert(pKey.memIsValid());
                                             Sqlite3.REGISTER_TRACE(this, pOp.p3, pKey);
@@ -3706,7 +3567,7 @@ start = sqlite3Hwtime();
                                         {
                                             Debug.Assert((pData.flags & (MemFlags.MEM_Blob | MemFlags.MEM_Str)) != 0);
                                         }
-                                        seekResult = (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : 0);
+                                        var seekResult = (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : ThreeState.Neutral);///Result of prior seek or 0 if no USESEEKRESULT flag 
                                         if ((pData.flags & MemFlags.MEM_Zero) != 0)
                                         {
                                             nZero = pData.u.nZero;
@@ -3722,13 +3583,13 @@ start = sqlite3Hwtime();
                                         ///<param name="Invoke the update">hook if required. </param>
                                         if (rc == SqlResult.SQLITE_OK && db.xUpdateCallback != null && pOp.p4.z != null)
                                         {
-                                            zDb = db.Backends[pC.iDb].Name;
-                                            zTbl = pOp.p4.z;
-                                            op = ((
+                                            var zDb = db.Backends[pC.iDb].Name;///<param name="database name "> used by the update hook </param>                                        
+                                            var zTbl = pOp.p4.z;///<param name="Table name "> used by the opdate hook </param>
+                                            var op = ((
                                                 ((OpFlag)pOp.p5)
                                                 .Has(OpFlag.OPFLAG_ISUPDATE)
                                                 ? AuthTarget.SQLITE_UPDATE : AuthTarget.SQLITE_INSERT
-                                                ));
+                                                ));///Opcode for update hook: SQLITE_UPDATE or SQLITE_INSERT 
                                             Debug.Assert(pC.isTable);
                                             db.xUpdateCallback(db.pUpdateArg, op, zDb, zTbl, iKey);
                                             Debug.Assert(pC.iDb >= 0);
@@ -5305,7 +5166,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///the number of columns is stored in the VdbeCursor.nField element.
 
                 ///number of fields in the record 
-                int nField = vdbeCursor.nField;
+                int nField = vdbeCursor.FieldCount;
 
                 ///The BTree cursor 
                 BtCursor btCursor = vdbeCursor.pCursor;
@@ -5725,13 +5586,9 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
             }
 
 
-            private void OCode_Compare(Operation pOp, IList<Mem> aMem, ref int iCompare, ref int[] aPermute)
+            private void OCode_Compare(Operation pOp, IList<Mem> aMem, ref ThreeState iCompare, ref int[] aPermute)
             {
-                int n;
                 int i;
-                int p1;
-                int p2;
-                KeyInfo pKeyInfo;
                 int idx;
                 CollSeq pColl;
                 ///
@@ -5743,12 +5600,12 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///<summary>
                 ///True for DESCENDING sort order 
                 ///</summary>
-                n = pOp.p3;
-                pKeyInfo = pOp.p4.pKeyInfo;
+                var n = pOp.p3;
+                var pKeyInfo = pOp.p4.pKeyInfo;
                 Debug.Assert(n > 0);
                 Debug.Assert(pKeyInfo != null);
-                p1 = pOp.p1;
-                p2 = pOp.p2;
+                var p1 = pOp.p1;
+                var p2 = pOp.p2;
 #if SQLITE_DEBUG
 																																																																																																																																				              if ( aPermute != null )
               {
@@ -5779,7 +5636,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                     if (iCompare != 0)
                     {
                         if (bRev != 0)
-                            iCompare = -iCompare;
+                            iCompare = iCompare.Negate();
                         break;
                     }
                 }

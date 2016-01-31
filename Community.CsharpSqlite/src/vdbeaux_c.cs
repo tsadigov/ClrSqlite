@@ -32,9 +32,9 @@ namespace Community.CsharpSqlite.Engine
     using Operation = Engine.VdbeOp;
     using sqlite3_stmt = Engine.Vdbe;
     using sqlite3_value = Engine.Mem;
-    
+
     using System;
-    
+
     using System.Collections.Generic;
     using ParseState = Sqlite3.ParseState;
     using Community.CsharpSqlite.Os;
@@ -43,10 +43,10 @@ namespace Community.CsharpSqlite.Engine
     using Metadata;
     using Community.CsharpSqlite.tree;
     using Community.CsharpSqlite.Utils;
-    //public partial class Sqlite3
-    //{
+    using Core.Runtime;    //public partial class Sqlite3
+                           //{
 
-        public static class  vdbeaux
+    public static class  vdbeaux
         {
             ///
             ///<summary>
@@ -1476,9 +1476,9 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 Debug.Assert(p.magic == VdbeMagic.VDBE_MAGIC_INIT);
                 db = p.db;
                 //Debug.Assert( db.mallocFailed == 0 );
-                nVar = pParse.nVar;
+                nVar = pParse.VariableParameterCount;
                 nMem = pParse.UsedCellCount;
-                nCursor = pParse.nTab;
+                nCursor = pParse.AllocatedCursorCount;
                 nArg = pParse.nMaxArg;
                 ///
                 ///<summary>
@@ -1630,28 +1630,28 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             /// happens to hold.
             ///
             ///</summary>
-            public static void sqlite3VdbeFreeCursor(Vdbe p, VdbeCursor pCx)
+            public static void sqlite3VdbeFreeCursor(Vdbe p, VdbeCursor vdbeCursor)
             {
-                if (pCx == null)
+                if (vdbeCursor == null)
                 {
                     return;
                 }
-                if (pCx.pBt != null)
+                if (vdbeCursor.pBt != null)
                 {
-                    BTreeMethods.sqlite3BtreeClose(ref pCx.pBt);
+                    BTreeMethods.sqlite3BtreeClose(ref vdbeCursor.pBt);
                     ///The pCx.pCursor will be close automatically, if it exists, by
                     ///the call above. 
                 }
                 else
-                    if (pCx.pCursor != null)
+                    if (vdbeCursor.pCursor != null)
                     {
-                        pCx.pCursor.sqlite3BtreeCloseCursor();
+                        vdbeCursor.pCursor.sqlite3BtreeCloseCursor();
                     }
 #if !SQLITE_OMIT_VIRTUALTABLE
-                if (pCx.pVtabCursor != null)
+                if (vdbeCursor.pVtabCursor != null)
                 {
-                    sqlite3_vtab_cursor pVtabCursor = pCx.pVtabCursor;
-                    sqlite3_module pModule = pCx.pModule;
+                    sqlite3_vtab_cursor pVtabCursor = vdbeCursor.pVtabCursor;
+                    sqlite3_module pModule = vdbeCursor.pModule;
                     p.inVtabMethod = 1;
                     pModule.xClose(ref pVtabCursor);
                     p.inVtabMethod = 0;
@@ -2272,26 +2272,15 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             {
                 if (p.deferredMoveto)
                 {
-                    int res = 0;
-                    SqlResult rc;
-#if SQLITE_TEST
-																																																																																																        //extern int sqlite3_search_count;
-#endif
+                    var res = ThreeState.Neutral;                    
                     Debug.Assert(p.isTable);
-                    rc = p.pCursor.sqlite3BtreeMovetoUnpacked(null, p.movetoTarget, 0, ref res);
+                    var rc = p.pCursor.sqlite3BtreeMovetoUnpacked(null, p.movetoTarget, 0, ref res);
                     if (rc != 0)
                         return rc;
                     p.lastRowid = p.movetoTarget;
-                    if (res != 0)
+                    if (res != ThreeState.Neutral)
                         return sqliteinth.SQLITE_CORRUPT_BKPT();
                     p.rowidIsValid = true;
-#if SQLITE_TEST
-#if !TCLSH
-																																																																																																        sqlite3_search_count++;
-#else
-																																																																																																        sqlite3_search_count.iValue++;
-#endif
-#endif
                     p.deferredMoveto = false;
                     p.cacheStatus = Sqlite3.CACHE_STALE;
                 }
@@ -3148,7 +3137,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
             ///</summary>
             static Mem mem1 = new Mem();
             // ALTERNATE FORM for C#
-            public static int sqlite3VdbeRecordCompare(int nKey1, byte[] pKey1,///
+            public static ThreeState sqlite3VdbeRecordCompare(int nKey1, byte[] pKey1,///
                 ///<summary>
                 ///Left key 
                 ///</summary>
@@ -3161,34 +3150,16 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 return sqlite3VdbeRecordCompare(nKey1, pKey1, 0, pPKey2);
             }
             
-            public static int sqlite3VdbeRecordCompare(int nKey1, byte[] pKey1,///
-                ///<summary>
-                ///Left key 
-                ///</summary>
-            int offset, UnpackedRecord pPKey2///
-                ///<summary>
-                ///Right key 
-                ///</summary>
+            public static ThreeState sqlite3VdbeRecordCompare(
+                int nKey1, byte[] pKey1,///Left key 
+                int offset, UnpackedRecord pPKey2///Right key 
             )
             {
-                int d1;
-                ///
-                ///<summary>
-                ///Offset into aKey[] of next data element 
-                ///</summary>
-                u32 idx1;
-                ///
-                ///<summary>
-                ///Offset into aKey[] of next header element 
-                ///</summary>
                 u32 szHdr1;
-                ///
-                ///<summary>
                 ///Number of bytes in header 
-                ///</summary>
                 int i = 0;
                 int nField;
-                var rc = 0;
+                var rc = ThreeState.Neutral;
                 byte[] aKey1 = new byte[pKey1.Length - offset];
                 //Buffer.BlockCopy( pKey1, offset, aKey1, 0, aKey1.Length );
                 KeyInfo pKeyInfo;
@@ -3214,10 +3185,10 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<summary>
                 ///mem1.u.i = 0;  // not needed, here to silence compiler warning 
                 ///</summary>
-                idx1 = (u32)((szHdr1 = pKey1[offset]) <= 0x7f ? 1 : utilc.getVarint32(pKey1, offset, out szHdr1));
+                var idx1 = (u32)((szHdr1 = pKey1[offset]) <= 0x7f ? 1 : utilc.getVarint32(pKey1, offset, out szHdr1));///Offset into aKey[] of next header element 
                 // GetVarint( aKey1, szHdr1 );
-                d1 = (int)szHdr1;
-                if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_IGNORE_ROWID) != 0)
+                var d1 = (int)szHdr1;///Offset into aKey[] of next data element 
+            if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_IGNORE_ROWID) != 0)
                 {
                     szHdr1--;
                 }
@@ -3225,43 +3196,26 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 while (idx1 < szHdr1 && i < pPKey2.nField)
                 {
                     u32 serial_type1;
-                    ///
-                    ///<summary>
                     ///Read the serial types for the next element in each key. 
-                    ///</summary>
                     idx1 += (u32)((serial_type1 = pKey1[offset + idx1]) <= 0x7f ? 1 : utilc.getVarint32(pKey1, (uint)(offset + idx1), out serial_type1));
                     //GetVarint( aKey1 + idx1, serial_type1 );
                     if (d1 <= 0 || d1 >= nKey1 && sqlite3VdbeSerialTypeLen(serial_type1) > 0)
                         break;
-                    ///
-                    ///<summary>
                     ///Extract the values to be compared.
-                    ///
-                    ///</summary>
                     d1 += (int)sqlite3VdbeSerialGet(pKey1, offset + d1, serial_type1, mem1);
                     //sqlite3VdbeSerialGet( aKey1, d1, serial_type1, mem1 );
-                    ///
-                    ///<summary>
                     ///Do the comparison
-                    ///
-                    ///</summary>
                     rc = vdbemem_cs.sqlite3MemCompare(mem1, pPKey2.aMem[i], i < nField ? pKeyInfo.aColl[i] : null);
                     if (rc != 0)
                     {
                         //Debug.Assert( mem1.zMalloc==null );  /* See comment below */
-                        ///
-                        ///<summary>
                         ///Invert the result if we are using DESC sort order. 
-                        ///</summary>
                         if (pKeyInfo.aSortOrder != null && i < nField && pKeyInfo.aSortOrder[i] != 0)
                         {
-                            rc = -rc;
+                            rc = (ThreeState)(-(int)rc);
                         }
-                        ///
-                        ///<summary>
                         ///If the PREFIX_SEARCH flag is set and all fields except the final
                         ///rowid field were equal, then clear the PREFIX_SEARCH flag and set
-                        ///</summary>
                         ///<param name="pPKey2">>rowid to the value of the rowid field in (pKey1, nKey1).</param>
                         ///<param name="This is used by the OP_IsUnique opcode.">This is used by the OP_IsUnique opcode.</param>
                         ///<param name=""></param>
@@ -3298,7 +3252,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 Debug.Assert(rc == 0);
                 if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_INCRKEY) != 0)
                 {
-                    rc = -1;
+                    rc = ThreeState.Negative;
                 }
                 else
                     if ((pPKey2.flags & UnpackedRecordFlags.UNPACKED_PREFIX_MATCH) != 0)
@@ -3311,7 +3265,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                     else
                         if (idx1 < szHdr1)
                         {
-                            rc = 1;
+                            rc = ThreeState.Positive;
                         }
                 return rc;
             }
@@ -3447,10 +3401,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 ///<summary>
                 ///Unpacked version of key to compare against 
                 ///</summary>
-            ref int res///
-                ///<summary>
-                ///Write the comparison result here 
-                ///</summary>
+            ref ThreeState res///Write the comparison result here 
             )
             {
                 i64 nCellKey = 0;

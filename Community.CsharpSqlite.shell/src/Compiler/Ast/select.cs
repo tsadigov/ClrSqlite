@@ -61,6 +61,39 @@ namespace Community.CsharpSqlite.Ast
     public class Select
     {
 
+        public static Select Create(Sqlite3.ParseState pParse,/*which columns to include in the result */ExprList pEList, /*the FROM clause "> which tables to scan */SrcList pSrc, /*the WHERE clause */Expr pWhere,
+            /*the GROUP BY clause */ExprList pGroupBy,/*the HAVING clause */Expr pHaving, /*the ORDER BY clause*/ExprList pOrderBy,/*true if the DISTINCT keyword is present */int isDistinct,
+            /*LIMIT value.  NULL means not used */Expr pLimit,/*OFFSET value.  NULL means no offset */Expr pOffset
+        )
+        {
+            //           Select standin;
+            Connection db = pParse.db;
+            Debug.Assert(pOffset == null || pLimit != null);
+            var pNew = new Select()
+            {
+                ResultingFieldList = pEList,
+                FromSource = pSrc,
+                pWhere = pWhere,
+                pGroupBy = pGroupBy,
+                pHaving = pHaving,
+                pOrderBy = pOrderBy,
+                Flags = (isDistinct != 0 ? SelectFlags.Distinct : 0),
+                TokenOp = TokenType.TK_SELECT,
+                pLimit = pLimit,
+                pOffset = pOffset,
+                addrOpenEphm = new int[] { -1, -1, -1 }
+            };
+            //sqlite3DbMallocZero(db, sizeof(*pNew) );
+            Debug.Assert(null == pOffset || pLimit != null);
+            ///OFFSET implies LIMIT 
+            if (pEList == null)
+            {
+                pEList = CollectionExtensions.Append(null, exprc.sqlite3Expr(db, TokenType.TK_ALL, null));
+            }
+
+            return pNew;
+        }
+
 
         public void ShowDebugInfo()
         {
@@ -73,69 +106,48 @@ namespace Community.CsharpSqlite.Ast
         ///</summary>
         public ExprList ResultingFieldList;
 
-        public u8 tk_op { get; set; }
-        public TokenType TokenOp
-        {
-            get { return (TokenType)tk_op; }
-            set { tk_op = (u8)value; }
-        }
-
-        ///
         ///<summary>
         ///One of: TokenType.TK_UNION TokenType.TK_ALL TokenType.TK_INTERSECT TokenType.TK_EXCEPT 
-        ///</summary>
-
-        public char affinity;
+        ///</summary>        
+        public TokenType TokenOp{get; set;}
 
         ///<summary>
         ///MakeRecord with this affinity for SelectResultType.Set 
         ///</summary>
+        public char affinity;
 
-        public SelectFlags Flags;
-
-        ///
         ///<summary>
         ///Various SF_* values 
         ///</summary>
+        public SelectFlags Flags;
 
-        public SrcList FromSource;
-
-        ///
         ///<summary>
         ///The FROM clause 
         ///</summary>
+        public SrcList FromSource;
 
-        public Expr pWhere;
-
-        ///
         ///<summary>
         ///The WHERE clause 
         ///</summary>
+        public Expr pWhere;
 
-        public ExprList pGroupBy;
-
-        ///
         ///<summary>
         ///The GROUP BY clause 
         ///</summary>
+        public ExprList pGroupBy;
 
-        public Expr pHaving;
-
-        ///
         ///<summary>
         ///The HAVING clause 
         ///</summary>
+        public Expr pHaving;
 
         public ExprList pOrderBy;
-
-        ///
         ///<summary>
         ///The ORDER BY clause 
         ///</summary>
 
         public Select pPrior;
 
-        ///
         ///<summary>
         ///Prior select in a compound select statement 
         ///</summary>
@@ -222,7 +234,7 @@ namespace Community.CsharpSqlite.Ast
             }
         }
 
-        public int sqlite3SelectExprHeight()
+        public int SelectExprHeight()
         {
             int nHeight = 0;
             this.heightOfSelect(ref nHeight);
@@ -292,7 +304,7 @@ namespace Community.CsharpSqlite.Ast
             }
             p.Flags |= SelectFlags.Expanded;
             var pTabList = p.FromSource;
-            var pEList = p.ResultingFieldList;
+            var ResultingFieldList = p.ResultingFieldList;
             ///Make sure cursor numbers have been assigned to all entries in
             ///the FROM clause of the SELECT statement.
             build.sqlite3SrcListAssignCursors(parseState, pTabList);
@@ -371,9 +383,9 @@ namespace Community.CsharpSqlite.Ast
             ///
             ///The first loop just checks to see if there are any "*" operators
             ///that need expanding.
-            for (k = 0; k < pEList.Count; k++)
+            for (k = 0; k < ResultingFieldList.Count; k++)
             {
-                Expr pE = pEList[k].pExpr;
+                Expr pE = ResultingFieldList[k].pExpr;
                 if (pE.Operator == TokenType.TK_ALL)
                     break;
                 Debug.Assert(pE.Operator != TokenType.TK_DOT || pE.pRight != null);
@@ -381,16 +393,16 @@ namespace Community.CsharpSqlite.Ast
                 if (pE.Operator == TokenType.TK_DOT && pE.pRight.Operator == TokenType.TK_ALL)
                     break;
             }
-            if (k < pEList.Count)
+            if (k < ResultingFieldList.Count)
             {
                 ///If we get here it means the result set contains one or more "*"
                 ///operators that need to be expanded.  Loop through each expression
                 ///in the result set and expand them one by one.
-                var a = pEList.a;
+                var a = ResultingFieldList.a;
                 ExprList pNew = null;
                 SqliteFlags flags = parseState.db.flags;
                 bool longNames = (flags & SqliteFlags.SQLITE_FullColNames) != 0 && (flags & SqliteFlags.SQLITE_ShortColNames) == 0;
-                for (k = 0; k < pEList.Count; k++)
+                for (k = 0; k < ResultingFieldList.Count; k++)
                 {
                     Expr pE = a[k].pExpr;
                     Debug.Assert(pE.Operator != TokenType.TK_DOT || pE.pRight != null);
@@ -468,20 +480,14 @@ namespace Community.CsharpSqlite.Ast
                                     int iDummy = 0;
                                     if ((pFrom.jointype & JoinType.JT_NATURAL) != 0 && SelectMethods.tableAndColumnIndex(pTabList, i, zName, ref iDummy, ref iDummy) != 0)
                                     {
-                                        ///
-                                        ///<summary>
                                         ///In a NATURAL join, omit the join columns from the
                                         ///table to the right of the join 
-                                        ///</summary>
                                         continue;
                                     }
                                     if (build.sqlite3IdListIndex(pFrom.pUsing, zName) >= 0)
                                     {
-                                        ///
-                                        ///<summary>
                                         ///In a join with a USING clause, omit columns in the
                                         ///using clause from the table on the right. 
-                                        ///</summary>
                                         continue;
                                     }
                                 }
@@ -523,7 +529,7 @@ namespace Community.CsharpSqlite.Ast
                         }
                     }
                 }
-                exprc.Delete(db, ref pEList);
+                exprc.Delete(db, ref ResultingFieldList);
                 p.ResultingFieldList = pNew;
             }
             //#if SQLITE_MAX_COLUMN
@@ -620,38 +626,7 @@ namespace Community.CsharpSqlite.Ast
         }
 
 
-        public static Select Create(Sqlite3.ParseState pParse,/*which columns to include in the result */ExprList pEList, /*the FROM clause "> which tables to scan */SrcList pSrc, /*the WHERE clause */Expr pWhere,
-            /*the GROUP BY clause */ExprList pGroupBy,/*the HAVING clause */Expr pHaving, /*the ORDER BY clause*/ExprList pOrderBy,/*true if the DISTINCT keyword is present */int isDistinct,
-            /*LIMIT value.  NULL means not used */Expr pLimit,/*OFFSET value.  NULL means no offset */Expr pOffset
-        )
-        {
-            //           Select standin;
-            Connection db = pParse.db;
-            Debug.Assert(pOffset == null || pLimit != null);
-            var pNew = new Select()
-            {
-                ResultingFieldList = pEList,
-                FromSource = pSrc,
-                pWhere = pWhere,
-                pGroupBy = pGroupBy,
-                pHaving = pHaving,
-                pOrderBy = pOrderBy,
-                Flags = (isDistinct != 0 ? SelectFlags.Distinct : 0),
-                TokenOp = TokenType.TK_SELECT,
-                pLimit = pLimit,
-                pOffset = pOffset,
-                addrOpenEphm = new int[] { -1, -1, -1 }
-            };
-            //sqlite3DbMallocZero(db, sizeof(*pNew) );
-            Debug.Assert(null == pOffset || pLimit != null);
-            ///OFFSET implies LIMIT 
-            if (pEList == null)
-            {
-                pEList = CollectionExtensions.Append(null, exprc.sqlite3Expr(db, TokenType.TK_ALL, null));
-            }
-
-            return pNew;
-        }
+        
 
     }
 
@@ -682,172 +657,8 @@ namespace Community.CsharpSqlite.Ast
             ///FROM subqueries have Table metadata 
         }
 
-
-        ///<summary>
-        /// The following structure describes the FROM clause of a SELECT statement.
-        /// Each table or subquery in the FROM clause is a separate element of
-        /// the SrcList.a[] array.
-        ///
-        /// With the addition of multiple database support, the following structure
-        /// can also be used to describe a particular table such as the table that
-        /// is modified by an INSERT, DELETE, or UPDATE statement.  In standard SQL,
-        /// such a table must be a simple name: ID.  But in SQLite, the table can
-        /// now be identified by a database name, a dot, then the table name: ID.ID.
-        ///
-        /// The jointype starts out showing the join type between the current table
-        /// and the next table on the list.  The parser builds the list this way.
-        /// But build.sqlite3SrcListShiftJoinType() later shifts the jointypes so that each
-        /// jointype expresses the join between the table and the previous table.
-        ///
-        /// In the colUsed field, the high-order bit (bit 63) is set if the table
-        /// contains more than 63 columns and the 64-th or later column is used.
-        ///
-        ///</summary>
-        public class SrcList_item
-        {
-            ///<summary>
-            ///Name of database holding this table 
-            ///</summary>
-            public string zDatabase;
-            
-            ///<summary>
-            ///Name of the table 
-            ///</summary>
-            public string zName;
-
-            ///<summary>
-            ///The "B" part of a "A AS B" phrase.  zName is the "A" 
-            ///</summary>
-            public string zAlias;
-
-        ///<summary>
-        ///An SQL table corresponding to zName 
-        ///</summary>
-        public Table TableReference;
-            
-            public Select pSelect;
-            ///
-            ///<summary>
-            ///A SELECT statement used in place of a table name 
-            ///</summary>
-            public u8 isPopulated;
-            ///
-            ///<summary>
-            ///Temporary table associated with SELECT is populated 
-            ///</summary>
-            public JoinType jointype;
-            ///
-            ///<summary>
-            ///Type of join between this able and the previous 
-            ///</summary>
-            public u8 notIndexed;
-            ///
-            ///<summary>
-            ///True if there is a NOT INDEXED clause 
-            ///</summary>
-#if !SQLITE_OMIT_EXPLAIN
-            public u8 iSelectId;
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="If pSelect!=0, the id of the sub">select in EQP </param>
-#endif
-            public int iCursor;
-            ///
-            ///<summary>
-            ///The VDBE cursor number used to access this table 
-            ///</summary>
-            public Expr pOn;
-            ///
-            ///<summary>
-            ///The ON clause of a join 
-            ///</summary>
-            public IdList pUsing;
-            ///
-            ///<summary>
-            ///The USING clause of a join 
-            ///</summary>
-            public Bitmask colUsed;
-            ///
-            ///<summary>
-            ///Bit N (1<<N) set if column N of pTab is used 
-            ///</summary>
-            public string zIndex;
-            ///
-            ///<summary>
-            ///Identifier from "INDEXED BY <zIndex>" clause 
-            ///</summary>
-            public Index pIndex;
-            ///
-            ///<summary>
-            ///Index structure corresponding to zIndex, if any 
-            ///</summary>
-        }
-        
+     
 
 
-        ///<summary>
-        /// Permitted values of the SrcList.a.jointype field
-        ///
-        ///</summary>
-        public enum JoinType : byte{
-            JT_INNER = 0x0001,
-            //#define JT_INNER     0x0001    /* Any kind of inner or cross join */
-            JT_CROSS = 0x0002,
-            //#define JT_CROSS     0x0002    /* Explicit use of the CROSS keyword */
-            JT_NATURAL = 0x0004,
-            //#define JT_NATURAL   0x0004    /* True for a "natural" join */
-            JT_LEFT = 0x0008,
-            //#define JT_LEFT      0x0008    /* Left outer join */
-            JT_RIGHT = 0x0010,
-            //#define JT_RIGHT     0x0010    /* Right outer join */
-            JT_OUTER = 0x0020,
-            //#define JT_OUTER     0x0020    /* The "OUTER" keyword is present */
-            JT_ERROR = 0x0040
-            //#define JT_ERROR     0x0040    /* unknown or unsupported join type */
-        }
-
-        ///<summary>
-        /// Given 1 to 3 identifiers preceeding the JOIN keyword, determine the
-        /// type of join.  Return an integer constant that expresses that type
-        /// in terms of the following bit values:
-        ///
-        ///     JT_INNER
-        ///     JT_CROSS
-        ///     JT_OUTER
-        ///     JT_NATURAL
-        ///     JT_LEFT
-        ///     JT_RIGHT
-        ///
-        /// A full outer join is the combination of JT_LEFT and JT_RIGHT.
-        ///
-        /// If an illegal or unsupported join type is seen, then still return
-        /// a join type, but put an error in the pParse structure.
-        ///
-        ///</summary>
-        class Keyword
-        {
-            ///<summary>
-            ///Beginning of keyword text in zKeyText[] 
-            ///</summary>
-            public u8 i;
-
-            ///<summary>
-            ///Length of the keyword in characters 
-            ///</summary>
-            public u8 nChar;
-
-            ///<summary>
-            ///Join type mask 
-            ///</summary>
-            public JoinType code;
-            
-            public Keyword(u8 i, u8 nChar, JoinType code)
-            {
-                this.i = i;
-                this.nChar = nChar;
-                this.code = code;
-            }
-        }
     }
 

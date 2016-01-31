@@ -19,13 +19,7 @@ namespace Community.CsharpSqlite
 
     namespace Paging
     {
-        ///[---hdr|first block location:x-----next block location:y|current free size of x--------next block location:z|crrent free size of y]
-
-        public class MemPage
-        {
-
-
-            ///<summary>
+        ///<summary>
             /// Page type flags.  An ORed combination of these flags appear as the
             /// first byte of on-disk image of every BTree page.
             ///</summary>
@@ -37,6 +31,13 @@ namespace Community.CsharpSqlite
                 LEAFDATA = 0x04,
                 LEAF = 0x08
             }
+        ///[---hdr|first block location:x-----next block location:y|current free size of x--------next block location:z|crrent free size of y]
+
+        public class MemPage
+        {
+
+
+            
 
 
 
@@ -275,7 +276,7 @@ namespace Community.CsharpSqlite
                         iCell--;
                     }
                 }
-                return this.findCell(iCell);
+                return this.findCellAddress(iCell);
             }
 
             ///<summary>
@@ -394,7 +395,7 @@ namespace Community.CsharpSqlite
             //  btreeParseCellPtr((pPage), findCell((pPage), (iCell)), (pInfo))
             public void parseCell(int iCell, ref CellInfo pInfo)
             {
-                this.btreeParseCellPtr(this.findCell(iCell), ref pInfo);
+                this.btreeParseCellPtr(this.findCellAddress(iCell), ref pInfo);
             }
 
             ///<summary>
@@ -1082,10 +1083,7 @@ namespace Community.CsharpSqlite
                 /// Set up a raw page so that it looks like a database page holding
                 /// no entries.
                 ///</summary>
-            void zeroPage(int flags)
-            {
-                zeroPage((PTF)flags);
-            }
+            
             void zeroPage(PTF flags)
             {
                 byte[] data = this.aData;
@@ -1158,7 +1156,7 @@ namespace Community.CsharpSqlite
                 nCell = this.nCell;
                 for (i = 0; i < nCell; i++)
                 {
-                    int pCell = this.findCell(i);
+                    int pCell = this.findCellAddress(i);
                     this.ptrmapPutOvflPtr(pCell, ref rc);
                     if (false == this.IsLeaf)
                     {
@@ -1218,7 +1216,7 @@ namespace Community.CsharpSqlite
                     nCell = this.nCell;
                     for (i = 0; i < nCell; i++)
                     {
-                        int pCell = this.findCell(i);
+                        int pCell = this.findCellAddress(i);
                         if (eType == PTRMAP.OVERFLOW1)
                         {
                             CellInfo info = new CellInfo();
@@ -1850,7 +1848,7 @@ namespace Community.CsharpSqlite
                     ///field. The second while(...) loop copies the key value from the-field. The second while(...) loop copies the key value from the
                     ///cell on pPage into the pSpace buffer.">cell on pPage into the pSpace buffer.
 
-                    int iCell = pPage.findCell(pPage.nCell - 1);
+                    int iCell = pPage.findCellAddress(pPage.nCell - 1);
                     //pCell = findCell( pPage, pPage.nCell - 1 );
                     pCell = pPage.aData;
                     int _pCell = iCell;
@@ -2048,7 +2046,7 @@ namespace Community.CsharpSqlite
                 }
                 else
                 {
-                    pRight = this.findCell(i + nxDiv - this.nOverflow);
+                    pRight = this.findCellAddress(i + nxDiv - this.nOverflow);
                 }
                 pgno = Converter.sqlite3Get4byte(this.aData, pRight);
                 while (true)
@@ -2072,7 +2070,7 @@ namespace Community.CsharpSqlite
                     }
                     else
                     {
-                        apDiv[i] = this.findCell(i + nxDiv - this.nOverflow);
+                        apDiv[i] = this.findCellAddress(i + nxDiv - this.nOverflow);
                         pgno = Converter.sqlite3Get4byte(this.aData, apDiv[i]);
                         szNew[i] = this.cellSizePtr(apDiv[i]);
                         ///
@@ -2791,7 +2789,6 @@ ptrmapCheckPages(pParent, 1);
             ///</summay>
             public SqlResult balance_deeper(ref MemPage ppChild)
             {
-                SqlResult rc;///Return value from subprocedures 
                 MemPage pChild = null;///Pointer to a new child page 
                 Pgno pgnoChild = 0;///Page number of the new child page 
                 BtShared pBt = this.pBt;///The BTree 
@@ -2802,7 +2799,7 @@ ptrmapCheckPages(pParent, 1);
                 ///page that will become the new right-child of pPage. Copy the contents
                 ///of the node stored on pRoot into the new child page.
 
-                rc = PagerMethods.sqlite3PagerWrite(this.pDbPage);
+                var rc = PagerMethods.sqlite3PagerWrite(this.pDbPage);///Return value from subprocedures 
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     rc = BTreeMethods.allocateBtreePage(pBt, ref pChild, ref pgnoChild, this.pgno, 0);
@@ -2833,10 +2830,17 @@ ptrmapCheckPages(pParent, 1);
                 ///Zero the contents of pRoot. Then install pChild as the right">child. </param>
 
                 this.zeroPage((PTF)pChild.aData[0] & ~PTF.LEAF);
+                this.ChildPageNo = pgnoChild;
 
-                this.aData.sqlite3Put4byte(this.hdrOffset + 8, pgnoChild);
+
                 ppChild = pChild;
                 return SqlResult.SQLITE_OK;
+            }
+
+            public uint ChildPageNo
+            {
+                set { this.aData.sqlite3Put4byte(this.hdrOffset + 8, value); }
+                get { return Converter.sqlite3Get4byte(this.aData, this.hdrOffset + (int)PTF.LEAF); }
             }
 
             /*
@@ -2846,7 +2850,7 @@ ptrmapCheckPages(pParent, 1);
           **
           ** This routine works only for pages that do not contain overflow cells.
           */
-            public int findCell(int iCell)
+            public int findCellAddress(int iCell)
             {
                 return this.aData.get2byte(this.cellOffset + 2 * (iCell));
             }
@@ -2867,19 +2871,6 @@ ptrmapCheckPages(pParent, 1);
         }
     }
 
-        public static class PTF {
-            ///<summary>
-            /// Page type flags.  An ORed combination of these flags appear as the
-            /// first byte of on-disk image of every BTree page.
-            ///</summary>
-            public const byte INTKEY = 0x01;
-
-            public const byte ZERODATA = 0x02;
-
-            public const byte LEAFDATA = 0x04;
-
-            public const byte LEAF = 0x08;
-
-        }
+        
 	}
 

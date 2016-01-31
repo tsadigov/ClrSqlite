@@ -169,7 +169,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
                 ///(SQLITE_MAX_EXPR_DEPTH">Parse.nHeight) height. This is a bit</param>
                 ///more conservative than necessary, but much easier than enforcing">more conservative than necessary, but much easier than enforcing</param>
                 ///an exact limit.">an exact limit.</param>
-                pParse.nHeight += pSelect.sqlite3SelectExprHeight();
+                pParse.nHeight += pSelect.SelectExprHeight();
                 ///Check to see if the subquery can be absorbed into the parent. 
                 isAggSub = (pSub.Flags & SelectFlags.Aggregate) != 0;
                 if (SelectMethods.flattenSubquery(pParse, pSelect, i, isAgg, isAggSub) != 0)
@@ -194,7 +194,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
                 //{
                 //  goto select_end;
                 //}
-                pParse.nHeight -= pSelect.sqlite3SelectExprHeight();
+                pParse.nHeight -= pSelect.SelectExprHeight();
                 SelectSourceList = pSelect.FromSource;
                 if (!(pDest.eDest <= SelectResultType.Discard))//        if( null==IgnorableOrderby(pDest) )
                 {
@@ -270,8 +270,8 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
             {
                 KeyInfo pKeyInfo;
                 pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, pOrderBy);
-                pOrderBy.iECursor = pParse.nTab++;
-                pSelect.addrOpenEphm[2] = addrSortIndex = v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, pOrderBy.iECursor, pOrderBy.Count + 2, 0, pKeyInfo, P4Usage.P4_KEYINFO_HANDOFF);
+                pOrderBy.iECursor = pParse.AllocatedCursorCount++;
+                pSelect.addrOpenEphm[2] = addrSortIndex = v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, pOrderBy.iECursor, pOrderBy.Count + 2, 0, pKeyInfo);
             }
             else
             {
@@ -291,9 +291,9 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
             {
                 KeyInfo pKeyInfo;
                 Debug.Assert(isAgg || pGroupBy != null);
-                distinct = pParse.nTab++;
+                distinct = pParse.AllocatedCursorCount++;
                 pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, pSelect.ResultingFieldList);
-                v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, distinct, 0, 0, pKeyInfo, P4Usage.P4_KEYINFO_HANDOFF);
+                v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, distinct, 0, 0, pKeyInfo);
                 v.ChangeP5(Sqlite3.BTREE_UNORDERED);
             }
             else
@@ -408,9 +408,9 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
                     ///implement it.  Allocate that sorting index now.  If it turns out
                     ///that we do not need it after all, the OpenEphemeral instruction
                     ///will be converted into a Noop.
-                    sAggInfo.sortingIdx = pParse.nTab++;
+                    sAggInfo.sortingIdx = pParse.AllocatedCursorCount++;
                     var pKeyInfo = SelectMethods.keyInfoFromExprList(pParse, pGroupBy);///Keying information for the group by clause 
-                    addrSortingIdx = v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, sAggInfo.sortingIdx, sAggInfo.nSortingColumn, 0, pKeyInfo, P4Usage.P4_KEYINFO_HANDOFF);
+                    addrSortingIdx = v.sqlite3VdbeAddOp4(OpCode.OP_OpenEphemeral, sAggInfo.sortingIdx, sAggInfo.nSortingColumn, 0, pKeyInfo);
                     ///Initialize memory locations used by GROUP BY aggregate processing
                     ///x
                     iUseFlag = ++pParse.UsedCellCount;
@@ -604,7 +604,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
                         ///is better to execute the op on an index, as indexes are almost
                         ///always spread across less pages than their corresponding tables.
                         int iDb = pParse.db.indexOfBackendWithSchema(pTab.pSchema);
-                        int iCsr = pParse.nTab++;
+                        int iCsr = pParse.AllocatedCursorCount++;
                         ///<param name="Cursor to scan b">tree </param>
                         Index pIdx;
                         ///Iterator variable 
@@ -615,7 +615,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
                         int iRoot = pTab.tnum;
                         ///<param name="Root page of scanned b">tree </param>
                         build.sqlite3CodeVerifySchema(pParse, iDb);
-                        sqliteinth.sqlite3TableLock(pParse, iDb, pTab.tnum, 0, pTab.zName);
+                        sqliteinth.TableLock(pParse, iDb, pTab.tnum, 0, pTab.zName);
                         ///Search for the index that has the least amount of columns. If
                         ///there is such an index, and it has less columns than the table
                         ///does, then we can assume that it consumes less space on disk and
@@ -921,7 +921,7 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
                         {
                             ///We will need to create our own temporary table to hold the
                             ///intermediate results.
-                            unionTab = pParse.nTab++;
+                            unionTab = pParse.AllocatedCursorCount++;
                             Debug.Assert(select.pOrderBy == null);
                             addr = v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, unionTab, 0);
                             Debug.Assert(select.addrOpenEphm[0] == -1);
@@ -1008,8 +1008,8 @@ namespace Community.CsharpSqlite.Compiler.CodeGeneration
                         ///INTERSECT is different from the others since it requires
                         ///two temporary tables.  Hence it has its own case.  Begin
                         ///by allocating the tables we will need.
-                        var tab1 = pParse.nTab++;
-                        var tab2 = pParse.nTab++;
+                        var tab1 = pParse.AllocatedCursorCount++;
+                        var tab2 = pParse.AllocatedCursorCount++;
                         Debug.Assert(select.pOrderBy == null);
                         addr = v.sqlite3VdbeAddOp2(OpCode.OP_OpenEphemeral, tab1, 0);
                         Debug.Assert(select.addrOpenEphm[0] == -1);

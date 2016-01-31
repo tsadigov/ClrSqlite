@@ -723,7 +723,7 @@ sqlite3 *pNextBlocked;        /* Next in list of all blocked connections */
             /// See also: build.sqlite3LocateCollSeq(), sqlite3GetCollSeq()
             ///
             ///</summary>
-            public CollSeq sqlite3FindCollSeq( SqliteEncoding enc, string zName, u8 create)
+            public CollSeq FindCollSeq( SqliteEncoding enc, string zName, u8 create)
             {
                 Connection db = this;
                 CollSeq[] pColl;

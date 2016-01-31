@@ -20,7 +20,9 @@ namespace Community.CsharpSqlite.Utils
 
     public static class MathExtensions
     {
-
+        public static ThreeState Negate(this ThreeState state) {
+            return (ThreeState)(-(int)state);
+        }
         public static bool Intersects(this SortOrder a, SortOrder b)
         {
             return (a & b) != (SortOrder)0;

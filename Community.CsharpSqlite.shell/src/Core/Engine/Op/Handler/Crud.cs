@@ -26,7 +26,7 @@ namespace Community.CsharpSqlite.Engine.Op
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Vdbe = Engine.Vdbe;
-
+    using Core.Runtime;
     public class Crud
     {
 
@@ -115,8 +115,6 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///Cursor to table into which insert is written 
                         int nZero;
                         ///<param name="Number of zero">bytes to append </param>
-                        int seekResult;
-                        ///Result of prior seek or 0 if no USESEEKRESULT flag 
                         string zDb;
                         ///<param name="database name "> used by the update hook </param>
                         string zTbl;
@@ -153,7 +151,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         {
                             Debug.Assert((pData.flags & (MemFlags.MEM_Blob | MemFlags.MEM_Str)) != 0);
                         }
-                        seekResult = (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : 0);
+                        var seekResult = (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : ThreeState.Neutral);///Result of prior seek or 0 if no USESEEKRESULT flag 
                         if ((pData.flags & MemFlags.MEM_Zero) != 0)
                         {
                             nZero = pData.u.nZero;

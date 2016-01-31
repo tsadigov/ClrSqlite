@@ -256,7 +256,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
 
                 io.sqlite3_snprintf(200, zContext, "On tree page %d cell %d: ", iPage, i);
-                int iCell = pPage.findCell(i);
+                int iCell = pPage.findCellAddress(i);
                 //pCell = findCell( pPage, i );
                 pCell = pPage.aData;
                 pPage.btreeParseCellPtr(iCell, ref info);

@@ -12,6 +12,7 @@ namespace Community.CsharpSqlite.Engine.Op
 {
 
     using Community.CsharpSqlite.Engine;
+    using Utils;
     public class Logical
     {
         public static RuntimeException Exec(CPU cpu, OpCode opcode, VdbeOp pOp)
@@ -143,7 +144,7 @@ namespace Community.CsharpSqlite.Engine.Op
                         ///<summary>
                         ///same as TokenType.TK_GE, jump, in1, in3 
                         ///</summary>
-                        int res = 0;
+                        var res = ThreeState.Neutral;
                         ///
                         ///<summary>
                         ///Result of the comparison of pIn1 against pIn3 
@@ -183,7 +184,7 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///
                                 ///</summary>
                                 Debug.Assert(pOp.OpCode == OpCode.OP_Eq || pOp.OpCode == OpCode.OP_Ne);
-                                res = (pIn1.flags & pIn3.flags & MemFlags.MEM_Null) == 0 ? 1 : 0;
+                                res = (pIn1.flags & pIn3.flags & MemFlags.MEM_Null) == 0 ? ThreeState.Positive : ThreeState.Neutral;
                             }
                             else
                             {
@@ -229,22 +230,22 @@ namespace Community.CsharpSqlite.Engine.Op
                         switch (pOp.OpCode)
                         {
                             case OpCode.OP_Eq:
-                                res = (res == 0) ? 1 : 0;
+                                res = (res == 0) ? ThreeState.Positive : ThreeState.Neutral;
                                 break;
                             case OpCode.OP_Ne:
-                                res = (res != 0) ? 1 : 0;
+                                res = (res != 0) ? ThreeState.Positive : ThreeState.Neutral;
                                 break;
                             case OpCode.OP_Lt:
-                                res = (res < 0) ? 1 : 0;
+                                res = (res < 0) ? ThreeState.Positive : ThreeState.Neutral;
                                 break;
                             case OpCode.OP_Le:
-                                res = (res <= 0) ? 1 : 0;
+                                res = (res <= 0) ? ThreeState.Positive : ThreeState.Neutral;
                                 break;
                             case OpCode.OP_Gt:
-                                res = (res > 0) ? 1 : 0;
+                                res = (res > 0) ? ThreeState.Positive : ThreeState.Neutral;
                                 break;
                             default:
-                                res = (res >= 0) ? 1 : 0;
+                                res = (res >= 0) ? ThreeState.Positive : ThreeState.Neutral;
                                 break;
                         }
                         if ((pOp.p5 & sqliteinth.SQLITE_STOREP2) != 0)
@@ -252,7 +253,7 @@ namespace Community.CsharpSqlite.Engine.Op
                             var pOut = aMem[pOp.p2];
                             vdbe.memAboutToChange(pOut);
                             pOut.MemSetTypeFlag(MemFlags.MEM_Int);
-                            pOut.u.AsInteger = res;
+                            pOut.u.AsInteger = (int)res;
                             Sqlite3.REGISTER_TRACE(vdbe, pOp.p2, pOut);
                         }
                         else

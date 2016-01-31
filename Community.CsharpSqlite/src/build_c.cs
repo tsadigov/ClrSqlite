@@ -78,7 +78,7 @@ namespace Community.CsharpSqlite
             public static void setupExplain(ParseState pParse, int explainFlag)
             {
                 pParse.explain = (byte)explainFlag;
-                pParse.nVar = 0;
+                pParse.VariableParameterCount = 0;
             }
 #if !SQLITE_OMIT_SHARED_CACHE
 																																																						///<summary>
@@ -182,115 +182,76 @@ p.zName,  P4Usage.P4_STATIC );
             /// no VDBE code was generated.
             ///</summary>
             public static void sqlite3FinishCoding(ParseState pParse)
-            {
-                Connection db;
-                Vdbe v;
-                db = pParse.db;
-                //      if ( db.mallocFailed != 0 ) return;
+            {    
+                var db = pParse.db;
                 if (pParse.nested != 0)
                     return;
                 if (pParse.nErr != 0)
                     return;
-                ///
-                ///<summary>
                 ///Begin by generating some termination code at the end of the
                 ///vdbe program
-                ///
-                ///</summary>
-                v = pParse.sqlite3GetVdbe();
-                Debug.Assert(0 == pParse.isMultiWrite
-#if SQLITE_DEBUG
-																																																																																	        || sqlite3VdbeAssertMayAbort( v, pParse.mayAbort ) != 0
-#endif
-);
-                if (v != null)
+                var vdbe = pParse.sqlite3GetVdbe();
+                Debug.Assert(0 == pParse.isMultiWrite);
+                if (vdbe != null)
                 {
-                    v.sqlite3VdbeAddOp0(OpCode.OP_Halt);
-                    ///
-                    ///<summary>
+                    vdbe.sqlite3VdbeAddOp0(OpCode.OP_Halt);
                     ///The cookie mask contains one bit for each database file open.
                     ///(Bit 0 is for main, bit 1 is for temp, and so forth.)  Bits are
                     ///set for each database that is used.  Generate code to start a
                     ///transaction on each used database and to verify the schema cookie
                     ///on each used database.
-                    ///
-                    ///</summary>
                     if (pParse.cookieGoto > 0)
                     {
                         u32 mask;
                         int iDb;
-                        v.sqlite3VdbeJumpHere(pParse.cookieGoto - 1);
+                        vdbe.sqlite3VdbeJumpHere(pParse.cookieGoto - 1);
                         for (iDb = 0, mask = 1; iDb < db.BackendCount; mask <<= 1, iDb++)
                         {
                             if ((mask & pParse.cookieMask) == 0)
                                 continue;
-                            Engine.vdbeaux.markUsed(v, iDb);
-                            v.sqlite3VdbeAddOp2( OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
+                            Engine.vdbeaux.markUsed(vdbe, iDb);
+                            vdbe.sqlite3VdbeAddOp2( OpCode.OP_Transaction, iDb, (mask & pParse.writeMask) != 0);
                             if (!db.init.IsBusy)
                             {
                                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, iDb, null));
-                                v.AddOpp3(OpCode.OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.Backends[iDb].pSchema.iGeneration);
+                                vdbe.AddOpp3(OpCode.OP_VerifyCookie, iDb, pParse.cookieValue[iDb], (int)db.Backends[iDb].pSchema.iGeneration);
                             }
                         }
 #if !SQLITE_OMIT_VIRTUALTABLE
-                        {
-                            int i;
-                            for (i = 0; i < pParse.nVtabLock; i++)
+                        {                            
+                            for (var i = 0; i < pParse.nVtabLock; i++)
                             {
                                 VTable vtable = VTableMethodsExtensions.sqlite3GetVTable(db, pParse.apVtabLock[i]);
-                                v.sqlite3VdbeAddOp4(OpCode.OP_VBegin, 0, 0, 0, vtable,  P4Usage.P4_VTAB);
+                                vdbe.sqlite3VdbeAddOp4(OpCode.OP_VBegin, 0, 0, 0, vtable,  P4Usage.P4_VTAB);
                             }
                             pParse.nVtabLock = 0;
 #endif
-                            ///
-                            ///<summary>
                             ///Once all the cookies have been verifiedand transactions opened,
-                            ///</summary>
                             ///<param name="obtain the required table">op unless the</param>
                             ///<param name="shared">cache feature is enabled.</param>
-                            ///
-                            ///<summary>
                             ///Initialize any AUTOINCREMENT data structures required.
                             ///
-                            ///</summary>
-                            ///
-                            ///<summary>
                             ///Finally, jump back to the beginning of the executable code. 
-                            ///</summary>
                         }
                         codeTableLocks(pParse);
                         pParse.sqlite3AutoincrementBegin();
-                        v.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, pParse.cookieGoto);
+                        vdbe.sqlite3VdbeAddOp2(OpCode.OP_Goto, 0, pParse.cookieGoto);
                     }
                 }
-                ///
-                ///<summary>
                 ///Get the VDBE program ready for execution
-                ///
-                ///</summary>
-                if (v != null && Sqlite3.ALWAYS(pParse.nErr == 0)///
-                    ///<summary>
-                    ///&& 0 == db.mallocFailed 
-                    ///</summary>
-                )
+                if (vdbe != null && Sqlite3.ALWAYS(pParse.nErr == 0))
                 {
 #if SQLITE_DEBUG
 																																																																																																												        TextWriter trace = ( db.flags & SQLITE_VdbeTrace ) != 0 ? Console.Out : null;
         sqlite3VdbeTrace( v, trace );
 #endif
                     Debug.Assert(pParse.iCacheLevel == 0);
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="Disables and re">enables match </param>
-                    ///
-                    ///<summary>
                     ///A minimum of one cursor is required if autoincrement is used
                     ///See ticket [a696379c1f08866] 
-                    ///</summary>
-                    if (pParse.pAinc != null && pParse.nTab == 0)
-                        pParse.nTab = 1;
-                    Engine.vdbeaux.sqlite3VdbeMakeReady(v, pParse);
+                    if (pParse.pAinc != null && pParse.AllocatedCursorCount == 0)
+                        pParse.AllocatedCursorCount = 1;
+                    Engine.vdbeaux.sqlite3VdbeMakeReady(vdbe, pParse);
                     pParse.rc = SqlResult.SQLITE_DONE;
                     pParse.colNamesSet = 0;
                 }
@@ -298,10 +259,10 @@ p.zName,  P4Usage.P4_STATIC );
                 {
                     pParse.rc = SqlResult.SQLITE_ERROR;
                 }
-                pParse.nTab = 0;
+                pParse.AllocatedCursorCount = 0;
                 pParse.UsedCellCount = 0;
-                pParse.nSet = 0;
-                pParse.nVar = 0;
+                pParse.UsedSetCount = 0;
+                pParse.VariableParameterCount = 0;
                 pParse.cookieMask = 0;
                 pParse.cookieGoto = 0;
             }
@@ -513,13 +474,13 @@ p.zName,  P4Usage.P4_STATIC );
             public static void sqlite3OpenMasterTable(ParseState p, int iDb)
             {
                 Vdbe v = p.sqlite3GetVdbe();
-                sqliteinth.sqlite3TableLock(p, iDb, sqliteinth.MASTER_ROOT, 1, sqliteinth.SCHEMA_TABLE(iDb));
+                sqliteinth.TableLock(p, iDb, sqliteinth.MASTER_ROOT, 1, sqliteinth.SCHEMA_TABLE(iDb));
                 v.AddOpp3(OpCode.OP_OpenWrite, 0, sqliteinth.MASTER_ROOT, iDb);
                 v.sqlite3VdbeChangeP4(-1, (int)5,  P4Usage.P4_INT32);
                 ///5 column table 
-                if (p.nTab == 0)
+                if (p.AllocatedCursorCount == 0)
                 {
-                    p.nTab = 1;
+                    p.AllocatedCursorCount = 1;
                 }
             }
             
@@ -1025,7 +986,7 @@ p.zName,  P4Usage.P4_STATIC );
                 // ENC(db);
                 u8 initbusy = db.init.busy;
                 CollSeq pColl;
-                pColl = db.sqlite3FindCollSeq( enc, zName, initbusy);
+                pColl = db.FindCollSeq( enc, zName, initbusy);
                 if (0 == initbusy && (pColl == null || pColl.xCmp == null))
                 {
                     pColl = Sqlite3.sqlite3GetCollSeq(db, enc, pColl, zName);
@@ -1161,7 +1122,7 @@ p.zName,  P4Usage.P4_STATIC );
                 DbFixer sFix = new DbFixer();
                 Token pName = null;
                 Connection db = pParse.db;
-                if (pParse.nVar > 0)
+                if (pParse.VariableParameterCount > 0)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "parameters are not allowed in views");
                     SelectMethods.SelectDestructor(db, ref pSelect);
@@ -1240,11 +1201,8 @@ p.zName,  P4Usage.P4_STATIC );
             {                
                 SqlResult nErr = (SqlResult)0;
                 ///Number of errors encountered 
-                int n;
-                ///Temporarily holds the number of cursors assigned 
                 Connection db = pParse.db;
                 ///Database connection for malloc errors 
-                dxAuth xAuth;
                 //)(void*,int,const char*,const char*,const char*,const char);
                 Debug.Assert(pTable != null);
 #if !SQLITE_OMIT_VIRTUALTABLE
@@ -1277,7 +1235,7 @@ p.zName,  P4Usage.P4_STATIC );
                 if (pTable.nCol < 0)
                 {
                     utilc.sqlite3ErrorMsg(pParse, "view %s is circularly defined", pTable.zName);
-                    return (SqlResult)1;
+                    return SqlResult.SQLITE_ERROR;
                 }
                 Debug.Assert(pTable.nCol >= 0);
                 ///If we get this far, it means we need to compute the table names.
@@ -1291,8 +1249,9 @@ p.zName,  P4Usage.P4_STATIC );
             if (pSel != null)
                 {
                     u8 enableLookaside = db.lookaside.bEnabled;
-                    n = pParse.nTab;
-                    sqlite3SrcListAssignCursors(pParse, pSel.FromSource);
+                ///Temporarily holds the number of cursors assigned 
+                    var n = pParse.AllocatedCursorCount;
+                sqlite3SrcListAssignCursors(pParse, pSel.FromSource);
                     pTable.nCol = -1;
                     db.lookaside.bEnabled = 0;
 #if !SQLITE_OMIT_AUTHORIZATION
@@ -1304,7 +1263,7 @@ db.xAuth = xAuth;
                     var pSelTab = SelectMethods.sqlite3ResultSetOfSelect(pParse, pSel);///A fake table from which we get the result set 
 #endif
                 db.lookaside.bEnabled = enableLookaside;
-                    pParse.nTab = n;
+                    pParse.AllocatedCursorCount = n;
                     if (pSelTab != null)
                     {
                         Debug.Assert(pTable.aCol == null);
@@ -1331,12 +1290,13 @@ db.xAuth = xAuth;
                 return nErr;
             }
 #endif
+
 #if !SQLITE_OMIT_VIEW
+
             ///<summary>
             ///Clear the column names from every VIEW in database idx.
             ///</summary>
-            public 
-                static void sqliteViewResetAll(Connection db, int idx)
+            public  static void sqliteViewResetAll(Connection db, int idx)
             {
                 HashElem i;
                 Debug.Assert(Sqlite3.sqlite3SchemaMutexHeld(db, idx, null));
@@ -1707,7 +1667,7 @@ db.xAuth = xAuth;
                 {
                     goto exit_drop_index;
                 }
-                pIndex = IndexBuilder.FindByName(db, pName.a[0].zName, pName.a[0].zDatabase);
+                pIndex = IndexBuilder.FindByName(db, pName.a[0].zDatabase, pName.a[0].zName);
                 if (pIndex == null)
                 {
                     if (ifExists == 0)
@@ -1964,25 +1924,18 @@ goto exit_drop_index;
 
         ///<summary>
         /// Assign VdbeCursor index numbers to all tables in a SrcList
-        ///
         ///</summary>
         public static void sqlite3SrcListAssignCursors(ParseState pParse, SrcList pList)
             {
-                Debug.Assert(pList != null///
-                    ///<summary>
-                    ///|| pParse.db.mallocFailed != 0 
-                    ///</summary>
-                );
+                Debug.Assert(pList != null);
 
-                pList.a.ForEach(
-                    pItem => {
-                        if (0 <= pItem.iCursor)
-                            return;
-                        pItem.iCursor = pParse.nTab++;
-                        if (pItem.pSelect != null)
-                        {
+                pList
+                .Where(pItem=>!(0 <= pItem.iCursor))
+                .ForEach(
+                    pItem => {                        
+                        pItem.iCursor = pParse.AllocatedCursorCount++;
+                        if (pItem.pSelect != null)//recursive
                             sqlite3SrcListAssignCursors(pParse, pItem.pSelect.FromSource);
-                        }
                     }
                 );
                 

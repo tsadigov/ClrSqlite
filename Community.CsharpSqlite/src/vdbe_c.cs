@@ -25,11 +25,12 @@ using yDbMask=System.Int32;
 namespace Community.CsharpSqlite {
     using sqlite3_value = Engine.Mem;
     using Op = Engine.VdbeOp;
-	using System;
-	using System.Collections.Generic;
+    using System;
+    using System.Collections.Generic;
     using Metadata;
     using Community.CsharpSqlite.Engine;
-	public partial class Sqlite3 {
+    using Engine.Core.Runtime;
+    public partial class Sqlite3 {
 		///
 		///<summary>
 		///2001 September 15
@@ -255,66 +256,62 @@ namespace Community.CsharpSqlite {
 							pMem.ValType=FoundationalType.SQLITE_BLOB;
 						}
 		}
-		///<summary>
-		/// Allocate VdbeCursor number iCur.  Return a pointer to it.  Return NULL
-		/// if we run out of memory.
-		///
-		///</summary>
-		public static VdbeCursor allocateCursor(Vdbe p,///The virtual machine 
+        ///<summary>
+        /// Allocate VdbeCursor number iCur.  Return a pointer to it.  Return NULL
+        /// if we run out of memory.
+        ///
+        ///</summary>
+        public static VdbeCursor allocateCursor(
+            Vdbe vdbe,///The virtual machine 
 		    int iCur,///Index of the new VdbeCursor 
 		    int nField,///Number of fields in the table or index 
-		    int iDb,///<param name="When database the cursor belongs to, or ">1 </param>
-		    int isBtreeCursor///<param name="True for B">table or vtab </param>
-		) {
-			///Find the memory cell that will be used to store the blob of memory
-			///required for this VdbeCursor structure. It is convenient to use a
-			///vdbe memory cell to manage the memory allocation required for a
-			///VdbeCursor structure for the following reasons:
-			///
-			///Sometimes cursor numbers are used for a couple of different
-			///purposes in a vdbe program. The different uses might require
-			///different sized allocations. Memory cells provide growable
-			///allocations.
-			///
-			///When using ENABLE_MEMORY_MANAGEMENT, memory cell buffers can
-			///be freed lazily via the sqlite3_release_memory() API. This
-			///minimizes the number of malloc calls made by the system.
-			///
-			///Memory cells for cursors are allocated at the top of the address
-			///space. Memory cell (p.nMem) corresponds to cursor 0. Space for
-			///</summary>
-			///<param name="cursor 1 is managed by memory cell (p.nMem">1), etc.</param>
-			///<param name=""></param>
-			//Mem pMem = p.aMem[p.nMem - iCur];
-			//int nByte;
-			VdbeCursor pCx=null;
-			//ROUND8(sizeof(VdbeCursor)) +
-			//( isBtreeCursor ? sqlite3BtreeCursorSize() : 0 ) +
-			//2 * nField * sizeof( u32 );
-			Debug.Assert(iCur<p.nCursor);
-			if(p.OpenCursors[iCur]!=null) {
-                vdbeaux.sqlite3VdbeFreeCursor(p, p.OpenCursors[iCur]);
-				p.OpenCursors[iCur]=null;
-			}
-			//if ( SqlResult.SQLITE_OK == sqlite3VdbeMemGrow( pMem, nByte, 0 ) )
-			{
-				p.OpenCursors[iCur]=pCx=new VdbeCursor();
-				// (VdbeCursor)pMem.z;
-				//memset(pCx, 0, sizeof(VdbeCursor));
-				pCx.iDb=iDb;
-				pCx.nField=nField;
-				if(nField!=0) {
-					pCx.aType=new u32[nField];
-					// (u32)&pMem.z[ROUND8(sizeof( VdbeCursor ))];
-				}
-				if(isBtreeCursor!=0) {
-					pCx.pCursor=mempoolMethods.sqlite3MemMallocBtCursor(pCx.pCursor);
-					// (BtCursor)&pMem.z[ROUND8(sizeof( VdbeCursor )) + 2 * nField * sizeof( u32 )];
-					pCx.pCursor.sqlite3BtreeCursorZero();
-				}
-			}
-			return pCx;
-		}
+		    int iDb,///When database the cursor belongs to, or ">1 </param>
+		    int isBtreeCursor///True for B">table or vtab </param>
+		)
+        {
+            ///Find the memory cell that will be used to store the blob of memory
+            ///required for this VdbeCursor structure. It is convenient to use a
+            ///vdbe memory cell to manage the memory allocation required for a
+            ///VdbeCursor structure for the following reasons:
+            ///
+            ///Sometimes cursor numbers are used for a couple of different
+            ///purposes in a vdbe program. The different uses might require
+            ///different sized allocations. Memory cells provide growable
+            ///allocations.
+            ///
+            ///When using ENABLE_MEMORY_MANAGEMENT, memory cell buffers can
+            ///be freed lazily via the sqlite3_release_memory() API. This
+            ///minimizes the number of malloc calls made by the system.
+            ///
+            ///Memory cells for cursors are allocated at the top of the address
+            ///space. Memory cell (p.nMem) corresponds to cursor 0. Space for
+            ///
+            ///cursor 1 is managed by memory cell (p.nMem-1), etc.
+            ///
+            
+            Debug.Assert(iCur < vdbe.nCursor);
+            if (vdbe.OpenCursors[iCur] != null)//CLEAR EXISTING
+            {
+                vdbeaux.sqlite3VdbeFreeCursor(vdbe, vdbe.OpenCursors[iCur]);
+                vdbe.OpenCursors[iCur] = null;
+            }
+
+            VdbeCursor vdbeCursor =  vdbe.OpenCursors[iCur] =  new VdbeCursor()
+            {
+                iDb = iDb,
+                FieldCount = nField,
+                aType = (nField != 0) ? new u32[nField] : null
+            };
+
+
+            if (isBtreeCursor != 0)
+            {
+                vdbeCursor.pCursor = mempoolMethods.AllocBtCursor(vdbeCursor.pCursor);
+                vdbeCursor.pCursor.sqlite3BtreeCursorZero();
+            }
+
+            return vdbeCursor;
+        }
 		
 		
 		///<summary>

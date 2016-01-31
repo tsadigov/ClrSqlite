@@ -26,7 +26,7 @@ namespace Community.CsharpSqlite.Engine.Op
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Vdbe = Engine.Vdbe;
-
+    using Core.Runtime;
     public class VirtualTable
     {
 
@@ -105,29 +105,20 @@ namespace Community.CsharpSqlite.Engine.Op
                                 ///</summary>
                                 case OpCode.OP_VOpen:
                                     {
-                                        VdbeCursor pCur;
                                         sqlite3_vtab_cursor pVtabCursor;
-                                        sqlite3_vtab pVtab;
-                                        sqlite3_module pModule;
-                                        pCur = null;
-                                        pVtab = pOp.p4.pVtab.pVtab;
-                                        pModule = (sqlite3_module)pVtab.pModule;
+                                        VdbeCursor pCur = null;
+                                        var pVtab = pOp.p4.pVtab.pVtab;
+                                        var pModule = (sqlite3_module)pVtab.pModule;
                                         Debug.Assert(pVtab != null && pModule != null);
                                         rc = pModule.xOpen(pVtab, out pVtabCursor);
                                         Sqlite3.importVtabErrMsg(vdbe, pVtab);
                                         if (SqlResult.SQLITE_OK == rc)
                                         {
-                                            ///
-                                            ///<summary>
                                             ///Initialize sqlite3_vtab_cursor base class 
-                                            ///</summary>
                                             pVtabCursor.pVtab = pVtab;
-                                            ///
-                                            ///<summary>
                                             ///Initialise vdbe cursor object 
-                                            ///</summary>
                                             pCur = Sqlite3.allocateCursor(vdbe, pOp.p1, 0, -1, 0);
-                                            if (pCur != null)
+                                            if (null != pCur)
                                             {
                                                 pCur.pVtabCursor = pVtabCursor;
                                                 pCur.pModule = pVtabCursor.pVtab.pModule;

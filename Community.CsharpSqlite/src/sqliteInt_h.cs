@@ -1875,7 +1875,7 @@ int sqlite3AuthReadCol(Parse*, string , string , int);
         public static void sqlite3TableLock(ParseState p, int p1, int p2, u8 p3, byte[] p4)
         {
         }
-        public static void sqlite3TableLock(ParseState p, int p1, int p2, u8 p3, string p4)
+        public static void TableLock(ParseState p, int p1, int p2, u8 p3, string p4)
         {
         }
 #endif

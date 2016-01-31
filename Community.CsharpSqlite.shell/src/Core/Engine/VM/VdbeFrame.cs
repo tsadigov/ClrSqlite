@@ -19,7 +19,7 @@ namespace Community.CsharpSqlite.Engine
 
     using Operation = Engine.VdbeOp;
     using Community.CsharpSqlite.Engine;
-
+    using Core.Runtime;
     //typedef struct VdbeCursor VdbeCursor;
     ///<summary>
     /// When a sub-program is executed (OP_Program), a structure of this type

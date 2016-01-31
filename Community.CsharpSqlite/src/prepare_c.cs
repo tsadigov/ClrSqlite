@@ -163,7 +163,7 @@ namespace Community.CsharpSqlite
                             encoding = SqliteEncoding.UTF8;
                         db.Backends[0].pSchema.enc = encoding;
                         //ENC( db ) = encoding;
-                        db.pDfltColl = db.sqlite3FindCollSeq(SqliteEncoding.UTF8, "BINARY", 0);
+                        db.pDfltColl = db.FindCollSeq(SqliteEncoding.UTF8, "BINARY", 0);
                     }
                     else {
                         ///If opening an attached database, the encoding much match ENC(db) 
