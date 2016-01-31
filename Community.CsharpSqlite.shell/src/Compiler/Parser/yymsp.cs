@@ -28,12 +28,12 @@ namespace Community.CsharpSqlite.Parser
     /// None.
     ///
     ///</summary>
-    public class yymsp
+    public class OffsettedList
     {
         public yyParser _yyParser;
         public int _yyidx;
         // CONSTRUCTOR
-        public yymsp(ref yyParser pointer_to_yyParser, int yyidx)//' Parser and Stack Index
+        public OffsettedList(yyParser pointer_to_yyParser, int yyidx)//' Parser and Stack Index
         {
             this._yyParser = pointer_to_yyParser;
             this._yyidx = yyidx;
