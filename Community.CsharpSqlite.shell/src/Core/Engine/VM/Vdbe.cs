@@ -78,10 +78,11 @@ namespace Community.CsharpSqlite
             bool dbg = false;
             public override void ShowDebugInfo()
             {
+                return;
                 if (dbg) return;
                 dbg = true;
 
-                Console.Clear();
+                //Console.Clear();
                 vdbeaux.sqlite3VdbePrintSql(this);
                 //vdbeaux.sqlite3VdbeList(this);
                 for (int i = 0; i < aOp.Count(); i++)
@@ -107,7 +108,7 @@ namespace Community.CsharpSqlite
                 tabcount = 0;
                 pFrame.path(f => f.pParent).ForEach<VdbeFrame>(PrintFrame);
 
-                Console.ReadKey();
+                //Console.ReadKey();
                 dbg = false;
             }
             int tabcount = 0;

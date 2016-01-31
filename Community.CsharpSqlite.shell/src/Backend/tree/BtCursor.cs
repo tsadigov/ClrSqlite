@@ -35,8 +35,8 @@ namespace Community.CsharpSqlite.tree {
     ///<param name="Fields in this structure are accessed under the BtShared.mutex">Fields in this structure are accessed under the BtShared.mutex</param>
     ///<param name="found at self.pBt.mutex.">found at self.pBt.mutex.</param>
     ///<param name=""></param>
-    public class BtCursor
-        {
+    public class BtCursor:ILinkedListNode<BtCursor>, IBackwardLinkedListNode<BtCursor>
+    {
             ///<summary>
             ///The Btree to which this cursor belongs 
             ///</summary>
@@ -50,8 +50,8 @@ namespace Community.CsharpSqlite.tree {
             ///<summary>
             ///Forms a linked list of all cursors 
             ///</summary>
-            public BtCursor pNext;
-            public BtCursor pPrev;
+            public BtCursor pNext { get; set; }
+            public BtCursor pPrev { get; set; }
             
             ///<summary>
             ///Argument passed to comparison function 
