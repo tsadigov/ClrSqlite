@@ -3331,7 +3331,7 @@ start = sqlite3Hwtime();
                                                     {
                                                         goto abort_due_to_error;
                                                     }
-                                                    if (res != ThreeState.Negative)
+                                                    if (res != ThreeState.Neutral)
                                                     {
                                                         v = 1;
                                                         ///IMP: R-48074 
