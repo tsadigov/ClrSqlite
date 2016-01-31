@@ -27,11 +27,29 @@ namespace Community.CsharpSqlite.Engine.Op
     using Community.CsharpSqlite.Os;
     using Vdbe = Engine.Vdbe;
     using Core.Runtime;
+    using CsharpSqlite.Core.Runtime;
     public class Crud
     {
+        CPU cpu;
+        public Crud(CPU cpu)
+        {
+            this.cpu = cpu;
+            runtime.cpu = cpu;
+        }
 
+        static CrudRuntime s_runtime = new CrudRuntime();
+        private static CrudRuntime runtime
+        {
+            get { return s_runtime; }
+        }
 
         public static RuntimeException Exec(CPU cpu, OpCode opcode, VdbeOp pOp)
+        {
+            Crud c = new Crud(cpu);
+            return c.Exec(opcode, pOp);
+        }
+
+        public RuntimeException Exec(OpCode opcode, VdbeOp pOp)
         //(Community.CsharpSqlite.Vdbe vdbe, OpCode opcode, ref int opcodeIndex,Mem [] aMem,VdbeOp pOp,ref SqlResult rc)
         {
             var vdbe = cpu.vdbe;
@@ -264,6 +282,35 @@ namespace Community.CsharpSqlite.Engine.Op
                             vdbe.nChange++;
                         break;
                     }
+
+
+                ///
+                ///<summary>
+                ///Opcode: NewRowid P1 P2 P3 * *
+                ///
+                ///Get a new integer record number (a.k.a "rowid") used as the key to a table.
+                ///The record number is not previously used as a key in the database
+                ///table that cursor P1 points to.  The new record number is written
+                ///written to register P2.
+                ///
+                ///If P3>0 then P3 is a register in the root frame of this VDBE that holds 
+                ///the largest previously generated record number. No new record numbers are
+                ///allowed to be less than this value. When this value reaches its maximum, 
+                ///an SQLITE_FULL error is generated. The P3 register is updated with the '
+                ///generated record number. This P3 mechanism is used to help implement the
+                ///AUTOINCREMENT feature.
+                ///
+                ///</summary>
+                case OpCode.OP_NewRowid:
+                    #region generate rowid
+                    {
+                        RuntimeException r= runtime.NewRowId(pOp);
+                        if (r != RuntimeException.OK)
+                            return r;
+                        break;
+                    }
+#endregion
+
                 default: return RuntimeException.noop;
             }
 

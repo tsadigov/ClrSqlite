@@ -379,6 +379,7 @@
     <Compile Include="src\Core\Engine\VM\VdbeOp.cs" />
     <Compile Include="src\Core\Engine\VM\VdbeOpList.cs" />
     <Compile Include="src\Core\Engine\SortOrder.cs" />
+    <Compile Include="src\Core\Runtime\CrudRuntime.cs" />
     <Compile Include="src\Core\Runtime\CursorRuntime.cs" />
     <Compile Include="src\Core\Runtime\VdbeCursor.cs" />
     <Compile Include="src\Limits.cs" />

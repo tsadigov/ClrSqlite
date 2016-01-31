@@ -291,15 +291,6 @@ namespace Community.CsharpSqlite
 
 
 
-
-
-
-
-
-
-
-
-
         ///<summary>
         ///The number of samples of an index that SQLite takes in order to 
         ///construct a histogram of the table content when running ANALYZE
@@ -371,29 +362,7 @@ namespace Community.CsharpSqlite
         public const int SQLITE_MALLOC_SOFT_LIMIT = 1024;
 #endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        
 
         ///
         ///<summary>
@@ -442,5 +411,8 @@ namespace Community.CsharpSqlite
         public static byte[] zMagicHeader = Encoding.UTF8.GetBytes(Globals.SQLITE_FILE_HEADER);
 
 
+
+        internal static int TryCountForSmallRandomRowId=5;
+        internal static int TryCountForRandomRowId=100;
     }
 }
