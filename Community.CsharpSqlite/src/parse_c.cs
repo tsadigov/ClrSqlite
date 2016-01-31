@@ -11,6 +11,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Utils;
     using ParseState = Sqlite3.ParseState;
     using Compiler.Parser;
+    using Parser;
     public  class ParseMethods {
 
         ///<summary>
