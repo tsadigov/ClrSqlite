@@ -2016,6 +2016,7 @@ int origPc;                  /* Program counter at start of opcode */
 
                     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------					///
 
+                    
                     #region MAIN CPU LOOP
                     for (this.opcodeIndex = this.currentOpCodeIndex; rc == SqlResult.SQLITE_OK; this.opcodeIndex++)
                     {
@@ -2350,28 +2351,7 @@ start = sqlite3Hwtime();
                                         aPermute = pOp.p4.ai;
                                         break;
                                     }
-                                ///
-                                ///<summary>
-                                ///Opcode: Compare P1 P2 P3 P4 *
-                                ///
-                                ///</summary>
-                                ///<param name="Compare two vectors of registers in reg(P1)..reg(P1+P3">1) (call this</param>
-                                ///<param name="vector "A") and in reg(P2)..reg(P2+P3">1) ("B").  Save the result of</param>
-                                ///<param name="the comparison for use by the next  OpCode.OP_Jump instruct.">the comparison for use by the next  OpCode.OP_Jump instruct.</param>
-                                ///<param name=""></param>
-                                ///<param name="P4 is a KeyInfo structure that defines collating sequences and sort">P4 is a KeyInfo structure that defines collating sequences and sort</param>
-                                ///<param name="orders for the comparison.  The permutation applies to registers">orders for the comparison.  The permutation applies to registers</param>
-                                ///<param name="only.  The KeyInfo elements are used sequentially.">only.  The KeyInfo elements are used sequentially.</param>
-                                ///<param name=""></param>
-                                ///<param name="The comparison is a sort comparison, so NULLs compare equal,">The comparison is a sort comparison, so NULLs compare equal,</param>
-                                ///<param name="NULLs are less than numbers, numbers are less than strings,">NULLs are less than numbers, numbers are less than strings,</param>
-                                ///<param name="and strings are less than blobs.">and strings are less than blobs.</param>
-                                ///<param name=""></param>
-                                case OpCode.OP_Compare:
-                                    {
-                                        OCode_Compare(pOp, aMem, ref iCompare, ref aPermute);
-                                        break;
-                                    }
+                                
 
                                 ///
                                 ///<summary>
@@ -5297,10 +5277,7 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
 
             //yDbMask 
             private SqlResult OpCode_ResultRow(int opcodeIndex, int dataOffset, int columnCount, SqlResult rc, IList<Mem> memoryBuffer)
-            {
-                //Mem[] pMem;
-                int i;
-
+            {                
                 ///If this statement has violated immediate foreign key constraints, do
                 ///not return the number of rows modified. And do not RELEASE the statement
                 ///transaction. It needs to be rolled back.  
@@ -5334,91 +5311,27 @@ sqlite3VdbePrintOp(stdout, origPc, aOp[origPc]);
                 ///Invalidate all ephemeral cursor row caches 
                 this.cacheCtr = (this.cacheCtr + 2) | 1;
                 ///Make sure the results of the current row are \000 terminated
-                ///<param name="and have an assigned type.  The results are de">ephemeralized as</param>
-                ///<param name="as side effect.">as side effect.</param>
-                ///<param name=""></param>
+                ///and have an assigned type.  The results are de-ephemeralized as
+                ///as side effect.
+
                 //pMem = p.pResultSet = aMem[pOp.p1];
-                this.pResultSet = new Mem[columnCount];
-                for (i = 0; i < columnCount; i++)
-                {
-                    this.pResultSet[i] = memoryBuffer[dataOffset + i];
-                    Debug.Assert(this.pResultSet[i].memIsValid());
-                    //Deephemeralize( p.pResultSet[i] );
-                    //Debug.Assert( ( p.pResultSet[i].flags & MEM.MEM_Ephem ) == 0
-                    //        || ( p.pResultSet[i].flags & ( MEM.MEM_Str | MEM.MEM_Blob ) ) == 0 );
-                    vdbemem_cs.sqlite3VdbeMemNulTerminate(this.pResultSet[i]);
-                    //sqlite3VdbeMemNulTerminate(pMem[i]);
-                    Sqlite3.sqlite3VdbeMemStoreType(this.pResultSet[i]);
-                    Sqlite3.REGISTER_TRACE(this, dataOffset + i, this.pResultSet[i]);
-                }
-                //      if ( db.mallocFailed != 0 ) goto no_mem;
-                ///
-                ///<summary>
+                this.pResultSet = memoryBuffer.Skip(dataOffset).Take(columnCount).ToArray();
+                this.pResultSet.ForEach(
+                    (mem) => {
+                        Debug.Assert(mem.memIsValid());
+                        vdbemem_cs.sqlite3VdbeMemNulTerminate(mem);
+                        Sqlite3.sqlite3VdbeMemStoreType(mem);
+                        //Sqlite3.REGISTER_TRACE(this, dataOffset + i, this.pResultSet[i]);
+                    }
+                ); 
+                
                 ///Return SQLITE_ROW
-                ///
-                ///</summary>
                 this.currentOpCodeIndex = opcodeIndex + 1;
                 rc = SqlResult.SQLITE_ROW;
                 return rc;
             }
 
-
-            private void OCode_Compare(Operation pOp, IList<Mem> aMem, ref ThreeState iCompare, ref int[] aPermute)
-            {
-                int i;
-                int idx;
-                CollSeq pColl;
-                ///
-                ///<summary>
-                ///Collating sequence to use on this term 
-                ///</summary>
-                SortOrder bRev;
-                ///
-                ///<summary>
-                ///True for DESCENDING sort order 
-                ///</summary>
-                var n = pOp.p3;
-                var pKeyInfo = pOp.p4.pKeyInfo;
-                Debug.Assert(n > 0);
-                Debug.Assert(pKeyInfo != null);
-                var p1 = pOp.p1;
-                var p2 = pOp.p2;
-#if SQLITE_DEBUG
-																																																																																																																																				              if ( aPermute != null )
-              {
-                int k, mx = 0;
-                for ( k = 0; k < n; k++ )
-                  if ( aPermute[k] > mx )
-                    mx = aPermute[k];
-                Debug.Assert( p1 > 0 && p1 + mx <= p.nMem + 1 );
-                Debug.Assert( p2 > 0 && p2 + mx <= p.nMem + 1 );
-              }
-              else
-              {
-                Debug.Assert( p1 > 0 && p1 + n <= p.nMem + 1 );
-                Debug.Assert( p2 > 0 && p2 + n <= p.nMem + 1 );
-              }
-#endif
-                for (i = 0; i < n; i++)
-                {
-                    idx = aPermute != null ? aPermute[i] : i;
-                    Debug.Assert(aMem[p1 + idx].memIsValid());
-                    Debug.Assert(aMem[p2 + idx].memIsValid());
-                    Sqlite3.REGISTER_TRACE(this, p1 + idx, aMem[p1 + idx]);
-                    Sqlite3.REGISTER_TRACE(this, p2 + idx, aMem[p2 + idx]);
-                    Debug.Assert(i < pKeyInfo.nField);
-                    pColl = pKeyInfo.aColl[i];
-                    bRev = pKeyInfo.aSortOrder[i];
-                    iCompare = vdbemem_cs.sqlite3MemCompare(aMem[p1 + idx], aMem[p2 + idx], pColl);
-                    if (iCompare != 0)
-                    {
-                        if (bRev != 0)
-                            iCompare = iCompare.Negate();
-                        break;
-                    }
-                }
-                aPermute = null;
-            }
+            
 
 
             ///<summary>

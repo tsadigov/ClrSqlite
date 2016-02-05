@@ -1787,9 +1787,8 @@ nextPage = pCur.aOverflow[iIdx+1];
             public void getCellInfo()
             {
                 if (this.info.nSize == 0)
-                {
-                    int iPage = this.pageStackIndex;
-                    this.PageStack[iPage].btreeParseCell(this.indexInPage[iPage], ref this.info);
+                {                    
+                    this.CurrentPage.btreeParseCell(this.CurrentIndex, ref this.info);
                     this.validNKey = true;
                 }
                 else

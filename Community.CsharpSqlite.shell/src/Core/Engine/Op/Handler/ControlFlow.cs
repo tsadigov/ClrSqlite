@@ -10,6 +10,9 @@ namespace Community.CsharpSqlite.Engine.Op
 {
     using CsharpSqlite.Metadata;
     using sqlite3_value = Engine.Mem;
+    using Operation = VdbeOp;
+    using Utils;
+
     public static class ControlFlow
     {
         public static RuntimeException Exec(CPU cpu, OpCode opcode, VdbeOp pOp)
@@ -17,6 +20,28 @@ namespace Community.CsharpSqlite.Engine.Op
             var aMem = cpu.aMem;
             switch (opcode)
             {
+                ///
+                ///<summary>
+                ///Opcode: Compare P1 P2 P3 P4 *
+                ///
+                ///</summary>
+                ///<param name="Compare two vectors of registers in reg(P1)..reg(P1+P3">1) (call this</param>
+                ///<param name="vector "A") and in reg(P2)..reg(P2+P3">1) ("B").  Save the result of</param>
+                ///<param name="the comparison for use by the next  OpCode.OP_Jump instruct.">the comparison for use by the next  OpCode.OP_Jump instruct.</param>
+                ///<param name=""></param>
+                ///<param name="P4 is a KeyInfo structure that defines collating sequences and sort">P4 is a KeyInfo structure that defines collating sequences and sort</param>
+                ///<param name="orders for the comparison.  The permutation applies to registers">orders for the comparison.  The permutation applies to registers</param>
+                ///<param name="only.  The KeyInfo elements are used sequentially.">only.  The KeyInfo elements are used sequentially.</param>
+                ///<param name=""></param>
+                ///<param name="The comparison is a sort comparison, so NULLs compare equal,">The comparison is a sort comparison, so NULLs compare equal,</param>
+                ///<param name="NULLs are less than numbers, numbers are less than strings,">NULLs are less than numbers, numbers are less than strings,</param>
+                ///<param name="and strings are less than blobs.">and strings are less than blobs.</param>
+                ///<param name=""></param>
+                case OpCode.OP_Compare:
+                    {
+                        OCode_Compare(pOp, aMem, ref cpu.iCompare, ref cpu.aPermute);
+                        break;
+                    }
                 ///
                 ///<summary>
                 ///Opcode: IfPos P1 P2 * * *
@@ -162,10 +187,7 @@ namespace Community.CsharpSqlite.Engine.Op
                 ///</summary>
                 case OpCode.OP_Jump:
                     {
-                        ///
-                        ///<summary>
                         ///jump 
-                        ///</summary>
                         if (cpu.iCompare < 0)
                         {
                             cpu.opcodeIndex = pOp.p1 - 1;
@@ -207,10 +229,7 @@ namespace Community.CsharpSqlite.Engine.Op
                 ///</summary>
                 case OpCode.OP_IfNot:
                     {
-                        ///
-                        ///<summary>
                         ///jump, in1 
-                        ///</summary>
                         int c;
                         var pIn1 = aMem[pOp.p1];
                         if ((pIn1.flags & MemFlags.MEM_Null) != 0)
@@ -443,6 +462,52 @@ namespace Community.CsharpSqlite.Engine.Op
             cpu.opcodeIndex = pcDest;
         }
 
-            
+        private static void OCode_Compare(Operation pOp, IList<Mem> aMem, ref ThreeState iCompare, ref int[] aPermute)
+        {
+            OCode_Compare(pOp.p1, pOp.p2, pOp.p3, pOp.p4.pKeyInfo, aMem, ref iCompare, ref aPermute);
+        }
+        private static void OCode_Compare(int p1, int p2, int n, KeyInfo pKeyInfo/* p4 */, IList<Mem> memoryBuffer, ref ThreeState result, ref int[] aPermute)
+        {
+            Debug.Assert(n > 0);
+            Debug.Assert(pKeyInfo != null);
+#if SQLITE_DEBUG
+																																																																																																																																				              if ( aPermute != null )
+              {
+                int k, mx = 0;
+                for ( k = 0; k < n; k++ )
+                  if ( aPermute[k] > mx )
+                    mx = aPermute[k];
+                Debug.Assert( p1 > 0 && p1 + mx <= p.nMem + 1 );
+                Debug.Assert( p2 > 0 && p2 + mx <= p.nMem + 1 );
+              }
+              else
+              {
+                Debug.Assert( p1 > 0 && p1 + n <= p.nMem + 1 );
+                Debug.Assert( p2 > 0 && p2 + n <= p.nMem + 1 );
+              }
+#endif
+            for (var i = 0; i < n; i++)
+            {
+                var idx = aPermute != null ? aPermute[i] : i;
+                #region 
+                Debug.Assert(memoryBuffer[p1 + idx].memIsValid());
+                Debug.Assert(memoryBuffer[p2 + idx].memIsValid());
+                //Sqlite3.REGISTER_TRACE(this, p1 + idx, aMem[p1 + idx]);
+                //Sqlite3.REGISTER_TRACE(this, p2 + idx, aMem[p2 + idx]);
+                Debug.Assert(i < pKeyInfo.nField);
+                #endregion
+                result = vdbemem_cs.sqlite3MemCompare(memoryBuffer[p1 + idx], memoryBuffer[p2 + idx], pKeyInfo.aColl[i]/*Collating sequence to use on this term */);
+
+                if (ThreeState.Neutral == result) continue;
+
+                if (SortOrder.SQLITE_SO_ASC != pKeyInfo.aSortOrder[i]) //(0!=iCompare && 0 != bRev)//True for DESCENDING sort order                 
+                    result = result.Negate();                
+                break;
+                
+            }
+            aPermute = null;
+        }
+
+
     }
 }
