@@ -27,26 +27,21 @@ namespace Community.CsharpSqlite.Paging
             get { return _size; }
             set { data.put2byte(this.Address + 2, _size = value); }
         }
+
         public int Address { get; protected set; }
-        public int NextAddress { get; protected set; }
+        int _nextAddress;
+        public int NextAddress { get { return _nextAddress; } protected set { data.put2byte(this.Address , _nextAddress = value); } }
 
         public FreeSlot pNext
         {
             get
             {
-                return NextAddress > 0 ? new FreeSlot(page, NextAddress) : null;
+                return 0==NextAddress  ? null:new FreeSlot(page, NextAddress) ;
             }
 
             set
             {
-                if (null == value)
-                {
-                    NextAddress = 0;
-                }
-                else {
-                    data[Address + 0] = data[value.Address + 0];
-                    data[Address + 1] = data[value.Address + 1];
-                }
+                NextAddress = null==value?0:value.Address;
             }
         }
     }

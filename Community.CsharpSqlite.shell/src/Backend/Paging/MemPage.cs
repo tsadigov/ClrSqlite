@@ -892,11 +892,11 @@ namespace Community.CsharpSqlite
                     }
                 }
                 ///If the cell content area begins with a freeblock, remove it. 
-                if (FirstFreeBlockAddress == CellBodyOffset)
+                var head = this.FreeSlotHead;
+                if (head.NextAddress == CellBodyOffset)
                 {
-                    u16 sz = data.get2byte(this.FirstFreeBlockAddress + 2);
-                    this.FirstFreeBlockAddress = data.get2byte(this.FirstFreeBlockAddress);
-                    CellBodyOffset += sz;
+                    CellBodyOffset += head.pNext.Size;
+                    head.RemoveNext();
                 }
 
                 Debug.Assert(this.pDbPage.sqlite3PagerIswriteable());
@@ -1563,7 +1563,6 @@ namespace Community.CsharpSqlite
                     if (pTemp != null)
                     {
                         Buffer.BlockCopy(pCell, nSkip, pTemp, nSkip, sz - nSkip);
-                        //memcpy(pTemp+nSkip, pCell+nSkip, sz-nSkip);
                         pCell = pTemp;
                     }
                     if (iChild != 0)
@@ -1601,11 +1600,8 @@ namespace Community.CsharpSqlite
                         pRC = rc;
                         return;
                     }
-                    ///
-                    ///<summary>
                     ///The allocateSpace() routine guarantees the following two properties
                     ///if it returns success 
-                    ///</summary>
 
                     Debug.Assert(newCellDataLocation >= end + 2);
                     Debug.Assert(newCellDataLocation + sz <= (int)this.pBt.usableSize);
@@ -1617,14 +1613,7 @@ namespace Community.CsharpSqlite
                     {
                         Converter.sqlite3Put4byte(pageDataBuffer, newCellDataLocation, iChild);
                     }
-                    //ptr = &data[end];
-                    //endPtr = &data[ins];
-                    //assert( ( SQLITE_PTR_TO_INT( ptr ) & 1 ) == 0 );  /* ptr is always 2-byte aligned */
-                    //while ( ptr > endPtr )
-                    //{
-                    //  *(u16*)ptr = *(u16*)&ptr[-2];
-                    //  ptr -= 2;
-                    //}
+                    
 
                     //shifting array by 2 bytes
                     //SubArray<>
