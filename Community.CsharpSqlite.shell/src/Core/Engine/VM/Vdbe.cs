@@ -2098,14 +2098,7 @@ start = sqlite3Hwtime();
 
                             pOut.Flags = MemFlags.MEM_Int;
                         }
-                        ///
-                        ///<summary>
                         ///Sanity checking on other operands 
-                        ///</summary>
-                        ///
-                        ///<summary>
-                        ///Sanity checking on other operands 
-                        ///</summary>
 #if SQLITE_DEBUG
 																																																																																																											        if ( ( pOp.opflags & OPFLG_IN1 ) != 0 )
         {
@@ -2574,31 +2567,18 @@ start = sqlite3Hwtime();
                                 ///existing savepoint, P1==1, or to rollback an existing savepoint P1==2.
                                 ///</summary>
                                 case OpCode.OP_Savepoint:
-                                    {
-                                        int p1;
-                                        ///
-                                        ///<summary>
-                                        ///Value of P1 operand 
-                                        ///</summary>
-                                        string zName;
-                                        ///
-                                        ///<summary>
+                                    {                                        
                                         ///Name of savepoint 
-                                        ///</summary>
                                         int nName;
                                         Savepoint pNew;
                                         Savepoint pSavepoint;
                                         Savepoint pTmp;
                                         int iSavepoint;
                                         int ii;
-                                        p1 = pOp.p1;
-                                        zName = pOp.p4.z;
-                                        ///
-                                        ///<summary>
+                                        var p1 = pOp.p1;
+                                        var zName = pOp.p4.z;
                                         ///Assert that the p1 parameter is valid. Also that if there is no open
                                         ///transaction, then there cannot be any savepoints.
-                                        ///
-                                        ///</summary>
                                         Debug.Assert(db.pSavepoint == null || db.autoCommit == 0);
                                         Debug.Assert(p1 == sqliteinth.SAVEPOINT_BEGIN || p1 == sqliteinth.SAVEPOINT_RELEASE || p1 == sqliteinth.SAVEPOINT_ROLLBACK);
                                         Debug.Assert(db.pSavepoint != null || db.isTransactionSavepoint == 0);
@@ -2607,12 +2587,8 @@ start = sqlite3Hwtime();
                                         {
                                             if (db.writeVdbeCnt > 0)
                                             {
-                                                ///
-                                                ///<summary>
                                                 ///A new savepoint cannot be created if there are active write
                                                 ///statements (i.e. open read/write incremental blob handles).
-                                                ///
-                                                ///</summary>
                                                 malloc_cs.sqlite3SetString(ref this.zErrMsg, db, "cannot open savepoint - ", "SQL statements in progress");
                                                 rc = SqlResult.SQLITE_BUSY;
                                             }
@@ -2620,22 +2596,16 @@ start = sqlite3Hwtime();
                                             {
                                                 nName = StringExtensions.Strlen30(zName);
 #if !SQLITE_OMIT_VIRTUALTABLE
-                                                ///
-                                                ///<summary>
                                                 ///This call is Ok even if this savepoint is actually a transaction
                                                 ///savepoint (and therefore should not prompt xSavepoint()) callbacks.
                                                 ///If this is a transaction savepoint being opened, it is guaranteed
-                                                ///</summary>
                                                 ///<param name="that the db">>aVTrans[] array is empty.  </param>
                                                 Debug.Assert(db.autoCommit == 0 || db.nVTrans == 0);
                                                 rc = VTableMethodsExtensions.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, db.nStatement + db.nSavepoint);
                                                 if (rc != SqlResult.SQLITE_OK)
                                                     goto abort_due_to_error;
 #endif
-                                                ///
-                                                ///<summary>
                                                 ///Create a new savepoint structure. 
-                                                ///</summary>
                                                 pNew = new Savepoint();
                                                 // sqlite3DbMallocRaw( db, sizeof( Savepoint ) + nName + 1 );
                                                 if (pNew != null)
@@ -2643,11 +2613,8 @@ start = sqlite3Hwtime();
                                                     //pNew.zName = (char )&pNew[1];
                                                     //memcpy(pNew.zName, zName, nName+1);
                                                     pNew.zName = zName;
-                                                    ///
-                                                    ///<summary>
                                                     ///If there is no open transaction, then mark this as a special
                                                     ///"transaction savepoint". 
-                                                    ///</summary>
                                                     if (db.autoCommit != 0)
                                                     {
                                                         db.autoCommit = 0;
@@ -2657,10 +2624,7 @@ start = sqlite3Hwtime();
                                                     {
                                                         db.nSavepoint++;
                                                     }
-                                                    ///
-                                                    ///<summary>
                                                     ///Link the new savepoint into the database handle's list. 
-                                                    ///</summary>
                                                     pNew.pNext = db.pSavepoint;
                                                     db.pSavepoint = pNew;
                                                     pNew.nDeferredCons = db.nDeferredCons;
@@ -2670,11 +2634,8 @@ start = sqlite3Hwtime();
                                         else
                                         {
                                             iSavepoint = 0;
-                                            ///
-                                            ///<summary>
                                             ///Find the named savepoint. If there is no such savepoint, then an
                                             ///an error is returned to the user.  
-                                            ///</summary>
                                             for (pSavepoint = db.pSavepoint; pSavepoint != null && !pSavepoint.zName.Equals(zName, StringComparison.InvariantCultureIgnoreCase); pSavepoint = pSavepoint.pNext)
                                             {
                                                 iSavepoint++;
@@ -2687,25 +2648,17 @@ start = sqlite3Hwtime();
                                             else
                                                 if (db.writeVdbeCnt > 0 || (p1 == sqliteinth.SAVEPOINT_ROLLBACK && db.activeVdbeCnt > 1))
                                             {
-                                                ///
-                                                ///<summary>
                                                 ///It is not possible to release (commit) a savepoint if there are
                                                 ///active write statements. It is not possible to rollback a savepoint
                                                 ///if there are any active statements at all.
-                                                ///
-                                                ///</summary>
                                                 malloc_cs.sqlite3SetString(ref this.zErrMsg, db, "cannot %s savepoint - SQL statements in progress", (p1 == sqliteinth.SAVEPOINT_ROLLBACK ? "rollback" : "release"));
                                                 rc = SqlResult.SQLITE_BUSY;
                                             }
                                             else
                                             {
-                                                ///
-                                                ///<summary>
                                                 ///Determine whether or not this is a transaction savepoint. If so,
                                                 ///and this is a RELEASE command, then the current transaction
                                                 ///is committed.
-                                                ///
-                                                ///</summary>
                                                 int isTransaction = (pSavepoint.pNext == null && db.isTransactionSavepoint != 0) ? 1 : 0;
                                                 if (isTransaction != 0 && p1 == sqliteinth.SAVEPOINT_RELEASE)
                                                 {
@@ -2742,11 +2695,8 @@ start = sqlite3Hwtime();
                                                         db.flags = (db.flags | SqliteFlags.SQLITE_InternChanges);
                                                     }
                                                 }
-                                                ///
-                                                ///<summary>
                                                 ///Regardless of whether this is a RELEASE or ROLLBACK, destroy all
                                                 ///savepoints nested inside of the savepoint being operated on. 
-                                                ///</summary>
                                                 while (db.pSavepoint != pSavepoint)
                                                 {
                                                     pTmp = db.pSavepoint;
@@ -2754,13 +2704,10 @@ start = sqlite3Hwtime();
                                                     db.DbFree(ref pTmp);
                                                     db.nSavepoint--;
                                                 }
-                                                ///
-                                                ///<summary>
                                                 ///If it is a RELEASE, then destroy the savepoint being operated on 
                                                 ///too. If it is a ROLLBACK TO, then set the number of deferred 
                                                 ///constraint violations present in the database to the value stored
                                                 ///when the savepoint was created.  
-                                                ///</summary>
                                                 if (p1 == sqliteinth.SAVEPOINT_RELEASE)
                                                 {
                                                     Debug.Assert(pSavepoint == db.pSavepoint);
@@ -2807,31 +2754,20 @@ start = sqlite3Hwtime();
                                         Debug.Assert(desiredAutoCommit != 0 || 0 == desiredAutoCommit);
                                         Debug.Assert(desiredAutoCommit != 0 || 0 == iRollback);
                                         Debug.Assert(db.activeVdbeCnt > 0);
-                                        ///
-                                        ///<summary>
                                         ///At least this one VM is active 
-                                        ///</summary>
                                         if (turnOnAC != 0 && iRollback != 0 && db.activeVdbeCnt > 1)
                                         {
-                                            ///
-                                            ///<summary>
                                             ///If this instruction implements a ROLLBACK and other VMs are
                                             ///still running, and a transaction is active, return an error indicating
                                             ///that the other VMs must complete first.
-                                            ///
-                                            ///</summary>
                                             malloc_cs.sqlite3SetString(ref this.zErrMsg, db, "cannot rollback transaction - " + "SQL statements in progress");
                                             rc = SqlResult.SQLITE_BUSY;
                                         }
                                         else
                                             if (turnOnAC != 0 && 0 == iRollback && db.writeVdbeCnt > 0)
                                         {
-                                            ///
-                                            ///<summary>
                                             ///If this instruction implements a COMMIT and other VMs are writing
                                             ///return an error indicating that the other VMs must complete first.
-                                            ///
-                                            ///</summary>
                                             malloc_cs.sqlite3SetString(ref this.zErrMsg, db, "cannot commit transaction - " + "SQL statements in progress");
                                             rc = SqlResult.SQLITE_BUSY;
                                         }
@@ -2879,84 +2815,7 @@ start = sqlite3Hwtime();
                                         }
                                         break;
                                     }
-                                ///
-                                ///<summary>
-                                ///Opcode: Transaction P1 P2 * * *
-                                ///
-                                ///Begin a transaction.  The transaction ends when a Commit or Rollback
-                                ///opcode is encountered.  Depending on the ON CONFLICT setting, the
-                                ///transaction might also be rolled back if an error is encountered.
-                                ///
-                                ///P1 is the index of the database file on which the transaction is
-                                ///started.  Index 0 is the main database file and index 1 is the
-                                ///file used for temporary tables.  Indices of 2 or more are used for
-                                ///attached databases.
-                                ///
-                                ///</summary>
-                                ///<param name="If P2 is non">transaction is started.  A RESERVED lock is</param>
-                                ///<param name="obtained on the database file when a write">transaction is started.  No</param>
-                                ///<param name="other process can start another write transaction while this transaction is">other process can start another write transaction while this transaction is</param>
-                                ///<param name="underway.  Starting a write transaction also creates a rollback journal. A">underway.  Starting a write transaction also creates a rollback journal. A</param>
-                                ///<param name="write transaction must be started before any changes can be made to the">write transaction must be started before any changes can be made to the</param>
-                                ///<param name="database.  If P2 is 2 or greater then an EXCLUSIVE lock is also obtained">database.  If P2 is 2 or greater then an EXCLUSIVE lock is also obtained</param>
-                                ///<param name="on the file.">on the file.</param>
-                                ///<param name=""></param>
-                                ///<param name="If a write">transaction is started and the Vdbe.usesStmtJournal flag is</param>
-                                ///<param name="true (this flag is set if the Vdbe may modify more than one row and may">true (this flag is set if the Vdbe may modify more than one row and may</param>
-                                ///<param name="throw an ABORT exception), a statement transaction may also be opened.">throw an ABORT exception), a statement transaction may also be opened.</param>
-                                ///<param name="More specifically, a statement transaction is opened iff the database">More specifically, a statement transaction is opened iff the database</param>
-                                ///<param name="connection is currently not in autocommit mode, or if there are other">connection is currently not in autocommit mode, or if there are other</param>
-                                ///<param name="active statements. A statement transaction allows the affects of this">active statements. A statement transaction allows the affects of this</param>
-                                ///<param name="VDBE to be rolled back after an error without having to roll back the">VDBE to be rolled back after an error without having to roll back the</param>
-                                ///<param name="entire transaction. If no error is encountered, the statement transaction">entire transaction. If no error is encountered, the statement transaction</param>
-                                ///<param name="will automatically commit when the VDBE halts.">will automatically commit when the VDBE halts.</param>
-                                ///<param name=""></param>
-                                ///<param name="If P2 is zero, then a read">lock is obtained on the database file.</param>
-                                ///<param name=""></param>
-                                case OpCode.OP_Transaction:
-                                    {
-                                        Btree pBt;
-                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.BackendCount);
-                                        Debug.Assert((this.btreeMask & (((yDbMask)1) << pOp.p1)) != 0);
-                                        pBt = db.Backends[pOp.p1].BTree;
-                                        if (pBt != null)
-                                        {
-                                            rc = pBt.sqlite3BtreeBeginTrans(pOp.p2);
-                                            if (rc == SqlResult.SQLITE_BUSY)
-                                            {
-                                                this.currentOpCodeIndex = opcodeIndex;
-                                                this.rc = rc = SqlResult.SQLITE_BUSY;
-                                                goto vdbe_return;
-                                            }
-                                            if (rc != SqlResult.SQLITE_OK)
-                                            {
-                                                goto abort_due_to_error;
-                                            }
-                                            if (pOp.p2 != 0 && this.usesStmtJournal && (db.autoCommit == 0 || db.activeVdbeCnt > 1))
-                                            {
-                                                Debug.Assert(pBt.sqlite3BtreeIsInTrans());
-                                                if (this.iStatement == 0)
-                                                {
-                                                    Debug.Assert(db.nStatement >= 0 && db.nSavepoint >= 0);
-                                                    db.nStatement++;
-                                                    this.iStatement = db.nSavepoint + db.nStatement;
-                                                }
-                                                rc = VTableMethodsExtensions.sqlite3VtabSavepoint(db, sqliteinth.SAVEPOINT_BEGIN, this.iStatement - 1);
-                                                if (rc == SqlResult.SQLITE_OK)
-                                                {
-                                                    rc = pBt.sqlite3BtreeBeginStmt(this.iStatement);
-                                                }
-                                                ///
-                                                ///<summary>
-                                                ///Store the current value of the database handles deferred constraint
-                                                ///counter. If the statement transaction needs to be rolled back,
-                                                ///the value of this counter needs to be restored too.  
-                                                ///</summary>
-                                                this.nStmtDefCons = db.nDeferredCons;
-                                            }
-                                        }
-                                        break;
-                                    }
+                                
 
 
                                 ///
@@ -3227,216 +3086,7 @@ start = sqlite3Hwtime();
                                         break;
                                     }
 
-
-
-
-                                ///
-                                ///<summary>
-                                ///Opcode: Insert P1 P2 P3 P4 P5
-                                ///
-                                ///Write an entry into the table of cursor P1.  A new entry is
-                                ///created if it doesn't already exist or the data for an existing
-                                ///entry is overwritten.  The data is the value MEM.MEM_Blob stored in register
-                                ///number P2. The key is stored in register P3. The key must
-                                ///be a MEM.MEM_Int.
-                                ///
-                                ///If the OPFLAG_NCHANGE flag of P5 is set, then the row change count is
-                                ///incremented (otherwise not).  If the OPFLAG_LASTROWID flag of P5 is set,
-                                ///then rowid is stored for subsequent return by the
-                                ///sqlite3_last_insert_rowid() function (otherwise it is unmodified).
-                                ///
-                                ///If the OPFLAG_USESEEKRESULT flag of P5 is set and if the result of
-                                ///the last seek operation ( OpCode.OP_NotExists) was a success, then this
-                                ///operation will not attempt to find the appropriate row before doing
-                                ///the insert but will instead overwrite the row that the cursor is
-                                ///currently pointing to.  Presumably, the prior  OpCode.OP_NotExists opcode
-                                ///has already positioned the cursor correctly.  This is an optimization
-                                ///that boosts performance by avoiding redundant seeks.
-                                ///
-                                ///If the OPFLAG_ISUPDATE flag is set, then this opcode is part of an
-                                ///UPDATE operation.  Otherwise (if the flag is clear) then this opcode
-                                ///is part of an INSERT operation.  The difference is only important to
-                                ///the update hook.
-                                ///
-                                ///</summary>
-                                ///<param name="Parameter P4 may point to a string containing the table">name, or</param>
-                                ///<param name="may be NULL. If it is not NULL, then the update">hook </param>
-                                ///<param name="(sqlite3.xUpdateCallback) is invoked following a successful insert.">(sqlite3.xUpdateCallback) is invoked following a successful insert.</param>
-                                ///<param name=""></param>
-                                ///<param name="(WARNING/TODO: If P1 is a pseudo">cursor and P2 is dynamically</param>
-                                ///<param name="allocated, then ownership of P2 is transferred to the pseudo">cursor</param>
-                                ///<param name="and register P2 becomes ephemeral.  If the cursor is changed, the">and register P2 becomes ephemeral.  If the cursor is changed, the</param>
-                                ///<param name="value of register P2 will then change.  Make sure this does not">value of register P2 will then change.  Make sure this does not</param>
-                                ///<param name="cause any problems.)">cause any problems.)</param>
-                                ///<param name=""></param>
-                                ///<param name="This instruction only works on tables.  The equivalent instruction">This instruction only works on tables.  The equivalent instruction</param>
-                                ///<param name="for indices is  OpCode.OP_IdxInsert.">for indices is  OpCode.OP_IdxInsert.</param>
-                                ///<param name=""></param>
-                                ///
-                                ///<summary>
-                                ///Opcode: InsertInt P1 P2 P3 P4 P5
-                                ///
-                                ///This works exactly like  OpCode.OP_Insert except that the key is the
-                                ///integer value P3, not the value of the integer stored in register P3.
-                                ///
-                                ///</summary>
-                                case OpCode.OP_Insert:
-                                case OpCode.OP_InsertInt:
-                                    {///MEM cell holding data for the record to be inserted 
-                                        Mem pData = aMem[pOp.p2];
-                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
-                                        Debug.Assert(pData.memIsValid());
-                                        i64 iKey;///The integer ROWID or key for the record to be inserted 
-                                        VdbeCursor pC = this.OpenCursors[pOp.p1];
-                                        Debug.Assert(pC != null);
-                                        Debug.Assert(pC.pCursor != null);
-                                        Debug.Assert(pC.pseudoTableReg == 0);
-                                        Debug.Assert(pC.isTable);
-
-                                        ///Cursor to table into which insert is written 
-                                        int nZero;///<param name="Number of zero">bytes to append </param>
-                                        
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p2, pData);
-                                        if (pOp.OpCode == OpCode.OP_Insert)
-                                        {
-                                            var pKey = aMem[pOp.p3];///MEM cell holding key  for the record 
-                                            Debug.Assert((pKey.flags & MemFlags.MEM_Int) != 0);
-                                            Debug.Assert(pKey.memIsValid());
-                                            Sqlite3.REGISTER_TRACE(this, pOp.p3, pKey);
-                                            iKey = pKey.u.AsInteger;
-                                        }
-                                        else
-                                        {
-                                            Debug.Assert(pOp.OpCode == OpCode.OP_InsertInt);
-                                            iKey = pOp.p3;
-                                        }
-                                        if (((OpFlag)pOp.p5 & OpFlag.OPFLAG_NCHANGE) != 0)
-                                            this.nChange++;
-                                        if (((OpFlag)pOp.p5 & OpFlag.OPFLAG_LASTROWID) != 0)
-                                            db.lastRowid = lastRowid = iKey;
-                                        if ((pData.flags & MemFlags.MEM_Null) != 0)
-                                        {
-                                            malloc_cs.sqlite3_free(ref pData.zBLOB);
-                                            pData.AsString = null;
-                                            pData.CharacterCount = 0;
-                                        }
-                                        else
-                                        {
-                                            Debug.Assert((pData.flags & (MemFlags.MEM_Blob | MemFlags.MEM_Str)) != 0);
-                                        }
-                                        var seekResult = (((OpFlag)pOp.p5 & OpFlag.OPFLAG_USESEEKRESULT) != 0 ? pC.seekResult : ThreeState.Neutral);///Result of prior seek or 0 if no USESEEKRESULT flag 
-                                        if ((pData.flags & MemFlags.MEM_Zero) != 0)
-                                        {
-                                            nZero = pData.u.nZero;
-                                        }
-                                        else
-                                        {
-                                            nZero = 0;
-                                        }
-                                        rc = pC.pCursor.sqlite3BtreeInsert(null, iKey, pData.zBLOB, pData.CharacterCount, nZero, ((OpFlag)pOp.p5 & OpFlag.OPFLAG_APPEND) != 0 ? 1 : 0, seekResult);
-                                        pC.rowidIsValid = false;
-                                        pC.deferredMoveto = false;
-                                        pC.cacheStatus = Sqlite3.CACHE_STALE;
-                                        ///<param name="Invoke the update">hook if required. </param>
-                                        if (rc == SqlResult.SQLITE_OK && db.xUpdateCallback != null && pOp.p4.z != null)
-                                        {
-                                            var zDb = db.Backends[pC.iDb].Name;///<param name="database name "> used by the update hook </param>                                        
-                                            var zTbl = pOp.p4.z;///<param name="Table name "> used by the opdate hook </param>
-                                            var op = ((
-                                                ((OpFlag)pOp.p5)
-                                                .Has(OpFlag.OPFLAG_ISUPDATE)
-                                                ? AuthTarget.SQLITE_UPDATE : AuthTarget.SQLITE_INSERT
-                                                ));///Opcode for update hook: SQLITE_UPDATE or SQLITE_INSERT 
-                                            Debug.Assert(pC.isTable);
-                                            db.xUpdateCallback(db.pUpdateArg, op, zDb, zTbl, iKey);
-                                            Debug.Assert(pC.iDb >= 0);
-                                        }
-                                        break;
-                                    }
-
-                                ///
-                                ///<summary>
-                                ///Opcode: Delete P1 P2 * P4 *
-                                ///
-                                ///Delete the record at which the P1 cursor is currently pointing.
-                                ///
-                                ///The cursor will be left pointing at either the next or the previous
-                                ///record in the table. If it is left pointing at the next record, then
-                                ///</summary>
-                                ///<param name="the next Next instruction will be a no">op.  Hence it is OK to delete</param>
-                                ///<param name="a record from within an Next loop.">a record from within an Next loop.</param>
-                                ///<param name=""></param>
-                                ///<param name="If the OPFLAG_NCHANGE flag of P2 is set, then the row change count is">If the OPFLAG_NCHANGE flag of P2 is set, then the row change count is</param>
-                                ///<param name="incremented (otherwise not).">incremented (otherwise not).</param>
-                                ///<param name=""></param>
-                                ///<param name="P1 must not be pseudo">table.  It has to be a real table with</param>
-                                ///<param name="multiple rows.">multiple rows.</param>
-                                ///<param name=""></param>
-                                ///<param name="If P4 is not NULL, then it is the name of the table that P1 is">If P4 is not NULL, then it is the name of the table that P1 is</param>
-                                ///<param name="pointing to.  The update hook will be invoked, if it exists.">pointing to.  The update hook will be invoked, if it exists.</param>
-                                ///<param name="If P4 is not NULL then the P1 cursor must have been positioned">If P4 is not NULL then the P1 cursor must have been positioned</param>
-                                ///<param name="using  OpCode.OP_NotFound prior to invoking this opcode.">using  OpCode.OP_NotFound prior to invoking this opcode.</param>
-                                ///<param name=""></param>
-                                case OpCode.OP_Delete:
-                                    {
-                                        i64 iKey;
-                                        VdbeCursor pC;
-                                        iKey = 0;
-                                        Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
-                                        pC = this.OpenCursors[pOp.p1];
-                                        Debug.Assert(pC != null);
-                                        Debug.Assert(pC.pCursor != null);
-                                        ///
-                                        ///<summary>
-                                        ///Only valid for real tables, no pseudotables 
-                                        ///</summary>
-                                        ///
-                                        ///<summary>
-                                        ///</summary>
-                                        ///<param name="If the update">hook will be invoked, set iKey to the rowid of the</param>
-                                        ///<param name="row being deleted.">row being deleted.</param>
-                                        if (db.xUpdateCallback != null && pOp.p4.z != null)
-                                        {
-                                            Debug.Assert(pC.isTable);
-                                            Debug.Assert(pC.rowidIsValid);
-                                            ///
-                                            ///<summary>
-                                            ///lastRowid set by previous  OpCode.OP_NotFound 
-                                            ///</summary>
-                                            iKey = pC.lastRowid;
-                                        }
-                                        ///
-                                        ///<summary>
-                                        ///The  OpCode.OP_Delete opcode always follows an  OpCode.OP_NotExists or  OpCode.OP_Last or
-                                        ///OP_Column on the same table without any intervening operations that
-                                        ///might move or invalidate the cursor.  Hence cursor pC is always pointing
-                                        ///to the row to be deleted and the sqlite3VdbeCursorMoveto() operation
-                                        ///</summary>
-                                        ///<param name="below is always a no">op and cannot fail.  We will run it anyhow, though,</param>
-                                        ///<param name="to guard against future changes to the code generator.">to guard against future changes to the code generator.</param>
-                                        ///<param name=""></param>
-                                        Debug.Assert(pC.deferredMoveto == false);
-                                        rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
-                                        if (Sqlite3.NEVER(rc != SqlResult.SQLITE_OK))
-                                            goto abort_due_to_error;
-                                        pC.pCursor.sqlite3BtreeSetCachedRowid(0);
-                                        rc = pC.pCursor.sqlite3BtreeDelete();
-                                        pC.cacheStatus = Sqlite3.CACHE_STALE;
-                                        ///
-                                        ///<summary>
-                                        ///</summary>
-                                        ///<param name="Invoke the update">hook if required. </param>
-                                        if (rc == SqlResult.SQLITE_OK && db.xUpdateCallback != null && pOp.p4.z != null)
-                                        {
-                                            string zDb = db.Backends[pC.iDb].Name;
-                                            string zTbl = pOp.p4.z;
-                                            db.xUpdateCallback(db.pUpdateArg, AuthTarget.SQLITE_DELETE, zDb, zTbl, iKey);
-                                            Debug.Assert(pC.iDb >= 0);
-                                        }
-                                        if ((pOp.p2 & (int)OpFlag.OPFLAG_NCHANGE) != 0)
-                                            this.nChange++;
-                                        break;
-                                    }
+                                    
 
                                 ///
                                 ///<summary>
@@ -4305,425 +3955,9 @@ malloc_cs.sqlite3SetString( ref p.zErrMsg, db, "database table is locked: ", z )
 break;
 }
 #endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VBegin * * * P4 *
-                                ///
-                                ///P4 may be a pointer to an sqlite3_vtab structure. If so, call the
-                                ///xBegin method for that table.
-                                ///
-                                ///Also, whether or not P4 is set, check that this is not being called from
-                                ///within a callback to a virtual table xSync() method. If it is, the error
-                                ///code will be set to SQLITE_LOCKED.
-                                ///</summary>
-                                case OpCode.OP_VBegin:
-                                    {
-                                        VTable pVTab;
-                                        pVTab = pOp.p4.pVtab;
-                                        rc = VTableMethodsExtensions.sqlite3VtabBegin(db, pVTab);
-                                        if (pVTab != null)
-                                            Sqlite3.importVtabErrMsg(this, pVTab.pVtab);
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VCreate P1 * * P4 *
-                                ///
-                                ///P4 is the name of a virtual table in database P1. Call the xCreate method
-                                ///for that table.
-                                ///</summary>
-                                case OpCode.OP_VCreate:
-                                    {
-                                        rc = VTableMethodsExtensions.sqlite3VtabCallCreate(db, pOp.p1, pOp.p4.z, ref this.zErrMsg);
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VDestroy P1 * * P4 *
-                                ///
-                                ///P4 is the name of a virtual table in database P1.  Call the xDestroy method
-                                ///of that table.
-                                ///</summary>
-                                case OpCode.OP_VDestroy:
-                                    {
-                                        this.inVtabMethod = 2;
-                                        rc = VTableMethodsExtensions.sqlite3VtabCallDestroy(db, pOp.p1, pOp.p4.z);
-                                        this.inVtabMethod = 0;
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VOpen P1 * * P4 *
-                                ///
-                                ///P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
-                                ///P1 is a cursor number.  This opcode opens a cursor to the virtual
-                                ///table and stores that cursor in P1.
-                                ///</summary>
-                                case OpCode.OP_VOpen:
-                                    {
-                                        VdbeCursor pCur;
-                                        sqlite3_vtab_cursor pVtabCursor;
-                                        sqlite3_vtab pVtab;
-                                        sqlite3_module pModule;
-                                        pCur = null;
-                                        pVtab = pOp.p4.pVtab.pVtab;
-                                        pModule = (sqlite3_module)pVtab.pModule;
-                                        Debug.Assert(pVtab != null && pModule != null);
-                                        rc = pModule.xOpen(pVtab, out pVtabCursor);
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
-                                        if (SqlResult.SQLITE_OK == rc)
-                                        {
-                                            ///
-                                            ///<summary>
-                                            ///Initialize sqlite3_vtab_cursor base class 
-                                            ///</summary>
-                                            pVtabCursor.pVtab = pVtab;
-                                            ///
-                                            ///<summary>
-                                            ///Initialise vdbe cursor object 
-                                            ///</summary>
-                                            pCur = Sqlite3.allocateCursor(this, pOp.p1, 0, -1, 0);
-                                            if (pCur != null)
-                                            {
-                                                pCur.pVtabCursor = pVtabCursor;
-                                                pCur.pModule = pVtabCursor.pVtab.pModule;
-                                            }
-                                            else
-                                            {
-                                                //db.mallocFailed = 1;
-                                                pModule.xClose(ref pVtabCursor);
-                                            }
-                                        }
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VFilter P1 P2 P3 P4 *
-                                ///
-                                ///P1 is a cursor opened using VOpen.  P2 is an address to jump to if
-                                ///the filtered result set is empty.
-                                ///
-                                ///P4 is either NULL or a string that was generated by the xBestIndex
-                                ///method of the module.  The interpretation of the P4 string is left
-                                ///to the module implementation.
-                                ///
-                                ///This opcode invokes the xFilter method on the virtual table specified
-                                ///by P1.  The integer query plan parameter to xFilter is stored in register
-                                ///P3. Register P3+1 stores the argc parameter to be passed to the
-                                ///xFilter method. Registers P3+2..P3+1+argc are the argc
-                                ///additional parameters which are passed to
-                                ///xFilter as argv. Register P3+2 becomes argv[0] when passed to xFilter.
-                                ///
-                                ///A jump is made to P2 if the result set after filtering would be empty.
-                                ///</summary>
-                                case OpCode.OP_VFilter:
-                                    {
-                                        ///
-                                        ///<summary>
-                                        ///jump 
-                                        ///</summary>
-                                        int nArg;
-                                        int iQuery;
-                                        sqlite3_module pModule;
-                                        Mem pQuery;
-                                        Mem pArgc = null;
-                                        sqlite3_vtab_cursor pVtabCursor;
-                                        sqlite3_vtab pVtab;
-                                        VdbeCursor pCur;
-                                        int res;
-                                        int i;
-                                        Mem[] apArg;
-                                        pQuery = aMem[pOp.p3];
-                                        pArgc = aMem[pOp.p3 + 1];
-                                        // pQuery[1];
-                                        pCur = this.OpenCursors[pOp.p1];
-                                        Debug.Assert(pQuery.memIsValid());
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p3, pQuery);
-                                        Debug.Assert(pCur.pVtabCursor != null);
-                                        pVtabCursor = pCur.pVtabCursor;
-                                        pVtab = pVtabCursor.pVtab;
-                                        pModule = pVtab.pModule;
-                                        ///
-                                        ///<summary>
-                                        ///Grab the index number and argc parameters 
-                                        ///</summary>
-                                        Debug.Assert((pQuery.flags & MemFlags.MEM_Int) != 0 && pArgc.flags == MemFlags.MEM_Int);
-                                        nArg = (int)pArgc.u.AsInteger;
-                                        iQuery = (int)pQuery.u.AsInteger;
-                                        ///
-                                        ///<summary>
-                                        ///Invoke the xFilter method 
-                                        ///</summary>
-                                        {
-                                            res = 0;
-                                            apArg = this.apArg;
-                                            for (i = 0; i < nArg; i++)
-                                            {
-                                                apArg[i] = aMem[(pOp.p3 + 1) + i + 1];
-                                                //apArg[i] = pArgc[i + 1];
-                                                Sqlite3.sqlite3VdbeMemStoreType(apArg[i]);
-                                            }
-                                            this.inVtabMethod = 1;
-                                            rc = pModule.xFilter(pVtabCursor, iQuery, pOp.p4.z, nArg, apArg);
-                                            this.inVtabMethod = 0;
-                                            Sqlite3.importVtabErrMsg(this, pVtab);
-                                            if (rc == SqlResult.SQLITE_OK)
-                                            {
-                                                res = pModule.xEof(pVtabCursor);
-                                            }
-                                            if (res != 0)
-                                            {
-                                                opcodeIndex = pOp.p2 - 1;
-                                            }
-                                        }
-                                        pCur.nullRow = false;
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VColumn P1 P2 P3 * *
-                                ///
-                                ///</summary>
-                                ///<param name="Store the value of the P2">th column of</param>
-                                ///<param name="the row of the virtual">table that the</param>
-                                ///<param name="P1 cursor is pointing to into register P3.">P1 cursor is pointing to into register P3.</param>
-                                case OpCode.OP_VColumn:
-                                    {
-                                        sqlite3_vtab pVtab;
-                                        sqlite3_module pModule;
-                                        Mem pDest;
-                                        sqlite3_context sContext;
-                                        VdbeCursor pCur = this.OpenCursors[pOp.p1];
-                                        Debug.Assert(pCur.pVtabCursor != null);
-                                        Debug.Assert(pOp.p3 > 0 && pOp.p3 <= this.aMem.Count());
-                                        pDest = aMem[pOp.p3];
-                                        this.memAboutToChange(pDest);
-                                        if (pCur.nullRow)
-                                        {
-                                            pDest.sqlite3VdbeMemSetNull();
-                                            break;
-                                        }
-                                        pVtab = pCur.pVtabCursor.pVtab;
-                                        pModule = pVtab.pModule;
-                                        Debug.Assert(pModule.xColumn != null);
-                                        sContext = new sqlite3_context();
-                                        //memset( &sContext, 0, sizeof( sContext ) );
-                                        ///
-                                        ///<summary>
-                                        ///The output cell may already have a buffer allocated. Move
-                                        ///</summary>
-                                        ///<param name="the current contents to sContext.s so in case the user">function</param>
-                                        ///<param name="can use the already allocated buffer instead of allocating a">can use the already allocated buffer instead of allocating a</param>
-                                        ///<param name="new one.">new one.</param>
-                                        ///<param name=""></param>
-                                        vdbemem_cs.sqlite3VdbeMemMove(sContext.s, pDest);
-                                        sContext.s.MemSetTypeFlag(MemFlags.MEM_Null);
-                                        rc = pModule.xColumn(pCur.pVtabCursor, sContext, pOp.p2);
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
-                                        if (sContext.isError != 0)
-                                        {
-                                            rc = sContext.isError;
-                                        }
-                                        ///
-                                        ///<summary>
-                                        ///Copy the result of the function to the P3 register. We
-                                        ///do this regardless of whether or not an error occurred to ensure any
-                                        ///dynamic allocation in sContext.s (a Mem struct) is  released.
-                                        ///
-                                        ///</summary>
-                                        vdbemem_cs.sqlite3VdbeChangeEncoding(sContext.s, encoding);
-                                        vdbemem_cs.sqlite3VdbeMemMove(pDest, sContext.s);
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p3, pDest);
-                                        Sqlite3.UPDATE_MAX_BLOBSIZE(pDest);
-                                        if (pDest.IsTooBig())
-                                        {
-                                            goto too_big;
-                                        }
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VNext P1 P2 * * *
-                                ///
-                                ///Advance virtual table P1 to the next row in its result set and
-                                ///jump to instruction P2.  Or, if the virtual table has reached
-                                ///the end of its result set, then fall through to the next instruction.
-                                ///</summary>
-                                case OpCode.OP_VNext:
-                                    {
-                                        ///
-                                        ///<summary>
-                                        ///jump 
-                                        ///</summary>
-                                        sqlite3_vtab pVtab;
-                                        sqlite3_module pModule;
-                                        int res;
-                                        VdbeCursor pCur;
-                                        res = 0;
-                                        pCur = this.OpenCursors[pOp.p1];
-                                        Debug.Assert(pCur.pVtabCursor != null);
-                                        if (pCur.nullRow)
-                                        {
-                                            break;
-                                        }
-                                        pVtab = pCur.pVtabCursor.pVtab;
-                                        pModule = pVtab.pModule;
-                                        Debug.Assert(pModule.xNext != null);
-                                        ///
-                                        ///<summary>
-                                        ///Invoke the xNext() method of the module. There is no way for the
-                                        ///underlying implementation to return an error if one occurs during
-                                        ///xNext(). Instead, if an error occurs, true is returned (indicating that
-                                        ///data is available) and the error code returned when xColumn or
-                                        ///some other method is next invoked on the save virtual table cursor.
-                                        ///
-                                        ///</summary>
-                                        this.inVtabMethod = 1;
-                                        rc = pModule.xNext(pCur.pVtabCursor);
-                                        this.inVtabMethod = 0;
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
-                                        if (rc == SqlResult.SQLITE_OK)
-                                        {
-                                            res = pModule.xEof(pCur.pVtabCursor);
-                                        }
-                                        if (0 == res)
-                                        {
-                                            ///
-                                            ///<summary>
-                                            ///If there is data, jump to P2 
-                                            ///</summary>
-                                            opcodeIndex = pOp.p2 - 1;
-                                        }
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VRename P1 * * P4 *
-                                ///
-                                ///P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
-                                ///This opcode invokes the corresponding xRename method. The value
-                                ///in register P1 is passed as the zName argument to the xRename method.
-                                ///</summary>
-                                case OpCode.OP_VRename:
-                                    {
-                                        sqlite3_vtab pVtab;
-                                        Mem pName;
-                                        pVtab = pOp.p4.pVtab.pVtab;
-                                        pName = aMem[pOp.p1];
-                                        Debug.Assert(pVtab.pModule.xRename != null);
-                                        Debug.Assert(pName.memIsValid());
-                                        Sqlite3.REGISTER_TRACE(this, pOp.p1, pName);
-                                        Debug.Assert((pName.flags & MemFlags.MEM_Str) != 0);
-                                        rc = pVtab.pModule.xRename(pVtab, pName.AsString);
-                                        Sqlite3.importVtabErrMsg(this, pVtab);
-                                        this.expired = false;
-                                        break;
-                                    }
-#endif
-#if !SQLITE_OMIT_VIRTUALTABLE
-                                ///
-                                ///<summary>
-                                ///Opcode: VUpdate P1 P2 P3 P4 *
-                                ///
-                                ///P4 is a pointer to a virtual table object, an sqlite3_vtab structure.
-                                ///This opcode invokes the corresponding xUpdate method. P2 values
-                                ///are contiguous memory cells starting at P3 to pass to the xUpdate
-                                ///</summary>
-                                ///<param name="invocation. The value in register (P3+P2">1) corresponds to the</param>
-                                ///<param name="p2th element of the argv array passed to xUpdate.">p2th element of the argv array passed to xUpdate.</param>
-                                ///<param name=""></param>
-                                ///<param name="The xUpdate method will do a DELETE or an INSERT or both.">The xUpdate method will do a DELETE or an INSERT or both.</param>
-                                ///<param name="The argv[0] element (which corresponds to memory cell P3)">The argv[0] element (which corresponds to memory cell P3)</param>
-                                ///<param name="is the rowid of a row to delete.  If argv[0] is NULL then no">is the rowid of a row to delete.  If argv[0] is NULL then no</param>
-                                ///<param name="deletion occurs.  The argv[1] element is the rowid of the new">deletion occurs.  The argv[1] element is the rowid of the new</param>
-                                ///<param name="row.  This can be NULL to have the virtual table select the new">row.  This can be NULL to have the virtual table select the new</param>
-                                ///<param name="rowid for itself.  The subsequent elements in the array are">rowid for itself.  The subsequent elements in the array are</param>
-                                ///<param name="the values of columns in the new row.">the values of columns in the new row.</param>
-                                ///<param name=""></param>
-                                ///<param name="If P2==1 then no insert is performed.  argv[0] is the rowid of">If P2==1 then no insert is performed.  argv[0] is the rowid of</param>
-                                ///<param name="a row to delete.">a row to delete.</param>
-                                ///<param name=""></param>
-                                ///<param name="P1 is a boolean flag. If it is set to true and the xUpdate call">P1 is a boolean flag. If it is set to true and the xUpdate call</param>
-                                ///<param name="is successful, then the value returned by sqlite3_last_insert_rowid()">is successful, then the value returned by sqlite3_last_insert_rowid()</param>
-                                ///<param name="is set to the value of the rowid for the row just inserted.">is set to the value of the rowid for the row just inserted.</param>
-                                case OpCode.OP_VUpdate:
-                                    {
-                                        sqlite3_vtab pVtab;
-                                        sqlite3_module pModule;
-                                        int nArg;
-                                        int i;
-                                        sqlite_int64 rowid = 0;
-                                        Mem[] apArg;
-                                        Mem pX;
-                                        Debug.Assert(pOp.p2 == 1 ||
-                                            ((OnConstraintError)pOp.p5)
-                                            .In(OnConstraintError.OE_Fail
-                                                , OnConstraintError.OE_Rollback
-                                                , OnConstraintError.OE_Abort
-                                                , OnConstraintError.OE_Ignore
-                                                , OnConstraintError.OE_Replace));
 
-                                        pVtab = pOp.p4.pVtab.pVtab;
-                                        pModule = (sqlite3_module)pVtab.pModule;
-                                        nArg = pOp.p2;
-                                        Debug.Assert(pOp.p4type == P4Usage.P4_VTAB);
-                                        if (Sqlite3.ALWAYS(pModule.xUpdate))
-                                        {
-                                            u8 vtabOnConflict = db.vtabOnConflict;
-                                            apArg = this.apArg;
-                                            //pX = aMem[pOp.p3];
-                                            for (i = 0; i < nArg; i++)
-                                            {
-                                                pX = aMem[pOp.p3 + i];
-                                                Debug.Assert(pX.memIsValid());
-                                                this.memAboutToChange(pX);
-                                                Sqlite3.sqlite3VdbeMemStoreType(pX);
-                                                apArg[i] = pX;
-                                                //pX++;
-                                            }
-                                            db.vtabOnConflict = pOp.p5;
-                                            rc = pModule.xUpdate(pVtab, nArg, apArg, out rowid);
-                                            db.vtabOnConflict = vtabOnConflict;
-                                            Sqlite3.importVtabErrMsg(this, pVtab);
-                                            if (rc == SqlResult.SQLITE_OK && pOp.p1 != 0)
-                                            {
-                                                Debug.Assert(nArg > 1 && apArg[0] != null && (apArg[0].flags & MemFlags.MEM_Null) != 0);
-                                                db.lastRowid = lastRowid = rowid;
-                                            }
-                                            if (rc == SqlResult.SQLITE_CONSTRAINT && pOp.p4.pVtab.bConstraint != 0)
-                                            {
-                                                if ((OnConstraintError)pOp.p5 == OnConstraintError.OE_Ignore)
-                                                {
-                                                    rc = SqlResult.SQLITE_OK;
-                                                }
-                                                else
-                                                {
-                                                    this.errorAction = ((OnConstraintError)pOp.p5).Filter(OnConstraintError.OE_Replace, OnConstraintError.OE_Abort);
-                                                }
-                                            }
-                                            else
-                                            {
-                                                this.nChange++;
-                                            }
-                                        }
-                                        break;
-                                    }
-#endif
+
+
                                 ///Opcode: Noop * * * * *
                                 ///
                                 ///Do nothing.  This instruction is often useful as a jump
