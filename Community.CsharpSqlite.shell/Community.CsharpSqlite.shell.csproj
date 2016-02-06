@@ -340,6 +340,7 @@
     <Compile Include="src\Compiler\Parser\yymsp.cs" />
     <Compile Include="src\Compiler\Parser\yyStackEntry.cs" />
     <Compile Include="src\Compiler\yymsp.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\HandlerBase.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Text.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\TheRest.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Transaction.cs" />
