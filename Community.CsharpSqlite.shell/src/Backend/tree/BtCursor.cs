@@ -559,40 +559,26 @@ aOverflow= null;
                 return Sqlite3.NEVER(p);
             }
             public SqlResult sqlite3BtreeInsert(
-                ///<summary>
-                ///Insert data into the table of this cursor 
-                ///</summary>
-            byte[] pKey, i64 nKey,///
-                ///<summary>
-                ///The key of the new record 
-                ///</summary>
-            byte[] pData, int nData,///
-                ///<summary>
-                ///The data of the new record 
-                ///</summary>
-            int nZero,///Number of extra 0 bytes to append to data 
-                ///</summary>
-            int appendBias,///True if this is likely an append 
-
-            ThreeState seekResult///Result of prior MovetoUnpacked() call 
+                byte[] pKey, i64 nKey,///The key of the new record                 
+                byte[] pData, int nData,///The data of the new record 
+                int nZero,///Number of extra 0 bytes to append to data                 
+                int appendBias,///True if this is likely an append 
+                ThreeState seekResult///Result of prior MovetoUnpacked() call 
             )
-            {
-                SqlResult rc;
-                ThreeState loc = seekResult;
-                ///1: before desired location  +1: after 
-                int szNew = 0;
-                int idx;
-                MemPage pPage;
-                Btree p = this.pBtree;
-                BtShared pBt = p.pBt;
-                int oldCell;
-                byte[] newCell = null;
+            {                
                 if (this.State == BtCursorState.CURSOR_FAULT)
                 {
                     Debug.Assert(this.skipNext != (int)SqlResult.SQLITE_OK);
                     return (SqlResult)this.skipNext;
                 }
-                Debug.Assert(this.cursorHoldsMutex());
+
+            ThreeState loc = seekResult;
+            ///1: before desired location  +1: after 
+            int szNew = 0;
+            Btree p = this.pBtree;
+            BtShared pBt = p.pBt;
+
+            Debug.Assert(this.cursorHoldsMutex());
                 Debug.Assert(this.wrFlag != 0 && pBt.inTransaction == TransType.TRANS_WRITE && !pBt.readOnly);
                 Debug.Assert(p.hasSharedCacheTableLock(this.pgnoRoot, this.pKeyInfo != null ? 1 : 0, 2));
                 
@@ -612,58 +598,57 @@ aOverflow= null;
                 }
                 
                 ///Save the positions of any other cursors open on this table.
-                ///In some cases, the call to btreeMoveto() below is a no">op. For</param>
-                ///example, when inserting data into a table with auto">generated integer</param>
-                ///keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the">keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the</param>
+                ///In some cases, the call to btreeMoveto() below is a no-op. For
+                ///example, when inserting data into a table with auto-generated integer
+                ///keys, the VDBE layer invokes sqlite3BtreeLast() to figure out the
                 ///integer key to use. It then calls this function to actually insert the
-                ///data into the intkey B">Tree. In this case btreeMoveto() recognizes</param>
-                ///that the cursor is already where it needs to be and returns without">that the cursor is already where it needs to be and returns without</param>
-                ///doing any work. To avoid thwarting these optimizations, it is important">doing any work. To avoid thwarting these optimizations, it is important</param>
-                ///not to clear the cursor here.">not to clear the cursor here.</param>
-                rc = pBt.saveAllCursors(this.pgnoRoot, this);
+                ///data into the intkey B-Tree. In this case btreeMoveto() recognizes
+                ///that the cursor is already where it needs to be and returns without
+                ///doing any work. To avoid thwarting these optimizations, it is important
+                ///not to clear the cursor here.
+                var rc = pBt.saveAllCursors(this.pgnoRoot, this);
                 if (rc != 0)
                     return rc;
-                if (0 == loc)
+                if (ThreeState.Neutral == loc)
                 {
                     rc = this.btreeMoveto(pKey, nKey, appendBias, ref loc);
                     if (rc != 0)
                         return rc;
                 }
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID || (this.State == BtCursorState.CURSOR_INVALID && loc != 0));
-                pPage = this.PageStack[this.pageStackIndex];
+            var pPage = CurrentPage;// this.PageStack[this.pageStackIndex];
                 Debug.Assert(pPage.intKey != false || nKey >= 0);
                 Debug.Assert(pPage.IsLeaf != false || false == pPage.intKey);
                 Log.TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
                 Debug.Assert(pPage.isInit != false);
                 BTreeMethods.allocateTempSpace(pBt);
-                newCell = pBt.pTmpSpace;
+                var newCellTemp = pBt.pTmpSpace;
                 //if (newCell == null) return SQLITE_NOMEM;
-                rc = pPage.fillInCell(newCell, pKey, nKey, pData, nData, nZero, ref szNew);
+                rc = pPage.fillInCell(newCellTemp, pKey, nKey, pData, nData, nZero, ref szNew);
                 if (rc != 0)
                     goto end_insert;
-                Debug.Assert(szNew == pPage.cellSizePtr(newCell));
+                Debug.Assert(szNew == pPage.cellSizePtr(newCellTemp));
                 Debug.Assert(szNew <= pBt.MX_CELL_SIZE);
-                idx = this.indexInPage[this.pageStackIndex];
-                if (loc == 0)
+            var idx = this.CurrentIndex;
+                if (ThreeState.Neutral==loc)
                 {
-                    u16 szOld;
                     Debug.Assert(idx < pPage.nCell);
                     rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage);
                     if (rc != 0)
                     {
                         goto end_insert;
                     }
-                    oldCell = pPage.findCellAddress(idx);
-                    if (false == pPage.IsLeaf)
+                    var oldCellAddress = pPage.findCellAddress(idx);
+                    if ( !pPage.IsLeaf )
                     {
                         //memcpy(newCell, oldCell, 4);
-                        newCell[0] = pPage.aData[oldCell + 0];
-                        newCell[1] = pPage.aData[oldCell + 1];
-                        newCell[2] = pPage.aData[oldCell + 2];
-                        newCell[3] = pPage.aData[oldCell + 3];
+                        newCellTemp[0] = pPage.aData[oldCellAddress + 0];
+                        newCellTemp[1] = pPage.aData[oldCellAddress + 1];
+                        newCellTemp[2] = pPage.aData[oldCellAddress + 2];
+                        newCellTemp[3] = pPage.aData[oldCellAddress + 3];
                     }
-                    szOld = pPage.cellSizePtr(oldCell);
-                    rc = BTreeMethods.clearCell(pPage, oldCell);
+                    var szOld = pPage.cellSizePtr(oldCellAddress);
+                    rc = BTreeMethods.clearCell(pPage, oldCellAddress);
                     pPage.dropCell(idx, szOld, ref rc);
                     if (rc != 0)
                         goto end_insert;
@@ -671,14 +656,14 @@ aOverflow= null;
                 else
                     if (loc < 0 && pPage.nCell > 0)
                     {
-                        Debug.Assert(pPage.IsLeaf != false);
+                        Debug.Assert(pPage.IsLeaf);
                         idx = ++this.indexInPage[this.pageStackIndex];
                     }
                     else
                     {
                         Debug.Assert(pPage.IsLeaf != false);
                     }
-                pPage.insertCell(idx, newCell, szNew, null, 0, ref rc);
+                pPage.insertCell(idx, newCellTemp, szNew, null, 0, ref rc);
                 Debug.Assert(rc != SqlResult.SQLITE_OK || pPage.nCell > 0 || pPage.nOverflow > 0);
                 ///
                 ///<summary>
@@ -708,20 +693,19 @@ aOverflow= null;
                 if (rc == SqlResult.SQLITE_OK && pPage.nOverflow != 0)
                 {
                     rc = this.balance();
-                    ///
-                    ///<summary>
                     ///Must make sure nOverflow is reset to zero even if the balance()
                     ///fails. Internal data structure corruption will result otherwise.
                     ///Also, set the cursor state to invalid. This stops saveCursorPosition()
                     ///from trying to save the current position of the cursor.  
-                    ///</summary>
-                    this.PageStack[this.pageStackIndex].nOverflow = 0;
+                    this.CurrentPage.nOverflow = 0;
                     this.State = BtCursorState.CURSOR_INVALID;
                 }
                 Debug.Assert(this.PageStack[this.pageStackIndex].nOverflow == 0);
             end_insert:
                 return rc;
             }
+
+
             public SqlResult balance()
             {
                 SqlResult rc = SqlResult.SQLITE_OK;

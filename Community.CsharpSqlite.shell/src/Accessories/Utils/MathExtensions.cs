@@ -53,7 +53,7 @@ namespace Community.CsharpSqlite.Utils
 
         public static bool Has(this OpFlag val, OpFlag flag)
         {
-            return 0 == (val & flag);
+            return 0 != (val & flag);
         }
         public static T Filter<T>(this T o, T when, T then)
         {

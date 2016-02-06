@@ -181,10 +181,13 @@ namespace Community.CsharpSqlite
                 }
             }
 
+            public u16 FreeSlotHeadAddress {
+                get { return (u16)(hdrOffset + Offsets.firstFreeBlock); }
+            }
             public u16 FirstFreeBlockAddress
             {
-                get { return aData.get2byte(hdrOffset + 1); }
-                set { aData.put2byte(hdrOffset + 1, value); }
+                get { return aData.get2byte(FreeSlotHeadAddress); }
+                set { aData.put2byte(FreeSlotHeadAddress, value); }
             }
 
             ///<summary>
@@ -202,6 +205,7 @@ namespace Community.CsharpSqlite
                 public const int nCell = 3;
                 public const int cellbody = 5;
                 public static int nFrag = 7;
+                public const int firstFreeBlock=1;
             }
 
 
@@ -221,6 +225,7 @@ namespace Community.CsharpSqlite
             ///</summary>
 
             public Pgno pgno;
+            FreeSlot FreeSlotHead { get { return new FreeSlot(this, FreeSlotHeadAddress, 0); } }
 
             ///<summary>
             ///Page number for this page
@@ -651,25 +656,25 @@ namespace Community.CsharpSqlite
 
 
 
-            public///<summary>
-                /// Allocate nByte bytes of space from within the B-Tree page passed
-                /// as the first argument. Write into pIdx the index into pPage.aData[]
-                /// of the first byte of allocated space. Return either SqlResult.SQLITE_OK or
-                /// an error code (usually SQLITE_CORRUPT).
-                ///
-                /// The caller guarantees that there is sufficient space to make the
-                /// allocation.  This routine might need to defragment in order to bring
-                /// all the space together, however.  This routine will avoid using
-                /// the first two bytes past the cell pointer area since presumably this
-                /// allocation is being made in order to insert a new cell, so we will
-                /// also end up needing a new cell pointer.
-                ///</summary>
-            SqlResult allocateSpace(int nByte, ref int pIdx)
+            ///<summary>
+            /// Allocate nByte bytes of space from within the B-Tree page passed
+            /// as the first argument. Write into pIdx the index into pPage.aData[]
+            /// of the first byte of allocated space. Return either SqlResult.SQLITE_OK or
+            /// an error code (usually SQLITE_CORRUPT).
+            ///
+            /// The caller guarantees that there is sufficient space to make the
+            /// allocation.  This routine might need to defragment in order to bring
+            /// all the space together, however.  This routine will avoid using
+            /// the first two bytes past the cell pointer area since presumably this
+            /// allocation is being made in order to insert a new cell, so we will
+            /// also end up needing a new cell pointer.
+            ///</summary>
+            public SqlResult allocateSpace(int requiredSize, ref int pIdx)
             {
                 int hdr = this.hdrOffset;///Local cache of pPage.hdrOffset 
                 u8[] data = this.aData;///Local cache of pPage.aData 
                 u8 nFrag = this.nFrag;///Number of fragmented bytes on pPage
-                int top = BTreeMethods.get2byteNotZero(data, hdr + Offsets.cellbody); ;///First byte of cell content area 
+                int cellBodyAreaAddress = BTreeMethods.get2byteNotZero(data, hdr + Offsets.cellbody); ;///First byte of cell content area 
                 int gap = this.cellOffset + 2 * this.nCell;///First byte of gap between cell pointers and cell content 
                 SqlResult rc;///Integer return code 
                 u32 usableSize = this.pBt.usableSize; ;///Usable size of the page 
@@ -677,22 +682,22 @@ namespace Community.CsharpSqlite
                 Debug.Assert(this.pDbPage.sqlite3PagerIswriteable());
                 Debug.Assert(this.pBt != null);
                 Debug.Assert(this.pBt.mutex.sqlite3_mutex_held());
-                Debug.Assert(nByte >= 0);
+                Debug.Assert(requiredSize >= 0);
                 ///Minimum cell size is 4 
 
-                Debug.Assert(this.nFree >= nByte);
+                Debug.Assert(this.nFree >= requiredSize);
                 Debug.Assert(this.nOverflow == 0);
 
-                Debug.Assert(nByte < usableSize - 8);
+                Debug.Assert(requiredSize < usableSize - 8);
 
                 Debug.Assert(this.cellOffset == hdr + 12 - (this.IsLeaf ? 4 : 0));
 
 
-                if (gap > top)
+                if (gap > cellBodyAreaAddress)
                     return sqliteinth.SQLITE_CORRUPT_BKPT();
-                sqliteinth.testcase(gap + 2 == top);
-                sqliteinth.testcase(gap + 1 == top);
-                sqliteinth.testcase(gap == top);
+                sqliteinth.testcase(gap + 2 == cellBodyAreaAddress);
+                sqliteinth.testcase(gap + 1 == cellBodyAreaAddress);
+                sqliteinth.testcase(gap == cellBodyAreaAddress);
                 if (nFrag >= 60)
                 {
                     ///Always defragment highly fragmented pages 
@@ -700,69 +705,72 @@ namespace Community.CsharpSqlite
                     rc = this.defragmentPage();
                     if (rc != 0)
                         return rc;
-                    top = BTreeMethods.get2byteNotZero(data, hdr + 5);
+                    cellBodyAreaAddress = BTreeMethods.get2byteNotZero(data, hdr + Offsets.cellbody);
                 }
                 else
-                    if (gap + 2 <= top)
-                    {
-                        ///Search the freelist looking for a free slot big enough to satisfy
-                        ///the request. The allocation is made from the first free slot in
-                        ///the list that is large enough to accomadate it.
+                    if (gap + 2 <= cellBodyAreaAddress)
+                {
+                    ///Search the freelist looking for a free slot big enough to satisfy
+                    ///the request. The allocation is made from the first free slot in
+                    ///the list that is large enough to accomadate it.
+                    
+                    SqlResult r = SqlResult.SQLITE_OK;
+                    var tempIdx = pIdx;
 
-                        int pc, addr;
-                        for (addr = hdr + 1; (pc = data.get2byte(addr)) > 0; addr = pc)
+                    FreeSlotHead.linkedList().ForEach2(
+                        (current, next, idx) =>
                         {
-                            u16 size;
-                            ///Size of free slot 
-                            if (pc > usableSize - 4 || pc < addr + 4)
+                            if (next.Address > usableSize - 4 || next.Address < current.Address + 4)
                             {
-                                return sqliteinth.SQLITE_CORRUPT_BKPT();
+                                r = sqliteinth.SQLITE_CORRUPT_BKPT();
+                                return false;
                             }
-                            size = (u16)data.get2byte(pc + 2);
-                            if (size >= nByte)
+
+                            if (next.Size >= requiredSize)
                             {
-                                u8 leftBytes = (u8)(size - nByte);
+                                u8 leftBytes = (u8)(next.Size - requiredSize);
                                 sqliteinth.testcase(leftBytes == 4);
                                 sqliteinth.testcase(leftBytes == 3);
-                                if (leftBytes < 4)
+                                if (leftBytes < 4)///Remove the slot from the free list. Update the number of fragmented bytes within the page. 
                                 {
-                                    ///<param name="Remove the slot from the free">list. Update the number of</param>
-                                    ///<param name="fragmented bytes within the page. ">fragmented bytes within the page. </param>
-
-                                    data[addr + 0] = data[pc + 0];
-                                    data[addr + 1] = data[pc + 1];
-                                    //memcpy( data[addr], ref data[pc], 2 );
+                                    current.RemoveNext();
                                     this.nFrag = (u8)(nFrag + leftBytes);
                                 }
                                 else
-                                    if (size + pc > usableSize)
-                                    {
-                                        return sqliteinth.SQLITE_CORRUPT_BKPT();
-                                    }
-                                    else
-                                    {
-                                        ///<param name="The slot remains on the free">list. Reduce its size to account</param>
-                                        ///<param name="for the portion used by the new allocation. ">for the portion used by the new allocation. </param>
-
-                                        data.put2byte(pc + 2, leftBytes);
-                                    }
-                                pIdx = pc + leftBytes;
-                                Console.WriteLine("allocated space index " + pIdx);
-                                return SqlResult.SQLITE_OK;
+                                    if (next.Size + next.Address > usableSize)
+                                {
+                                    r = sqliteinth.SQLITE_CORRUPT_BKPT();
+                                    return false;
+                                }
+                                else
+                                {
+                                    ///The slot remains on the free list. Reduce its size to account for the portion used by the new allocation. 
+                                    next.Size = leftBytes;
+                                }
+                                tempIdx = next.Address + leftBytes;                                
+                                r = SqlResult.SQLITE_OK;
+                                return false;
                             }
+
+                            return true;
                         }
-                    }
+                      );
+                    pIdx = tempIdx;
+                    if (r != SqlResult.SQLITE_OK)
+                        return r;
+
+                }
                 ///Check to make sure there is enough space in the gap to satisfy
                 ///the allocation.  If not, defragment.
 
-                sqliteinth.testcase(gap + 2 + nByte == top);
-                if (gap + 2 + nByte > top)
+                sqliteinth.testcase(gap + 2 + requiredSize == cellBodyAreaAddress);
+                if (gap + 2 + requiredSize > cellBodyAreaAddress)
                 {
                     rc = this.defragmentPage();
                     if (rc != 0)
                         return rc;
-                    top = BTreeMethods.get2byteNotZero(data, hdr + 5);
-                    Debug.Assert(gap + nByte <= top);
+                    cellBodyAreaAddress = this.CellBodyOffset;
+                    Debug.Assert(gap + requiredSize <= cellBodyAreaAddress);
                 }
                 ///Allocate memory from the gap in between the cell pointer array
                 ///and the cell content area.  The btreeInitPage() call has already
@@ -770,10 +778,10 @@ namespace Community.CsharpSqlite
                 ///is no way that the allocation can extend off the end of the page.
                 ///The Debug.Assert() below verifies the previous sentence.
 
-                top -= nByte;
-                data.put2byte(hdr + 5, top);
-                Debug.Assert(top + nByte <= (int)this.pBt.usableSize);
-                pIdx = top;
+                cellBodyAreaAddress -= requiredSize;
+                this.CellBodyOffset = (u16)cellBodyAreaAddress;
+                Debug.Assert(cellBodyAreaAddress + requiredSize <= (int)this.pBt.usableSize);
+                pIdx = cellBodyAreaAddress;
                 return SqlResult.SQLITE_OK;
             }
 
@@ -883,14 +891,11 @@ namespace Community.CsharpSqlite
                         addr = pbegin;
                     }
                 }
-                ///<summary>
                 ///If the cell content area begins with a freeblock, remove it. 
-                ///</summary>
-                ///
                 if (FirstFreeBlockAddress == CellBodyOffset)
                 {
-                    u16 sz = data.get2byte(FirstFreeBlockAddress + 2);
-                    FirstFreeBlockAddress = data.get2byte(FirstFreeBlockAddress);
+                    u16 sz = data.get2byte(this.FirstFreeBlockAddress + 2);
+                    this.FirstFreeBlockAddress = data.get2byte(this.FirstFreeBlockAddress);
                     CellBodyOffset += sz;
                 }
 
@@ -1279,7 +1284,6 @@ namespace Community.CsharpSqlite
                 ref int pnSize///Write cell size here 
             )
             {
-
                 u8[] pSrc;
                 int pSrcIndex = 0;
                 int nSrc, n;
@@ -1289,11 +1293,10 @@ namespace Community.CsharpSqlite
                 MemPage pToRelease = null;
                 byte[] pPrior;
                 int pPriorIndex = 0;
-                byte[] pPayload;
+                
                 int pPayloadIndex = 0;
                 BtShared pBt = this.pBt;
                 Pgno pgnoOvfl = 0;
-                int nHeader;
                 CellInfo info = new CellInfo();
                 Debug.Assert(this.pBt.mutex.sqlite3_mutex_held());
                 ///pPage is not necessarily writeable since pCell might be auxiliary
@@ -1302,36 +1305,26 @@ namespace Community.CsharpSqlite
                 // TODO -- Determine if the following Assert is needed under c#
                 //Debug.Assert( pCell < pPage.aData || pCell >= &pPage.aData[pBt.pageSize]
                 //          || sqlite3PagerIswriteable(pPage.pDbPage) );
-                ///
+                
+
                 ///Fill in the header. 
 
-                nHeader = 0;
-                if (false == this.IsLeaf)
-                {
-                    nHeader += 4;
-                }
-                if (this.hasData != false)
-                {
+                var nHeader = this.IsLeaf ? 0 : 4;
+                if (this.hasData)
                     nHeader += (int)utilc.putVarint(pCell, nHeader, (int)(nData + nZero));
-                    //putVarint( pCell[nHeader], nData + nZero );
-                }
                 else
-                {
                     nData = nZero = 0;
-                }
+
                 nHeader += utilc.putVarint(pCell, nHeader, (u64)nKey);
                 //putVarint( pCell[nHeader], *(u64*)&nKey );
                 this.btreeParseCellPtr(pCell, ref info);
                 Debug.Assert(info.nHeader == nHeader);
                 Debug.Assert(info.nKey == nKey);
                 Debug.Assert(info.nData == (u32)(nData + nZero));
-                ///
-                ///<summary>
-                ///Fill in the payload 
-                ///</summary>
-
+                
+                //Fill in the payload 
                 int nPayload = nData + nZero;
-                if (this.intKey != false)
+                if (this.intKey)
                 {
                     pSrc = pData;
                     nSrc = nData;
@@ -1347,10 +1340,11 @@ namespace Community.CsharpSqlite
                     pSrc = pKey;
                     nSrc = (int)nKey;
                 }
+
                 pnSize = info.nSize;
                 spaceLeft = info.nLocal;
                 //  pPayload = &pCell[nHeader];
-                pPayload = pCell;
+                var pPayload = pCell;
                 pPayloadIndex = nHeader;
                 //  pPrior = &pCell[info.iOverflow];
                 pPrior = pCell;
@@ -1361,11 +1355,7 @@ namespace Community.CsharpSqlite
                     {
 #if !SQLITE_OMIT_AUTOVACUUM
                         Pgno pgnoPtrmap = pgnoOvfl;
-                        ///
-                        ///<summary>
-                        ///</summary>
-                        ///<param name="Overflow page pointer">map entry page </param>
-
+                        ///Overflow page pointer-map entry page 
                         if (pBt.autoVacuum)
                         {
                             do
@@ -1377,9 +1367,6 @@ namespace Community.CsharpSqlite
 #endif
                         rc = BTreeMethods.allocateBtreePage(pBt, ref pOvfl, ref pgnoOvfl, pgnoOvfl, 0);
 #if !SQLITE_OMIT_AUTOVACUUM
-                        ///
-                        ///<summary>
-                        ///</summary>
                         ///<param name="If the database supports auto">vacuum, and the second or subsequent</param>
                         ///<param name="overflow page is being allocated, add an entry to the pointer">map</param>
                         ///<param name="for that page now.">for that page now.</param>
@@ -1405,18 +1392,11 @@ namespace Community.CsharpSqlite
                             BTreeMethods.releasePage(pToRelease);
                             return rc;
                         }
-                        ///
-                        ///<summary>
                         ///If pToRelease is not zero than pPrior points into the data area
                         ///of pToRelease.  Make sure pToRelease is still writeable. 
-                        ///</summary>
-
                         Debug.Assert(pToRelease == null || pToRelease.pDbPage.sqlite3PagerIswriteable());
-                        ///
-                        ///<summary>
                         ///If pPrior is part of the data area of pPage, then make sure pPage
                         ///is still writeable 
-                        ///</summary>
 
                         // TODO -- Determine if the following Assert is needed under c#
                         //Debug.Assert( pPrior < pPage.aData || pPrior >= &pPage.aData[pBt.pageSize]
@@ -1435,18 +1415,12 @@ namespace Community.CsharpSqlite
                     n = nPayload;
                     if (n > spaceLeft)
                         n = spaceLeft;
-                    ///
-                    ///<summary>
                     ///If pToRelease is not zero than pPayload points into the data area
                     ///of pToRelease.  Make sure pToRelease is still writeable. 
-                    ///</summary>
 
                     Debug.Assert(pToRelease == null || pToRelease.pDbPage.sqlite3PagerIswriteable());
-                    ///
-                    ///<summary>
                     ///If pPayload is part of the data area of pPage, then make sure pPage
                     ///is still writeable 
-                    ///</summary>
 
                     // TODO -- Determine if the following Assert is needed under c#
                     //Debug.Assert( pPayload < pPage.aData || pPayload >= &pPage.aData[pBt.pageSize]

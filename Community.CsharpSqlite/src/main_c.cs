@@ -1512,22 +1512,19 @@ return rc;
 		/// inserted or deleted using this database connection.
 		///
 		///</summary>
-		static object sqlite3_update_hook(Connection db,///
-		///<summary>
-		///Attach the hook to this database 
-		///</summary>
-		dxUpdateCallback xCallback,//void (*xCallback)(void*,int,char const *,char const *,sqlite_int64),
-		object pArg///
-		///<summary>
-		///Argument to the function 
-		///</summary>
+		static object sqlite3_update_hook(
+            Connection db,///Attach the hook to this database 		
+		    dxUpdateCallback xCallback,//void (*xCallback)(void*,int,char const *,char const *,sqlite_int64),
+		    object pArg///Argument to the function 		
 		) {
-			object pRet;
-			db.mutex.Enter();
-			pRet=db.pUpdateArg;
-			db.xUpdateCallback=xCallback;
-			db.pUpdateArg=pArg;
-			db.mutex.Exit();
+			object pRet=null;
+            using (db.mutex.scope())
+            {
+                pRet = db.pUpdateArg;
+                db.xUpdateCallback = xCallback;
+                db.pUpdateArg = pArg;
+            }
+			
 			return pRet;
 		}
 		///<summary>

@@ -311,6 +311,7 @@
     <Compile Include="src\Backend\Cache\PgHdr1.cs" />
     <Compile Include="src\Backend\Cache\PGHDR_.cs" />
     <Compile Include="src\Backend\Cache\PGroup.cs" />
+    <Compile Include="src\Backend\Paging\FreeSlot.cs" />
     <Compile Include="src\Backend\Paging\PagerState.cs" />
     <Compile Include="src\Backend\Paging\PagingJournalMode.cs" />
     <Compile Include="src\CellInfo.cs" />

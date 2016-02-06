@@ -50,6 +50,19 @@ namespace Community.CsharpSqlite.Utils
                 if(!action(element,idx++)) break;
         }
 
+        public static void ForEach2<T>(
+            this IEnumerable<T> source,
+            Func<T,T, int, bool> action)
+        {
+            int idx = 0;
+            var e = source.GetEnumerator();
+            if(!e.MoveNext())return;
+            
+            for(var prev = e.Current; e.MoveNext();prev=e.Current)            
+                if (!action(prev, e.Current, idx++)) break;
+            
+        }
+
         public static void push<T>(ref T head, T p)where T : IBackwardLinkedListNode<T>
         {
             if (head != null)
@@ -59,6 +72,12 @@ namespace Community.CsharpSqlite.Utils
 
             head = p;
         }
+
+        public static void RemoveNext<T>(this T current) where T : ILinkedListNode<T>
+        {
+            current.pNext = current.pNext.pNext;
+        }
+
         public static void removeFromLinkedList<T>(this T itemToRemove, ref T start, Func<T, T> prop, Action<T, T> setter) where T : class
         {
 
