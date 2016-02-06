@@ -1,5 +1,6 @@
 ﻿using Community.CsharpSqlite.Engine;
 using Community.CsharpSqlite.Metadata;
+using Community.CsharpSqlite.Runtime;
 using Community.CsharpSqlite.tree;
 using Community.CsharpSqlite.Utils;
 using System;
@@ -12,7 +13,7 @@ using i64 = System.Int64;
 
 namespace Community.CsharpSqlite.Core.Runtime
 {
-    public class CursorRuntime
+    public class CursorRuntime:IRuntime
     {
         public CPU cpu { get; set; }
         public CursorRuntime()

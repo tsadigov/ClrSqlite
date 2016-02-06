@@ -1,25 +1,15 @@
 ﻿using Community.CsharpSqlite.Engine;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using i64 = System.Int64;
-using u8 = System.Byte;
-using u16 = System.UInt16;
-using u32 = System.UInt32;
-using u64 = System.UInt64;
-using unsigned = System.UIntPtr;
-using Pgno = System.UInt32;
-using i32 = System.Int32;
-using sqlite_int64 = System.Int64;
 using Community.CsharpSqlite.Utils;
 using Community.CsharpSqlite.Engine.Core.Runtime;
+using Community.CsharpSqlite.Runtime;
 
 namespace Community.CsharpSqlite.Core.Runtime
 {
-    public class CrudRuntime
+    public class CrudRuntime: IRuntime
     {
         public CPU cpu { get; set; }
         public CrudRuntime()

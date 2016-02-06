@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace Community.CsharpSqlite.Runtime
 {
-    public interface IRuntime {
+    public interface IRuntime
+    {
         CPU cpu { get; set; }
     }
-    public class HandlerBase<TRuntime> where TRuntime:IRuntime,new()
+    public abstract class HandlerBase<TRuntime> where TRuntime : IRuntime, new()
     {
         CPU cpu;
         public HandlerBase(CPU cpu)
@@ -25,11 +26,7 @@ namespace Community.CsharpSqlite.Runtime
             get { return s_runtime; }
         }
 
-        public static RuntimeException Exec(CPU cpu, OpCode opcode, VdbeOp pOp)
-        {
-            HandlerBase<TRuntime> c = new HandlerBase<TRuntime>(cpu);
-            return c.Exec(opcode, pOp);
-        }
+
 
         public RuntimeException Exec(OpCode opcode, VdbeOp pOp)
         {
