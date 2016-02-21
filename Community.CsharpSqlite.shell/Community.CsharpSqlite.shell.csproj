@@ -341,6 +341,7 @@
     <Compile Include="src\Compiler\Parser\yyStackEntry.cs" />
     <Compile Include="src\Compiler\yymsp.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\HandlerBase.cs" />
+    <Compile Include="src\Core\Engine\Op\Handler\OutputHandler.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Text.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\TheRest.cs" />
     <Compile Include="src\Core\Engine\Op\Handler\Transaction.cs" />
@@ -383,6 +384,7 @@
     <Compile Include="src\Core\Engine\SortOrder.cs" />
     <Compile Include="src\Core\Runtime\CrudRuntime.cs" />
     <Compile Include="src\Core\Runtime\CursorRuntime.cs" />
+    <Compile Include="src\Core\Runtime\OutputRuntime.cs" />
     <Compile Include="src\Core\Runtime\VdbeCursor.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
