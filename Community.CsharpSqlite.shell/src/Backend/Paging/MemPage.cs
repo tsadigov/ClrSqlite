@@ -35,13 +35,6 @@ namespace Community.CsharpSqlite
 
         public class MemPage
         {
-
-
-            
-
-
-
-
             public MemPage()
             {
                 Log.WriteLine("page .ctor");
@@ -129,7 +122,7 @@ namespace Community.CsharpSqlite
 
             public u8 childPtrSize
             {
-                get { return (u8)(4 - (this.IsLeaf ? 4 : 0)); }
+                get { return (u8) (this.IsLeaf ? 0 : 4); }
             }
 
             ///<summary>
@@ -327,7 +320,7 @@ namespace Community.CsharpSqlite
 
                 u16 n = this.childPtrSize;///Number bytes in cell content header 
 
-                Debug.Assert(n == 4 - (this.IsLeaf ? 4 : 0));
+                Debug.Assert(n == (this.IsLeaf ? 0 : 4));
                 if (this.intKey)
                 {
                     if (this.hasData)
