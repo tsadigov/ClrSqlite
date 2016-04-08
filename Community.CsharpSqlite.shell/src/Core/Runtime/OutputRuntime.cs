@@ -66,30 +66,39 @@ namespace Community.CsharpSqlite.Core.Runtime
         ///<param name=""></param>
 
         public RuntimeException Column(Operation pOp){
-            this.OpCode_Column(pOp, cpu.rc, cpu.db, cpu.encoding, cpu.aMem);
-            return RuntimeException.OK;
-        }
-
-        public SqlResult OpCode_Column(Operation pOp, SqlResult rc, Connection db, SqliteEncoding encoding, IList<Mem> aMem)
-        {
-            ///The length of the serialized data for the column 
-            int len;
-            ///Number of bytes in the record 
-            u32 payloadSize = 0;
-            ///Pointer to complete record
-            byte[] zRecord = null;
-            ///Number of bytes in the record : INDEX 
-            i64 payloadSize64 = 0;
-
             ///P1 value of the opcode 
             ///
-            int p1 = pOp.p1;
-            Debug.Assert(p1 < cpu.vdbe.nCursor);
+            int cursorIdx = pOp.p1;
+            Debug.Assert(cursorIdx < cpu.vdbe.nCursor);
+            ///The VDBE cursor 
+            VdbeCursor vdbeCursor = cpu.vdbe.OpenCursors[cursorIdx];
+
+            ///Where to write the extracted value 
+            Debug.Assert(pOp.p3 > 0 && pOp.p3 <= cpu.aMem.Count());
+            var destionationMemAddress = pOp.p3;
 
             ///column number to retrieve 
             int clumnNumber_p2 = pOp.p2;
-            ///The VDBE cursor 
-            VdbeCursor vdbeCursor = cpu.vdbe.OpenCursors[p1];
+
+            Mem pDest = cpu.aMem[destionationMemAddress];
+            ///For storing the record being decoded 
+
+            ///PseudoTable input register 
+            var preg = vdbeCursor.pseudoTableReg > 0 ? cpu.aMem[vdbeCursor.pseudoTableReg] :null;
+
+            this.OpCode_Column( vdbeCursor, preg, pDest, clumnNumber_p2,(OpFlag)pOp.p5, pOp.p4type,pOp.p4, cpu.rc, cpu.db, cpu.encoding);
+            Sqlite3.REGISTER_TRACE(cpu.vdbe, destionationMemAddress, pDest);
+            return RuntimeException.OK;
+        }
+
+        public SqlResult OpCode_Column(VdbeCursor vdbeCursor, Mem pReg, Mem pDest, int clumnNumber_p2, OpFlag flags, P4Usage p4type, union_p4 p4, SqlResult rc, Connection db, SqliteEncoding encoding)
+        {
+            ///The length of the serialized data for the column 
+            u32 payloadSize = 0;
+            ///Pointer to complete record
+            byte[] zRecord = null;
+            
+            
             ///This block sets the variable payloadSize to be the total number of
             ///bytes in the record.
             ///
@@ -109,36 +118,14 @@ namespace Community.CsharpSqlite.Core.Runtime
             ///aType[i] holds the numeric type of the i"th column 
             u32[] columnTypes = vdbeCursor.aType;
 
-
-            ///Loop counter 
-            int i;
-            ///Part of the record being decoded 
-            byte[] zData = null;
-            ///Where to write the extracted value 
-            Debug.Assert(pOp.p3 > 0 && pOp.p3 <= cpu.aMem.Count());
-            Mem pDest = aMem[pOp.p3];
-            ///For storing the record being decoded 
             Mem sMem = null;
             sMem = malloc_cs.sqlite3Malloc(sMem);
 
-
-            ///Index into header 
-            int idxHeader;
-            ///Pointer to first byte after the header 
-            int idxEndHeader;
-            ///Offset into the data 
+           ///Offset into the data 
             u32 offsetIntoData = 0;
             ///Number of bytes in the content of a field 
             u32 szField = 0;
-
-            ///Number of bytes of available data 
-            int avail;
-            ///PseudoTable input register 
-            Mem pReg;
-
-
-            //  memset(&sMem, 0, sizeof(sMem));
-
+            
             cpu.vdbe.memAboutToChange(pDest);
             pDest.MemSetTypeFlag(MemFlags.MEM_Null);
 
@@ -152,7 +139,7 @@ namespace Community.CsharpSqlite.Core.Runtime
             {
                 ///The record is stored in a B">Tree
                 rc = vdbeaux.sqlite3VdbeCursorMoveto(vdbeCursor);
-                if (rc != 0)
+                if (rc != SqlResult.SQLITE_OK)
                     return (int)ColumnResult.abort_due_to_error;
                 //goto  abort_due_to_error;
                 if (vdbeCursor.nullRow)
@@ -172,6 +159,8 @@ namespace Community.CsharpSqlite.Core.Runtime
                         if (vdbeCursor.isIndex)
                         {
                             Debug.Assert(btCursor.sqlite3BtreeCursorIsValid());
+                            ///Number of bytes in the record : INDEX 
+                            i64 payloadSize64 = 0;
                             rc = btCursor.sqlite3BtreeKeySize(ref payloadSize64);
                             Debug.Assert(rc == SqlResult.SQLITE_OK);
                             ///True because of CursorMoveto() call above 
@@ -186,25 +175,20 @@ namespace Community.CsharpSqlite.Core.Runtime
                             Debug.Assert(btCursor.sqlite3BtreeCursorIsValid());
                             rc = btCursor.sqlite3BtreeDataSize(ref payloadSize);
                             Debug.Assert(rc == SqlResult.SQLITE_OK);
-                            ///
-                            ///<summary>
                             ///DataSize() cannot fail 
-                            ///</summary>
                         }
                     }
                 }
             }
             else
             {
-                if (vdbeCursor.pseudoTableReg > 0)
+                if (null!=pReg)///The record is the sole entry of a pseudo">table
                 {
-                    ///The record is the sole entry of a pseudo">table
-                    pReg = aMem[vdbeCursor.pseudoTableReg];
                     Debug.Assert((pReg.flags & MemFlags.MEM_Blob) != 0);
                     Debug.Assert(pReg.memIsValid());
                     payloadSize = (u32)pReg.CharacterCount;
                     zRecord = pReg.zBLOB;
-                    vdbeCursor.cacheStatus = ((OpFlag)pOp.p5 & OpFlag.OPFLAG_CLEARCACHE) != 0 ? Sqlite3.CACHE_STALE : cpu.vdbe.cacheCtr;
+                    vdbeCursor.cacheStatus = (flags & OpFlag.OPFLAG_CLEARCACHE) != 0 ? Sqlite3.CACHE_STALE : cpu.vdbe.cacheCtr;
                     Debug.Assert(payloadSize == 0 || zRecord != null);
                 }
                 else
@@ -228,15 +212,16 @@ namespace Community.CsharpSqlite.Core.Runtime
                 return (SqlResult)ColumnResult.too_big;
             }
 
-
             Debug.Assert(clumnNumber_p2 < nField);
 
             //aOffset[i] is offset to start of data for i">th column
             u32[] clumnOffsets;
 
+            ///Part of the record being decoded 
+            byte[] zData = null;
+            
             ///Read and parse the table header.  Store the results of the parse
             ///into the record header cache fields of the cursor.
-
             if (vdbeCursor.cacheStatus == cpu.vdbe.cacheCtr)
             {
                 clumnOffsets = vdbeCursor.aOffset;
@@ -244,13 +229,14 @@ namespace Community.CsharpSqlite.Core.Runtime
             else
             {
                 Debug.Assert(columnTypes != null);
-                avail = 0;
+                var avail = 0;///Number of bytes of available data 
                 //pC.aOffset = aOffset = aType[nField];
                 clumnOffsets = new u32[nField];
                 vdbeCursor.aOffset = clumnOffsets;
                 vdbeCursor.payloadSize = payloadSize;
                 vdbeCursor.cacheStatus = cpu.vdbe.cacheCtr;
                 ///Figure out how many bytes are in the header 
+                
                 if (zRecord != null)
                 {
                     zData = zRecord;
@@ -286,8 +272,7 @@ namespace Community.CsharpSqlite.Core.Runtime
                 ///Debug.Assert( zRec!=0 || avail>=payloadSize || avail>=9 );
                 ///
                 ///Size of the header size field at start of record 
-                int szHdr;
-                szHdr = utilc.getVarint32(zData, out offsetIntoData);
+                int szHdr = utilc.getVarint32(zData, out offsetIntoData);
                 ///Make sure a corrupt database has not given us an oversize header.
                 ///Do this now to avoid an oversize memory allocation.
                 ///
@@ -314,7 +299,7 @@ namespace Community.CsharpSqlite.Core.Runtime
                 ///will likely be much smaller since nField will likely be less than
                 ///20 or so.  This insures that Robson memory allocation limits are
                 ///not exceeded even for corrupt database files.
-                len = nField * 5 + 3;
+                var len = nField * 5 + 3;///Number of bytes in the record 
                 if (len > (int)offsetIntoData)
                     len = (int)offsetIntoData;
                 ///The KeyFetch() or DataFetch() above are fast and will get the entire
@@ -333,9 +318,10 @@ namespace Community.CsharpSqlite.Core.Runtime
                     }
                     zData = sMem.zBLOB;
                 }
-                idxEndHeader = len;
+                var idxEndHeader = len; ///Pointer to first byte after the header 
                 // zData[len];
-                idxHeader = szHdr;
+                ///Index into header 
+                var idxHeader = szHdr;
                 // zData[szHdr];
                 ///
                 ///Scan the header and use it to fill in the aType[] and aOffset[]
@@ -347,7 +333,7 @@ namespace Community.CsharpSqlite.Core.Runtime
                 ///[0]          : number of columns
                 ///[1-num]      : type of the column
                 ///[num,2*num]  : data of the column
-                for (i = 0; i < nField; i++)
+                for (var i = 0; i < nField; i++)
                 {
                     if (idxHeader < idxEndHeader)
                     {
@@ -403,7 +389,7 @@ namespace Community.CsharpSqlite.Core.Runtime
                 }
                 else
                 {
-                    len = (int)vdbeaux.sqlite3VdbeSerialTypeLen(columnTypes[clumnNumber_p2]);
+                    var len = (int)vdbeaux.sqlite3VdbeSerialTypeLen(columnTypes[clumnNumber_p2]);///Number of bytes in the record 
                     vdbemem_cs.sqlite3VdbeMemMove(sMem, pDest);
                     rc = vdbemem_cs.sqlite3VdbeMemFromBtree(btCursor, (int)clumnOffsets[clumnNumber_p2], len, vdbeCursor.isIndex, sMem);
                     if (rc != SqlResult.SQLITE_OK)
@@ -418,9 +404,9 @@ namespace Community.CsharpSqlite.Core.Runtime
             }
             else
             {
-                if (pOp.p4type == P4Usage.P4_MEM)
+                if (p4type == P4Usage.P4_MEM)
                 {
-                    vdbemem_cs.sqlite3VdbeMemShallowCopy(pDest, pOp.p4.pMem, MemFlags.MEM_Static);
+                    vdbemem_cs.sqlite3VdbeMemShallowCopy(pDest, p4.pMem, MemFlags.MEM_Static);
                 }
                 else
                 {
@@ -447,7 +433,6 @@ namespace Community.CsharpSqlite.Core.Runtime
 #if SQLITE_TEST
 																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pDest );
 #endif
-            Sqlite3.REGISTER_TRACE(cpu.vdbe, pOp.p3, pDest);
             if (zData != null && zData != zRecord)
                 malloc_cs.sqlite3_free(ref zData);
             //malloc_cs.sqlite3_free( ref zRec );

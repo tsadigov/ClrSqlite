@@ -385,6 +385,7 @@
     <Compile Include="src\Core\Runtime\CrudRuntime.cs" />
     <Compile Include="src\Core\Runtime\CursorRuntime.cs" />
     <Compile Include="src\Core\Runtime\OutputRuntime.cs" />
+    <Compile Include="src\Core\Runtime\SchemaRuntime.cs" />
     <Compile Include="src\Core\Runtime\VdbeCursor.cs" />
     <Compile Include="src\Limits.cs" />
     <Compile Include="src\Backend\Os\sqlite3_io_methods.cs" />
