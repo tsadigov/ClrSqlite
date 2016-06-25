@@ -38,7 +38,7 @@ namespace Community.CsharpSqlite.Cache
     ///
     ///</summary>
 
-    public class PgHdr:ReferenceCounted,ILinkedListNode<PgHdr>,IBackwardLinkedListNode<PgHdr>
+    public partial class PgHdr:ReferenceCounted,ILinkedListNode<PgHdr>,IBackwardLinkedListNode<PgHdr>
     {
         ///<summary>
         ///pData Content of this page 
@@ -218,7 +218,7 @@ namespace Community.CsharpSqlite.Cache
             return this.pExtra;
         }
 
-        public MemPage btreePageFromDbPage(Pgno pgno, tree.BtShared pBt)
+        public MemPage btreePageFromDbPage(Pgno pgno, Tree.BtShared pBt)
         {
             MemPage pPage = this.getExtra();
             pPage.aData = this.getData();

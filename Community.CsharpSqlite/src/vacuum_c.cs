@@ -5,7 +5,7 @@ using Pgno=System.UInt32;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using sqlite3_stmt = Engine.Vdbe;
     using Ast;
     using System.Collections.Generic;
@@ -416,7 +416,7 @@ namespace Community.CsharpSqlite {
 			pMain.sqlite3BtreeSetPageSize(-1,-1,1);
 			db.autoCommit=1;
 			if(pDb!=null) {
-                BTreeMethods.sqlite3BtreeClose(ref pDb.BTree);
+                pDb.BTree.Close();
 				pDb.BTree=null;
 				pDb.pSchema=null;
 			}

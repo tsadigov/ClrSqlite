@@ -1778,24 +1778,7 @@ szPageDflt = ii;
         ///<param name="nothing to rollback, so this routine is a no">op.</param>
         ///<param name=""></param>
 
-        ///<summary>
-        /// Release a page reference.
-        ///
-        /// If the number of references to the page drop to zero, then the
-        /// page is added to the LRU list.  When all references to all pages
-        /// are released, a rollback occurs and the lock on the database is
-        /// removed.
-        ///
-        ///</summary>
-        public static void sqlite3PagerUnref(DbPage pPg)
-        {
-            if (pPg != null)
-            {
-                Pager pPager = pPg.pPager;
-                PCacheMethods.sqlite3PcacheRelease(pPg);
-                pPager.pagerUnlockIfUnused();
-            }
-        }
+        
 
         ///<summary>
         /// Mark a single data page as writeable. The page is written into the
@@ -1997,14 +1980,13 @@ szPageDflt = ii;
         ///this routine returns SqlResult.SQLITE_OK.
         ///
         ///The difference between this function and pager_write() is that this
-        ///function also deals with the special case where 2 or more pages
+        ///function also deals with the special case where 2 or more pages        
+        ///fit on a single disk sector. In this case all co">resident pages
+        ///must have been written to the journal file before returning.
+        
+        ///If an error occurs, SQLITE_NOMEM or an IO error code is returned
+        ///as appropriate. Otherwise, SqlResult.SQLITE_OK.
         ///</summary>
-        ///<param name="fit on a single disk sector. In this case all co">resident pages</param>
-        ///<param name="must have been written to the journal file before returning.">must have been written to the journal file before returning.</param>
-        ///<param name=""></param>
-        ///<param name="If an error occurs, SQLITE_NOMEM or an IO error code is returned">If an error occurs, SQLITE_NOMEM or an IO error code is returned</param>
-        ///<param name="as appropriate. Otherwise, SqlResult.SQLITE_OK.">as appropriate. Otherwise, SqlResult.SQLITE_OK.</param>
-        ///<param name=""></param>
 
         public static SqlResult sqlite3PagerWrite(DbPage pDbPage)
         {
@@ -2017,20 +1999,11 @@ szPageDflt = ii;
             Debug.Assert(pPager.assert_pager_state());
             if (nPagePerSector > 1)
             {
-                Pgno nPageCount = 0;
-                ///Total number of pages in database file 
-
-                Pgno pg1;
-                ///First page of the sector pPg is located on. 
-
-                Pgno nPage = 0;
-                ///Number of pages starting at pg1 to journal 
-
-                int ii;
-                ///Loop counter 
-
-                bool needSync = false;
-                ///True if any page has PGHDR.NEED_SYNC 
+                Pgno nPageCount = 0;///Total number of pages in database file 
+                Pgno pg1;///First page of the sector pPg is located on. 
+                Pgno nPage = 0;///Number of pages starting at pg1 to journal 
+                int ii;///Loop counter 
+                bool needSync = false;///True if any page has PGHDR.NEED_SYNC 
 
                 ///Set the doNotSyncSpill flag to 1. This is because we cannot allow
                 ///a journal header to be written between the pages journaled by
@@ -2045,13 +2018,9 @@ szPageDflt = ii;
 );
                 Debug.Assert(pPager.doNotSyncSpill == 0);
                 pPager.doNotSyncSpill++;
-                ///
-                ///<summary>
-                ///</summary>
                 ///<param name="This trick assumes that both the page">size are</param>
                 ///<param name="an integer power of 2. It sets variable pg1 to the identifier">an integer power of 2. It sets variable pg1 to the identifier</param>
                 ///<param name="of the first page of the sector pPg is located on.">of the first page of the sector pPg is located on.</param>
-                ///<param name=""></param>
 
                 pg1 = (u32)((pPg.pgno - 1) & ~(nPagePerSector - 1)) + 1;
                 nPageCount = pPager.dbSize;
@@ -2087,7 +2056,7 @@ szPageDflt = ii;
                                 {
                                     needSync = true;
                                 }
-                                PagerMethods.sqlite3PagerUnref(pPage);
+                                    pPage.Unref();
                             }
                         }
                     }
@@ -2098,7 +2067,7 @@ szPageDflt = ii;
                             {
                                 needSync = true;
                             }
-                            PagerMethods.sqlite3PagerUnref(pPage);
+                            pPage.Unref();
                         }
                 }
                 ///
@@ -2126,7 +2095,7 @@ szPageDflt = ii;
                         if (pPage != null)
                         {
                             pPage.flags |= PGHDR.NEED_SYNC;
-                            PagerMethods.sqlite3PagerUnref(pPage);
+                            pPage.Unref();
                         }
                     }
                 }

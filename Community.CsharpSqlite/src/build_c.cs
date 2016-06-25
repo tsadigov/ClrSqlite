@@ -31,7 +31,7 @@ namespace Community.CsharpSqlite
     using Vdbe = Engine.Vdbe;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using System.Collections.Generic;    //public partial class Sqlite3
     //{

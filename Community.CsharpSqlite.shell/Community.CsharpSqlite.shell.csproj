@@ -309,6 +309,7 @@
     <Compile Include="src\Backend\Cache\PCache1.cs" />
     <Compile Include="src\Backend\Cache\PCacheGlobal.cs" />
     <Compile Include="src\Backend\Cache\PgFreeslot.cs" />
+    <Compile Include="src\Backend\Cache\PgHdr.cpp.cs" />
     <Compile Include="src\Backend\Cache\PgHdr.cs" />
     <Compile Include="src\Backend\Cache\PgHdr1.cs" />
     <Compile Include="src\Backend\Cache\PGHDR_.cs" />
@@ -317,8 +318,9 @@
     <Compile Include="src\Backend\Paging\FreeSlot.cs" />
     <Compile Include="src\Backend\Paging\PagerState.cs" />
     <Compile Include="src\Backend\Paging\PagingJournalMode.cs" />
-    <Compile Include="src\Backend\tree\BtShared.cpp.cs" />
-    <Compile Include="src\Backend\tree\BtShared.h.cs" />
+    <Compile Include="src\Backend\Tree\Btree.cpp.cs" />
+    <Compile Include="src\Backend\Tree\BtShared.cpp.cs" />
+    <Compile Include="src\Backend\Tree\BtShared.h.cs" />
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Compiler\Ast\Expr.cs" />
     <Compile Include="src\Compiler\Ast\ExprExtensions.cs" />
@@ -358,7 +360,7 @@
     <Compile Include="src\Core\Engine\VM\MemExtensions.cs" />
     <Compile Include="src\Core\Engine\VM\MemFlags.cs" />
     <Compile Include="src\Accessories\Utils\BitvecExtensions.cs" />
-    <Compile Include="src\Backend\tree\BtCursor.cs" />
+    <Compile Include="src\Backend\Tree\BtCursor.cs" />
     <Compile Include="src\Core\Engine\BusyHandler.cs" />
     <Compile Include="src\Core\Engine\Context.cs" />
     <Compile Include="src\Core\Engine\Cursor.cs" />
@@ -406,8 +408,8 @@
     <Compile Include="src\Schema\Builtin.cs" />
     <Compile Include="src\Schema\SchemaExtensions.cs" />
     <Compile Include="src\Schema\Traverse\FuncDefTraverse.cs" />
-    <Compile Include="src\Backend\tree\BTree.cs" />
-    <Compile Include="src\Backend\tree\BtreeExtensions.cs" />
+    <Compile Include="src\Backend\Tree\BTree.cs" />
+    <Compile Include="src\Backend\Tree\BtreeExtensions.cs" />
     <Compile Include="src\Compiler\CodeGeneration\builder\DbBuilder.cs" />
     <Compile Include="src\Compiler\CodeGeneration\builder\IndexBuilder.cs" />
     <Compile Include="src\Compiler\CodeGeneration\builder\TableBuilder.cs" />

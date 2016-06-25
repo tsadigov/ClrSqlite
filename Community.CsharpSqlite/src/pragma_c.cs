@@ -13,7 +13,7 @@ namespace Community.CsharpSqlite {
     using Vdbe = Engine.Vdbe;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Paging;
 	public partial class Sqlite3 {
@@ -173,7 +173,7 @@ namespace Community.CsharpSqlite {
 					utilc.sqlite3ErrorMsg(pParse,"temporary storage cannot be changed "+"from within a transaction");
 					return SqlResult.SQLITE_ERROR;
 				}
-				BTreeMethods.sqlite3BtreeClose(ref db.Backends[1].BTree);
+                db.Backends[1].BTree.Close( );
 				db.Backends[1].BTree=null;
 				build.sqlite3ResetInternalSchema(db,-1);
 			}

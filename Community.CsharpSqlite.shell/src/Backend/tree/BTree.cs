@@ -42,9 +42,9 @@ namespace Community.CsharpSqlite {
     ///they often do so without holding sqlite3.mutex.
     ///
     ///</summary>
-    namespace tree
+    namespace Tree
     {
-        public class Btree:IBusyScope
+        public partial class Btree:IBusyScope
         {
             //# define sqlite3BtreeLeave(X)
             public  void Exit()
@@ -755,14 +755,14 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
                     sqliteinth.sqlite3ConnectionBlocked(this.db, pBt.pCursor.pBtree.db);
                     return SqlResult.SQLITE_LOCKED_SHAREDCACHE;
                 }
-                rc = pBt.btreeGetPage((Pgno)iTable, ref pPage, 0);
+                rc = pBt.GetPage((Pgno)iTable, ref pPage, 0);
                 if (rc != 0)
                     return rc;
                 int Dummy0 = 0;
                 rc = this.sqlite3BtreeClearTable((int)iTable, ref Dummy0);
                 if (rc != 0)
                 {
-                    BTreeMethods.releasePage(pPage);
+                    BTreeMethods.release(pPage);
                     return rc;
                 }
                 piMoved = 0;
@@ -781,7 +781,7 @@ releasePage(pPage);
                             ///<param name="If the table being dropped is the table with the largest root">page</param>
                             ///<param name="number in the database, put the root page on the free list.">number in the database, put the root page on the free list.</param>
                             pPage.freePage( ref rc);
-                            BTreeMethods.releasePage(pPage);
+                            BTreeMethods.release(pPage);
                             if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
@@ -793,22 +793,22 @@ releasePage(pPage);
                             ///<param name="number in the database. So move the page that does into the">number in the database. So move the page that does into the</param>
                             ///<param name="gap left by the deleted root">page.</param>
                             MemPage pMove = new MemPage();
-                            BTreeMethods.releasePage(pPage);
-                            rc = pBt.btreeGetPage(maxRootPgno, ref pMove, 0);
+                            BTreeMethods.release(pPage);
+                            rc = pBt.GetPage(maxRootPgno, ref pMove, 0);
                             if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
                             }
                             rc = BTreeMethods.relocatePage(pBt, pMove, PTRMAP.ROOTPAGE, 0, iTable, 0);
-                            BTreeMethods.releasePage(pMove);
+                            BTreeMethods.release(pMove);
                             if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
                             }
                             pMove = null;
-                            rc = pBt.btreeGetPage(maxRootPgno, ref pMove, 0);
+                            rc = pBt.GetPage(maxRootPgno, ref pMove, 0);
                             pMove.freePage( ref rc);
-                            BTreeMethods.releasePage(pMove);
+                            BTreeMethods.release(pMove);
                             if (rc != SqlResult.SQLITE_OK)
                             {
                                 return rc;
@@ -834,7 +834,7 @@ releasePage(pPage);
                     else
                     {
                         pPage.freePage( ref rc);
-                        BTreeMethods.releasePage(pPage);
+                        BTreeMethods.release(pPage);
                     }
 #endif
                 }
@@ -848,7 +848,7 @@ releasePage(pPage);
                     ///
                     ///</summary>
                     pPage.zeroPage(PTF.INTKEY | PTF.LEAF);
-                    BTreeMethods.releasePage(pPage);
+                    BTreeMethods.release(pPage);
                 }
                 return rc;
             }
@@ -1117,18 +1117,14 @@ releasePage(pPage);
                 SqlResult rc = SqlResult.SQLITE_OK;
                 this.Enter();
                 Sqlite3.btreeIntegrity(this);
-                ///<param name="If the btree is already in a write">transaction, or it</param>
-                ///<param name="is already in a read">transaction</param>
-                ///<param name="is requested, this is a no">op.</param>
-                ///<param name=""></param>
+                ///If the btree is already in a write-transaction, or it
+                ///is already in a read-transaction and
+                ///is requested, this is a no-op.
                 if (this.inTrans == TransType.TRANS_WRITE || (this.inTrans == TransType.TRANS_READ && 0 == wrflag))
                 {
                     goto trans_begun;
                 }
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Write transactions are not possible on a read">only database </param>
+                ///Write transactions are not possible on a read-only database 
                 if (pBt.readOnly && wrflag != 0)
                 {
                     rc = SqlResult.SQLITE_READONLY;
@@ -1156,9 +1152,9 @@ rc = SQLITE_LOCKED_SHAREDCACHE;
 goto trans_begun;
 }
 #endif
-                ///<param name="Any read">lock on</param>
-                ///<param name="page 1. So if some other shared">lock</param>
-                ///<param name="on page 1, the transaction cannot be opened. ">on page 1, the transaction cannot be opened. </param>
+                ///Any read-lock on
+                ///page 1. So if some other shared-lock
+                ///on page 1, the transaction cannot be opened. 
                 rc = this.querySharedCacheTableLock(sqliteinth.MASTER_ROOT, BtLockType.READ_LOCK);
                 if (SqlResult.SQLITE_OK != rc)
                     goto trans_begun;
@@ -1172,7 +1168,7 @@ goto trans_begun;
                     ///<param name="file is not pBt.pageSize. In this case lockBtree() will update">file is not pBt.pageSize. In this case lockBtree() will update</param>
                     ///<param name="pBt.pageSize to the page">size of the file on disk.</param>
                     ///<param name=""></param>
-                    while (pBt.pPage1 == null && SqlResult.SQLITE_OK == (rc = BTreeMethods.lockBtree(pBt)))
+                    while (pBt.pPage1 == null && SqlResult.SQLITE_OK == (rc = pBt.lockBtree()))
                         ;
                     if (rc == SqlResult.SQLITE_OK && wrflag != 0)
                     {
@@ -1185,13 +1181,13 @@ goto trans_begun;
                             rc = pBt.pPager.sqlite3PagerBegin(wrflag > 1, Sqlite3.sqlite3TempInMemory(this.db) ? 1 : 0);
                             if (rc == SqlResult.SQLITE_OK)
                             {
-                                rc = BTreeMethods.newDatabase(pBt);
+                                rc = pBt.newDatabase();
                             }
                         }
                     }
                     if (rc != SqlResult.SQLITE_OK)
                     {
-                        BTreeMethods.unlockBtreeIfUnused(pBt);
+                        pBt.unlockIfUnused();
                     }
                 }
                 while ((rc & (SqlResult)0xFF) == SqlResult.SQLITE_BUSY && pBt.inTransaction == TransType.TRANS_NONE && BTreeMethods.btreeInvokeBusyHandler(pBt) != 0);
@@ -1337,7 +1333,7 @@ pBt.isExclusive = (u8)(wrflag>1);
                     ///pager if this call closed the only read or write transaction.  
                     ///</summary>
                     this.inTrans = TransType.TRANS_NONE;
-                    BTreeMethods.unlockBtreeIfUnused(pBt);
+                    pBt.unlockIfUnused();
                 }
                 Sqlite3.btreeIntegrity(this);
             }
@@ -1394,7 +1390,7 @@ pBt.isExclusive = (u8)(wrflag>1);
                     p.skipNext = (ThreeState)errCode;
                     for (var i = 0; i <= p.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(p.PageStack[i]);
+                        BTreeMethods.release(p.PageStack[i]);
                         p.PageStack[i] = null;
                     }
                 }
@@ -1435,7 +1431,7 @@ sqlite3BtreeTripAllCursors(p, rc);
                     ///call btreeGetPage() on page 1 again to make
                     ///sure pPage1.aData is set correctly. 
                     ///</summary>
-                    if (pBt.btreeGetPage(1, ref pPage1, 0) == SqlResult.SQLITE_OK)
+                    if (pBt.GetPage(1, ref pPage1, 0) == SqlResult.SQLITE_OK)
                     {
                         Pgno nPage = Converter.sqlite3Get4byte(pPage1.aData, 28);
                         sqliteinth.testcase(nPage == 0);
@@ -1443,7 +1439,7 @@ sqlite3BtreeTripAllCursors(p, rc);
                             pBt.pPager.sqlite3PagerPagecount(out nPage);
                         sqliteinth.testcase(pBt.nPage != nPage);
                         pBt.nPage = nPage;
-                        BTreeMethods.releasePage(pPage1);
+                        BTreeMethods.release(pPage1);
                     }
                     Debug.Assert(BTreeMethods.countWriteCursors(pBt) == 0);
                     pBt.inTransaction = TransType.TRANS_READ;
@@ -1488,7 +1484,7 @@ sqlite3BtreeTripAllCursors(p, rc);
                     {
                         if (iSavepoint < 0 && pBt.initiallyEmpty)
                             pBt.nPage = 0;
-                        rc = BTreeMethods.newDatabase(pBt);
+                        rc = pBt.newDatabase();
                         pBt.nPage = Converter.sqlite3Get4byte(pBt.pPage1.aData, 28);
                         ///
                         ///<summary>

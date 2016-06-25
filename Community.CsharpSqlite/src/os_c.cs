@@ -377,7 +377,7 @@ namespace Community.CsharpSqlite.Os
 																																																									      mutex = sqlite3MutexAlloc( SQLITE_MUTEX_STATIC_MASTER );
 #endif
             using (Sqlite3.mutex.scope())
-                pVfs = vfsList.linkedList().FirstOrDefault(f => (zVfs == null || zVfs == "") || (zVfs == pVfs.zName));//strcmp(zVfs, pVfs.zName) == null) break;
+                pVfs = vfsList.linkedList().FirstOrDefault(f => (zVfs == null || zVfs == "") || (zVfs == f.zName));//strcmp(zVfs, pVfs.zName) == null) break;
                 
                 return pVfs;
             }

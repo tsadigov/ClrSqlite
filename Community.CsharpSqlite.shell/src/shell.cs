@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using Community.CsharpSqlite.Ast;
 using Community.CsharpSqlite.Os;
 using Community.CsharpSqlite.Engine;
-using Community.CsharpSqlite.tree;
+using Community.CsharpSqlite.Tree;
 using Community.CsharpSqlite.Compiler;
 
 public class Shell

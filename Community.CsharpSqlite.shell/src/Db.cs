@@ -96,7 +96,7 @@ namespace Community.CsharpSqlite
         ///<summary>
         ///The B Tree structure for this database file  
         ///</summary>
-        public tree.Btree BTree;
+        public Tree.Btree BTree;
 
         ///<summary>
         ///0: not writable.  1: Transaction.  2: Checkpoint  

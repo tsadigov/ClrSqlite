@@ -11,7 +11,7 @@ namespace Community.CsharpSqlite
     using System.Security.Cryptography;
     using System.IO;
     using Community.CsharpSqlite.Os;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Paging;
     using Cache;
     using Utils;
@@ -142,7 +142,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                 //typedef struct {
                 public int mode_rekey;
                 public byte[] buffer;
-                public tree.Btree pBt;
+                public Tree.Btree pBt;
                 public cipher_ctx read_ctx;
                 public cipher_ctx write_ctx;
                 public codec_ctx Copy()
@@ -705,7 +705,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                                     //printf("sqlite3PagerWrite(%d)\n", pgno);
                                     if (rc == SqlResult.SQLITE_OK)
                                     {
-                                        PagerMethods.sqlite3PagerUnref(page);
+                                    page.Unref();
                                     }
                                 }
                             }

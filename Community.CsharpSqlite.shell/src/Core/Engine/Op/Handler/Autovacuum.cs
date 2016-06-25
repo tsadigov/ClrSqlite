@@ -27,7 +27,7 @@ namespace Community.CsharpSqlite.Engine.Op
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Vdbe = Engine.Vdbe;
-    using tree;
+    using Tree;
     public class AutoVacuum
     {
 

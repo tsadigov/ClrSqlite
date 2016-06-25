@@ -783,7 +783,7 @@ return (pPager->pWal!=0);
 #endif
 );
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
-                            Debug.Assert(PCacheMethods.sqlite3PcacheRefCount(pPager.pPCache) == 0 || pPager.tempFile);
+                            Debug.Assert(pPager.pPCache.GetRefCount() == 0 || pPager.tempFile);
                             break;
                         case PagerState.PAGER_READER:
                             Debug.Assert(pPager.errCode == SqlResult.SQLITE_OK);
@@ -846,7 +846,7 @@ return (pPager->pWal!=0);
                             ///</summary>
 
                             Debug.Assert(pPager.errCode != SqlResult.SQLITE_OK);
-                            Debug.Assert(PCacheMethods.sqlite3PcacheRefCount(pPager.pPCache) > 0);
+                            Debug.Assert(pPager.pPCache.GetRefCount() > 0);
                             break;
                     }
                     return true;
@@ -2221,8 +2221,8 @@ PagerMethods.sqlite3PagerUnref(p);
 
                         if (PagerMethods.CODEC1(this, pData, pPg.pgno, crypto.SQLITE_DECRYPT))
                             rc = SqlResult.SQLITE_NOMEM;
-                        //PagerMethods.CODEC1(pPager, pData, pPg.pgno, 3, rc=SQLITE_NOMEM);
-                        PCacheMethods.sqlite3PcacheRelease(pPg);
+                //PagerMethods.CODEC1(pPager, pData, pPg.pgno, 3, rc=SQLITE_NOMEM);
+                pPg.PcacheRelease();
                     }
                     return rc;
                 }
@@ -3361,7 +3361,7 @@ PagerMethods.sqlite3PagerUnref(p);
 
                     u32 pageSize = pPageSize;
                     Debug.Assert(pageSize == 0 || (pageSize >= 512 && pageSize <= Limits.SQLITE_MAX_PAGE_SIZE));
-                    if ((this.memDb == 0 || this.dbSize == 0) && PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0 && pageSize != 0 && pageSize != (u32)this.pageSize)
+                    if ((this.memDb == 0 || this.dbSize == 0) && this.pPCache.GetRefCount() == 0 && pageSize != 0 && pageSize != (u32)this.pageSize)
                     {
                         //char *pNew = NULL;             /* New temp space */
                         i64 nByte = 0;
@@ -4198,7 +4198,7 @@ pPager.pWal = 0;
                     ///<param name="exclusive access mode.">exclusive access mode.</param>
                     ///<param name=""></param>
 
-                    Debug.Assert(PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0);
+                    Debug.Assert(this.pPCache.GetRefCount() == 0);
                     Debug.Assert(this.assert_pager_state());
                     Debug.Assert(this.eState == PagerState.PAGER_OPEN || this.eState == PagerState.PAGER_READER);
                     
@@ -4461,9 +4461,9 @@ pPager.pWal = 0;
                     return rc;
                 }
 
-                public void pagerUnlockIfUnused()
+                public void UnlockIfUnused()
                 {
-                    if (PCacheMethods.sqlite3PcacheRefCount(this.pPCache) == 0)
+                    if (this.pPCache.GetRefCount() == 0)
                     {
                         this.pagerUnlockAndRollback();
                     }
@@ -4675,7 +4675,7 @@ rc = sqlite3BitvecSet( pPager.pInJournal, pgno );          //TESTONLY( rc = ) sq
                     {
                         PCacheMethods.sqlite3PcacheDrop(pPg);
                     }
-                    this.pagerUnlockIfUnused();
+                    this.UnlockIfUnused();
                     ppPage = null;
                     return rc;
                 }
@@ -5026,12 +5026,9 @@ int DIRECT_MODE = isDirectMode;
                                 this.changeCountDone = true;
                             }
                         }
-                        ///
-                        ///<summary>
                         ///Release the page reference. 
-                        ///</summary>
-
-                        PagerMethods.sqlite3PagerUnref(pPgHdr);
+                
+                        pPgHdr.Unref();
                     }
                     return rc;
                 }
@@ -5202,7 +5199,7 @@ int DIRECT_MODE = isDirectMode;
                             {
                                 rc = this.pagerWalFrames(pList, this.dbSize, 1, (this.fullSync ? this.syncFlags : (byte)0));
                             }
-                            PagerMethods.sqlite3PagerUnref(pPageOne);
+                            pPageOne.Unref();
                             if (rc == SqlResult.SQLITE_OK)
                             {
                                 PCacheMethods.sqlite3PcacheCleanAll(this.pPCache);
@@ -5316,7 +5313,7 @@ rc = pager_incr_changecounter(pPager, 0);
                                         if (rc != SqlResult.SQLITE_OK)
                                             goto commit_phase_one_exit;
                                         rc = PagerMethods.sqlite3PagerWrite(pPage);
-                                        PagerMethods.sqlite3PagerUnref(pPage);
+                                        pPage.Unref();
                                         if (rc != SqlResult.SQLITE_OK)
                                             goto commit_phase_one_exit;
                                     }
@@ -5491,15 +5488,9 @@ rc = pager_incr_changecounter(pPager, 0);
                 SqlResult sqlite3PagerRollback()
                 {
                     SqlResult rc = SqlResult.SQLITE_OK;
-                    ///
-                    ///<summary>
                     ///Return code 
-                    ///</summary>
 
                     PAGERTRACE("ROLLBACK %d\n", PagerMethods.PAGERID(this));
-                    ///
-                    ///<summary>
-                    ///</summary>
                     ///<param name="PagerRollback() is a no">op if called in READER or OPEN state. If</param>
                     ///<param name="the pager is already in the ERROR state, the rollback is not ">the pager is already in the ERROR state, the rollback is not </param>
                     ///<param name="attempted here. Instead, the error code is returned to the caller.">attempted here. Instead, the error code is returned to the caller.</param>
@@ -5532,13 +5523,9 @@ rc = pager_incr_changecounter(pPager, 0);
 #endif
  && eState > PagerState.PAGER_WRITER_LOCKED)
                             {
-                                ///
-                                ///<summary>
                                 ///This can happen using journal_mode=off. Move the pager to the error 
                                 ///state to indicate that the contents of the cache may not be trusted.
                                 ///Any active readers will get SQLITE_ABORT.
-                                ///
-                                ///</summary>
 
                                 this.errCode = SqlResult.SQLITE_ABORT;
                                 this.eState = PagerState.PAGER_ERROR;
@@ -5551,12 +5538,8 @@ rc = pager_incr_changecounter(pPager, 0);
                         }
                     Debug.Assert(this.eState == PagerState.PAGER_READER || rc != SqlResult.SQLITE_OK);
                     Debug.Assert(rc == SqlResult.SQLITE_OK || rc == SqlResult.SQLITE_FULL || (rc & (SqlResult)0xFF) == SqlResult.SQLITE_IOERR);
-                    ///
-                    ///<summary>
                     ///If an error occurs during a ROLLBACK, we can no longer trust the pager
                     ///cache. So call pager_error() on the way out to make any error persistent.
-                    ///
-                    ///</summary>
 
                     return this.pager_error(rc);
                 }
@@ -5576,13 +5559,13 @@ rc = pager_incr_changecounter(pPager, 0);
                     return this.readOnly;
                 }
 
-                public///<summary>
-                    /// Return the number of references to the pager.
-                    ///
-                    ///</summary>
-                int sqlite3PagerRefcount()
+        ///<summary>
+        /// Return the number of references to the pager.
+        ///
+        ///</summary>
+        public int sqlite3PagerRefcount()
                 {
-                    return PCacheMethods.sqlite3PcacheRefCount(this.pPCache);
+                    return this.pPCache.GetRefCount();
                 }
 
                 public///<summary>
@@ -6014,7 +5997,7 @@ this.memDb != 0
                     {
                         Debug.Assert(pPgOld);
                         PCacheMethods.sqlite3PcacheMove(pPgOld, origPgno);
-                        PagerMethods.sqlite3PagerUnref(pPgOld);
+                        pPgOld.Unref();
                     }
                     if (needSyncPgno != 0)
                     {
@@ -6051,7 +6034,7 @@ this.memDb != 0
                         }
                         pPgHdr.flags |= PGHDR.NEED_SYNC;
                         PCacheMethods.sqlite3PcacheMakeDirty(pPgHdr);
-                        PagerMethods.sqlite3PagerUnref(pPgHdr);
+                        pPgHdr.Unref();
                     }
                     return SqlResult.SQLITE_OK;
                 }

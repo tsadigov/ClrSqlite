@@ -52,7 +52,7 @@ namespace Community.CsharpSqlite
     namespace Engine
     {
         using Operation = VdbeOp;
-        using Community.CsharpSqlite.tree;
+        using Community.CsharpSqlite.Tree;
         using Community.CsharpSqlite.Paging;
         using Community.CsharpSqlite.Utils;
         using Ast;

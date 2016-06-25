@@ -12,7 +12,7 @@ namespace Community.CsharpSqlite.builder
 {
     using Community.CsharpSqlite.Engine;
     using Community.CsharpSqlite.Os;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using Compiler.Parser;
     using Metadata;

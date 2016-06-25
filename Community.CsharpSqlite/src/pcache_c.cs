@@ -112,6 +112,19 @@ namespace Community.CsharpSqlite.Cache
             }
         }
 
+        public void AddToDirtyList(PgHdr pgHdr)
+        {
+            this.Push(pgHdr);
+
+            if (null == this.pSynced && 0 == (pgHdr.flags & PGHDR.NEED_SYNC))
+            {
+                this.pSynced = pgHdr;
+            }
+#if SQLITE_ENABLE_EXPENSIVE_ASSERT
+																																																									expensive_assert( pcacheCheckSynced(p) );
+#endif
+        }
+
         public void Clear()
         {
             Head = null;
@@ -119,6 +132,47 @@ namespace Community.CsharpSqlite.Cache
             pSynced = null;
             nRef = 0;
         }
+
+
+
+
+        ///<summary>
+        /// Remove page pPage from the list of dirty pages.
+        ///</summary>
+        public  void RemoveFromDirtyList(PgHdr pPage)
+        {
+            
+            Debug.Assert(pPage.pNext != null || pPage == this.Tail);
+            Debug.Assert(pPage.pPrev != null || pPage == this.Head);
+            ///Update the PCache1.pSynced variable if necessary. 
+
+            if (this.pSynced == pPage)
+            {
+                PgHdr pSynced = pPage.pPrev;
+                while (pSynced != null && (pSynced.flags & PGHDR.NEED_SYNC) != 0)
+                {
+                    pSynced = pSynced.pPrev;
+                }
+                this.pSynced = pSynced;
+            }
+            this.Remove(pPage);
+
+#if SQLITE_ENABLE_EXPENSIVE_ASSERT
+																																																									expensive_assert( pcacheCheckSynced(p) );
+#endif
+        }
+
+
+        ///<summary>
+        /// Return the total number of referenced pages held by the cache.
+        ///
+        ///</summary>
+        public  int GetRefCount()
+        {
+            return this.nRef;
+        }
+
+
     };
 
    
@@ -181,79 +235,15 @@ Debug.Assert( p.nRef !=0|| (p.flags&PGHDR.NEED_SYNC) !=0);
 return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
 }
 #endif
-            ///<summary>
-            /// Remove page pPage from the list of dirty pages.
-            ///</summary>
-            static void pcacheRemoveFromDirtyList(PgHdr pPage)
-            {
-                PCache p = pPage.pCache;
-                Debug.Assert(pPage.pNext != null || pPage == p.Tail);
-                Debug.Assert(pPage.pPrev != null || pPage == p.Head);
-                ///
-                ///<summary>
-                ///Update the PCache1.pSynced variable if necessary. 
-                ///</summary>
-
-                if (p.pSynced == pPage)
-                {
-                    PgHdr pSynced = pPage.pPrev;
-                    while (pSynced != null && (pSynced.flags & PGHDR.NEED_SYNC) != 0)
-                    {
-                        pSynced = pSynced.pPrev;
-                    }
-                    p.pSynced = pSynced;
-                }
-                if (pPage.pNext != null)
-                {
-                    pPage.pNext.pPrev = pPage.pPrev;
-                }
-                else
-                {
-                    Debug.Assert(pPage == p.Tail);
-                    p.Tail = pPage.pPrev;
-                }
-                if (pPage.pPrev != null)
-                {
-                    pPage.pPrev.pNext = pPage.pNext;
-                }
-                else
-                {
-                    Debug.Assert(pPage == p.Head);
-                    p.Head = pPage.pNext;
-                }
-                pPage.pNext = null;
-                pPage.pPrev = null;
-#if SQLITE_ENABLE_EXPENSIVE_ASSERT
-																																																									expensive_assert( pcacheCheckSynced(p) );
-#endif
-            }
-
-            ///<summary>
-            /// Add page pPage to the head of the dirty list (PCache1.pDirty is set to
-            /// pPage).
-            ///
-            ///</summary>
-            static void pcacheAddToDirtyList(PgHdr pPage)
-            {
-                PCache pCache = pPage.pCache;
-            
-                pCache.Push(pPage);
            
-                if (null == pCache.pSynced && 0 == (pPage.flags & PGHDR.NEED_SYNC))
-                {
-                    pCache.pSynced = pPage;
-                }
-#if SQLITE_ENABLE_EXPENSIVE_ASSERT
-																																																									expensive_assert( pcacheCheckSynced(p) );
-#endif
-            }
 
+            
             ///<summary>
             /// Wrapper around the pluggable caches xUnpin method. If the cache is
             /// being used for an in-memory database, this function is a no-op.
             ///
             ///</summary>
-            static void pcacheUnpin(PgHdr p)
+            public static void Unpin(PgHdr p)
             {
                 PCache pCache = p.pCache;
                 if (pCache.bPurgeable)
@@ -485,30 +475,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
                 return (pPage == null && eCreate != 0) ? SqlResult.SQLITE_NOMEM : SqlResult.SQLITE_OK;
             }
 
-            ///<summary>
-            /// Decrement the reference count on a page. If the page is clean and the
-            /// reference count drops to 0, then it is made elible for recycling.
-            ///</summary>
-            public static void sqlite3PcacheRelease(PgHdr p)
-            {
-                Debug.Assert(p.ReferenceCount > 0);
-                p.ReferenceCount--;
-                if (p.ReferenceCount == 0)
-                {
-                    PCache pCache = p.pCache;
-                    pCache.nRef--;
-                    if ((p.flags & PGHDR.DIRTY) == 0)
-                    {
-                        pcacheUnpin(p);
-                    }
-                    else
-                    {
-                        ///Move the page to the head of the dirty list. 
-                        pcacheRemoveFromDirtyList(p);
-                        pcacheAddToDirtyList(p);
-                    }
-                }
-            }
+            
 
 
 
@@ -524,7 +491,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
                 Debug.Assert(p.ReferenceCount == 1);
                 if ((p.flags & PGHDR.DIRTY) != 0)
                 {
-                    pcacheRemoveFromDirtyList(p);
+                    p.RemoveFromDirtyList();
                 }
                 pCache = p.pCache;
                 pCache.nRef--;
@@ -547,7 +514,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
                 if (0 == (p.flags & PGHDR.DIRTY))
                 {
                     p.flags |= PGHDR.DIRTY;
-                    pcacheAddToDirtyList(p);
+                    p.AddToDirtyList();
                 }
             }
 
@@ -560,11 +527,11 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
             {
                 if ((p.flags & PGHDR.DIRTY) != 0)
                 {
-                    pcacheRemoveFromDirtyList(p);
+                    p.RemoveFromDirtyList();
                     p.flags &= ~(PGHDR.DIRTY | PGHDR.NEED_SYNC);
                     if (p.ReferenceCount == 0)
                     {
-                        pcacheUnpin(p);
+                        Unpin(p);
                     }
                 }
             }
@@ -606,8 +573,8 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
                 p.pgno = newPgno;
                 if ((p.flags & PGHDR.DIRTY) != 0 && (p.flags & PGHDR.NEED_SYNC) != 0)
                 {
-                    pcacheRemoveFromDirtyList(p);
-                    pcacheAddToDirtyList(p);
+                    p.RemoveFromDirtyList();
+                    p.AddToDirtyList();
                 }
             }
 
@@ -788,14 +755,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
                 return pcacheSortDirtyList(pCache.Head);
             }
 
-            ///<summary>
-            /// Return the total number of referenced pages held by the cache.
-            ///
-            ///</summary>
-            public static int sqlite3PcacheRefCount(PCache pCache)
-            {
-                return pCache.nRef;
-            }
+            
 
 
 

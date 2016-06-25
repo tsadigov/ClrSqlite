@@ -16,7 +16,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Metadata.Traverse;
@@ -982,7 +982,7 @@ break;
 			for(j=0;j<db.BackendCount;j++) {
 				DbBackend pDb=db.Backends[j];
 				if(pDb.BTree!=null) {
-                    BTreeMethods.sqlite3BtreeClose(ref pDb.BTree);
+                    pDb.BTree.Close();
 					pDb.BTree=null;
 					if(j!=1) {
 						pDb.pSchema=null;

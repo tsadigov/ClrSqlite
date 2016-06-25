@@ -8,7 +8,7 @@ using u32=System.UInt32;
 using u64=System.UInt64;
 using sqlite3_int64=System.Int64;
 using Pgno=System.UInt32;
-namespace Community.CsharpSqlite.tree {
+namespace Community.CsharpSqlite.Tree {
     using DbPage = Cache.PgHdr;
     using System.Text;
     using Metadata;
@@ -210,7 +210,7 @@ aOverflow= null;
                     int i;
                     for (i = 0; i <= this.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(this.PageStack[i]);
+                        BTreeMethods.release(this.PageStack[i]);
                         this.PageStack[i] = null;
                     }
                     this.pageStackIndex = -1;
@@ -543,7 +543,7 @@ aOverflow= null;
                 {
                     while (this.pageStackIndex > iCellDepth)
                     {
-                        BTreeMethods.releasePage(this.PageStack[this.pageStackIndex--]);
+                        BTreeMethods.release(this.PageStack[this.pageStackIndex--]);
                     }
                     rc = this.balance();
                 }
@@ -621,7 +621,7 @@ aOverflow= null;
                 Debug.Assert(pPage.IsLeaf != false || false == pPage.intKey);
                 Log.TRACE("INSERT: table=%d nkey=%lld ndata=%d page=%d %s\n", this.pgnoRoot, nKey, nData, pPage.pgno, loc == 0 ? "overwrite" : "new entry");
                 Debug.Assert(pPage.isInit != false);
-                BTreeMethods.allocateTempSpace(pBt);
+                pBt.allocateTempSpace();
                 var newCellTemp = pBt.pTmpSpace;
                 //if (newCell == null) return SQLITE_NOMEM;
                 rc = pPage.fillInCell(newCellTemp, pKey, nKey, pData, nData, nZero, ref szNew);
@@ -831,7 +831,7 @@ aOverflow= null;
                             ///<summary>
                             ///</summary>
                             ///<param name="The next iteration of the do">loop balances the parent page. </param>
-                            BTreeMethods.releasePage(pPage);
+                            BTreeMethods.release(pPage);
                             this.pageStackIndex--;
                         }
                 }
@@ -1371,7 +1371,7 @@ aOverflow= null;
                     int i;
                     for (i = 1; i <= this.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(this.PageStack[i]);
+                        BTreeMethods.release(this.PageStack[i]);
                     }
                     this.pageStackIndex = 0;
                 }
@@ -1435,7 +1435,7 @@ aOverflow= null;
                 Debug.Assert(this.pageStackIndex > 0);
                 Debug.Assert(this.PageStack[this.pageStackIndex] != null);
                 this.PageStack[this.pageStackIndex - 1].assertParentIndex(this.indexInPage[this.pageStackIndex - 1], this.PageStack[this.pageStackIndex].pgno);
-                BTreeMethods.releasePage(this.PageStack[this.pageStackIndex]);
+                BTreeMethods.release(this.PageStack[this.pageStackIndex]);
                 this.pageStackIndex--;
                 this.info.nSize = 0;
                 this.validNKey = false;
@@ -1565,43 +1565,22 @@ return SQLITE_ABORT;
                 Debug.Assert(this.indexInPage[this.pageStackIndex] < this.PageStack[this.pageStackIndex].nCell);
                 return this.accessPayload(offset, amt, pBuf, 0);
             }
-            public SqlResult accessPayload(///
-                ///<summary>
-                ///Cursor pointing to entry to read from 
-                ///</summary>
-            u32 offset,///
-                ///<summary>
-                ///Begin reading this far into payload 
-                ///</summary>
-            u32 amt,///
-                ///<summary>
-                ///Read this many bytes 
-                ///</summary>
-            byte[] pBuf,///
-                ///<summary>
-                ///Write the bytes into this buffer 
-                ///</summary>
-            int eOp///
-                ///<summary>
-                ///</summary>
-                ///<param name="zero to read. non">zero to write. </param>
+            public SqlResult accessPayload(
+                u32 offset,     ///Begin reading this far into payload 
+                u32 amt,        ///Read this many bytes 
+                byte[] pBuf,    ///Write the bytes into this buffer 
+                int eOp         ///zero to read. non-zero to write. 
             )
-            {
+        {
                 u32 pBufOffset = 0;
                 byte[] aPayload;
                 SqlResult rc = SqlResult.SQLITE_OK;
                 u32 nKey;
                 int iIdx = 0;
                 MemPage pPage = this.PageStack[this.pageStackIndex];
-                ///
-                ///<summary>
                 ///Btree page of current entry 
-                ///</summary>
                 BtShared pBt = this.pBt;
-                ///
-                ///<summary>
                 ///Btree this cursor belongs to 
-                ///</summary>
                 Debug.Assert(pPage != null);
                 Debug.Assert(this.State == BtCursorState.CURSOR_VALID);
                 Debug.Assert(this.indexInPage[this.pageStackIndex] < pPage.nCell);
@@ -1613,16 +1592,10 @@ return SQLITE_ABORT;
                 if (NEVER(offset + amt > nKey + this.info.nData) || this.info.nLocal > pBt.usableSize//&aPayload[pCur.info.nLocal] > &pPage.aData[pBt.usableSize]
                 )
                 {
-                    ///
-                    ///<summary>
                     ///Trying to read or write past the end of the data is an error 
-                    ///</summary>
                     return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
-                ///
-                ///<summary>
                 ///Check if data must be read/written to/from the btree page itself. 
-                ///</summary>
                 if (offset < this.info.nLocal)
                 {
                     int a = (int)amt;
@@ -1689,15 +1662,11 @@ pCur.aOverflow[iIdx] = nextPage;
                         MemPage MemPageDummy = null;
                         if (offset >= ovflSize)
                         {
-                            ///
-                            ///<summary>
                             ///The only reason to read this page is to obtain the page
                             ///number for the next page in the overflow chain. The page
                             ///data is not required. So first try to lookup the overflow
-                            ///</summary>
-                            ///<param name="page">list cache, if any, then fall back to the getOverflowPage()</param>
-                            ///<param name="function.">function.</param>
-                            ///<param name=""></param>
+                            ///page-list cache, if any, then fall back to the getOverflowPage()
+                            ///function.
 #if !SQLITE_OMIT_INCRBLOB
 																																																																																																																																																							if( pCur.aOverflow && pCur.aOverflow[iIdx+1] ){
 nextPage = pCur.aOverflow[iIdx+1];
@@ -1708,12 +1677,8 @@ nextPage = pCur.aOverflow[iIdx+1];
                         }
                         else
                         {
-                            ///
-                            ///<summary>
                             ///Need to read this page properly. It contains some of the
                             ///range of data that is being read (eOp==null) or written (eOp!=null).
-                            ///
-                            ///</summary>
                             PgHdr pDbPage = new PgHdr();
                             int a = (int)amt;
                             rc = pBt.pPager.sqlite3PagerGet(nextPage, ref pDbPage);
@@ -1726,7 +1691,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                                     a = (int)(ovflSize - offset);
                                 }
                                 rc = BTreeMethods.copyPayload(aPayload, offset + 4, pBuf, pBufOffset, (u32)a, eOp, pDbPage);
-                                PagerMethods.sqlite3PagerUnref(pDbPage);
+                                pDbPage.Unref();
                                 offset = 0;
                                 amt -= (u32)a;
                                 pBufOffset += (u32)a;
@@ -1780,7 +1745,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                     this.assertCellInfo();
                 }
             }
-            public SqlResult sqlite3BtreeCloseCursor()
+            public SqlResult Close()
             {
                 Btree pBtree = this.pBtree;
                 if (pBtree != null)
@@ -1803,9 +1768,9 @@ nextPage = pCur.aOverflow[iIdx+1];
                     }
                     for (i = 0; i <= this.pageStackIndex; i++)
                     {
-                        BTreeMethods.releasePage(this.PageStack[i]);
+                        BTreeMethods.release(this.PageStack[i]);
                     }
-                    BTreeMethods.unlockBtreeIfUnused(pBt);
+                    pBt.unlockIfUnused();
                     BTreeMethods.invalidateOverflowCache(this);
                     ///
                     ///<summary>

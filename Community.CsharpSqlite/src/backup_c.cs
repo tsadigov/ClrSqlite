@@ -10,7 +10,7 @@ namespace Community.CsharpSqlite {
     using DbPage = Cache.PgHdr;
     using Os;
     using builder;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;
     using Cache;
@@ -380,7 +380,7 @@ namespace Community.CsharpSqlite {
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
                                     rc = this.backupOnePage(iSrcPg, pSrcPg.getData());
-                                    PagerMethods.sqlite3PagerUnref(pSrcPg);
+                                    pSrcPg.Unref();
                                 }
                             }
                             this.iNext++;
@@ -476,7 +476,7 @@ namespace Community.CsharpSqlite {
                                         byte[] zData = pSrcPg.getData();
                                         rc = os.sqlite3OsWrite(pFile, zData, pgszSrc, iOff);
                                     }
-                                    PagerMethods.sqlite3PagerUnref(pSrcPg);
+                                    pSrcPg.Unref();
                                 }
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
@@ -687,7 +687,7 @@ namespace Community.CsharpSqlite {
                     pDestPg.getExtra().isInit = false;
                     // (  PagerMethods.sqlite3PagerGetExtra ( pDestPg ) )[0] = 0;
                 }
-                PagerMethods.sqlite3PagerUnref(pDestPg);
+                pDestPg.Unref();
             }
             return rc;
         }

@@ -1,6 +1,6 @@
 ﻿using Community.CsharpSqlite;
 using Community.CsharpSqlite.Paging;
-using Community.CsharpSqlite.tree;
+using Community.CsharpSqlite.Tree;
 using Community.CsharpSqlite.Metadata;
 using Community.CsharpSqlite.Utils;
 using System;

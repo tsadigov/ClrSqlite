@@ -41,7 +41,7 @@ namespace Community.CsharpSqlite.Engine
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
     using Metadata;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using Core.Runtime;    //public partial class Sqlite3
                            //{
@@ -1638,14 +1638,14 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                 }
                 if (vdbeCursor.pBt != null)
                 {
-                    BTreeMethods.sqlite3BtreeClose(ref vdbeCursor.pBt);
+                    vdbeCursor.pBt.Close();
                     ///The pCx.pCursor will be close automatically, if it exists, by
                     ///the call above. 
                 }
                 else
                     if (vdbeCursor.pCursor != null)
                     {
-                        vdbeCursor.pCursor.sqlite3BtreeCloseCursor();
+                        vdbeCursor.pCursor.Close();
                     }
 #if !SQLITE_OMIT_VIRTUALTABLE
                 if (vdbeCursor.pVtabCursor != null)

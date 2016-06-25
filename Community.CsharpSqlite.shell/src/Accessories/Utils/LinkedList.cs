@@ -28,5 +28,28 @@ namespace Community.CsharpSqlite.Utils
                 pCache.Tail = pPage;
             }
         }
+        public void Remove(T pPage)
+        {
+            if (pPage.pNext != null)
+            {
+                pPage.pNext.pPrev = pPage.pPrev;
+            }
+            else
+            {
+                Debug.Assert(EqualityComparer<T>.Default.Equals(pPage , this.Tail));
+                this.Tail = pPage.pPrev;
+            }
+            if (pPage.pPrev != null)
+            {
+                pPage.pPrev.pNext = pPage.pNext;
+            }
+            else
+            {
+                Debug.Assert(EqualityComparer<T>.Default.Equals(pPage , this.Head));
+                this.Head = pPage.pNext;
+            }
+            pPage.pNext = default(T);
+            pPage.pPrev = default(T);
+        }
     }
 }

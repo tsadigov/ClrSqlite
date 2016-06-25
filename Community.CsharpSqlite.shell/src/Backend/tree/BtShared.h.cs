@@ -14,7 +14,7 @@ using Community.CsharpSqlite.Utils;
 using Community.CsharpSqlite.Cache;
 
 
-namespace Community.CsharpSqlite.tree
+namespace Community.CsharpSqlite.Tree
 {
     using DbPage = Cache.PgHdr;
 
@@ -442,7 +442,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
                 }
             }
             ptrmap_exit:
-            PagerMethods.sqlite3PagerUnref(pDbPage);
+            pDbPage.Unref();
         }
 
         public SqlResult ptrmapGet(Pgno key, ref u8 pEType, ref Pgno pPgno)
@@ -483,7 +483,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             offset = (int)BTreeMethods.PTRMAP_PTROFFSET((u32)iPtrmap, key);
             if (offset < 0)
             {
-                PagerMethods.sqlite3PagerUnref(pDbPage);
+                pDbPage.Unref();
                 return sqliteinth.SQLITE_CORRUPT_BKPT();
             }
             Debug.Assert(offset <= (int)this.usableSize - 5);
@@ -493,13 +493,13 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             // Under C# pPgno will always exist. No need to test; //
             //if ( pPgno != 0 )
             pPgno = Converter.sqlite3Get4byte(pPtrmap, offset + 1);
-            PagerMethods.sqlite3PagerUnref(pDbPage);
+            pDbPage.Unref();
             if (pEType < 1 || pEType > 5)
                 return sqliteinth.SQLITE_CORRUPT_BKPT();
             return SqlResult.SQLITE_OK;
         }
 
-        public SqlResult btreeGetPage(
+        public SqlResult GetPage(
             Pgno pgno, ///Number of the page to fetch 
             ref MemPage ppPage, ///Return the page in this parameter 
             int noContent///Do not load page content if true 

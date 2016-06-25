@@ -34,7 +34,7 @@ namespace Community.CsharpSqlite.Utils
                     owner.Exit();
             }
         }
-        public static bool sqlite3BtreeHoldsMutex(this tree.Btree tree) {
+        public static bool sqlite3BtreeHoldsMutex(this Tree.Btree tree) {
             return true;
         }
             

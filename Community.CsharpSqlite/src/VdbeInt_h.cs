@@ -37,7 +37,7 @@ namespace Community.CsharpSqlite
     using sqlite3_value = Engine.Mem;
 	using System.Collections.Generic;
     using Metadata;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     ///<summary>
     ///A cursor is a pointer into a single BTree within a database file.

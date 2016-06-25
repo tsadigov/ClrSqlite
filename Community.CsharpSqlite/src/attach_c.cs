@@ -5,7 +5,7 @@ using u8=System.Byte;
 using u32=System.UInt32;
 namespace Community.CsharpSqlite {
     using sqlite3_value = Engine.Mem;
-    using tree;
+    using Tree;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Engine;
@@ -194,7 +194,7 @@ namespace Community.CsharpSqlite {
 				int iDb=db.BackendCount-1;
 				Debug.Assert(iDb>=2);
 				if(db.Backends[iDb].BTree!=null) {
-					BTreeMethods.sqlite3BtreeClose(ref db.Backends[iDb].BTree);
+                    db.Backends[iDb].BTree.Close( );
 					db.Backends[iDb].BTree=null;
 					db.Backends[iDb].pSchema=null;
 				}
@@ -266,7 +266,7 @@ namespace Community.CsharpSqlite {
 				io.sqlite3_snprintf(200,zErr,"database %s is locked",zName);
 				goto detach_error;
 			}
-			BTreeMethods.sqlite3BtreeClose(ref pDb.BTree);
+            pDb.BTree.Close( );
 			pDb.BTree=null;
 			pDb.pSchema=null;
 			build.sqlite3ResetInternalSchema(db,-1);

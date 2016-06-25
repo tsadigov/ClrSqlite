@@ -12,7 +12,7 @@ namespace Community.CsharpSqlite
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using System.Collections.Generic;
     using System.Linq;

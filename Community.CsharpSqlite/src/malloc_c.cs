@@ -10,7 +10,7 @@ namespace Community.CsharpSqlite
 	using System;
     using Community.CsharpSqlite.Os;
     using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
    
         public class malloc_cs

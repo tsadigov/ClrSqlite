@@ -16,7 +16,7 @@ namespace Community.CsharpSqlite
     using Metadata;
     using Community.CsharpSqlite.Os;
     
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Utils;
     using Cache;    ///<summary>
@@ -213,7 +213,7 @@ namespace Community.CsharpSqlite
                 return 0;
             if (this.checkRef((u32)iPage, zParentContext) != 0)
                 return 0;
-            if ((rc = pBt.btreeGetPage((Pgno)iPage, ref pPage, 0)) != 0)
+            if ((rc = pBt.GetPage((Pgno)iPage, ref pPage, 0)) != 0)
             {
                 this.checkAppendMsg(zContext.ToString(), "unable to get the page. error code=%d", rc);
                 return 0;
@@ -234,7 +234,7 @@ namespace Community.CsharpSqlite
                 ///</summary>
 
                 this.checkAppendMsg(zContext.ToString(), "btreeInitPage() returns error code %d", rc);
-                BTreeMethods.releasePage(pPage);
+                BTreeMethods.release(pPage);
                 return 0;
             }
             ///
@@ -492,7 +492,7 @@ namespace Community.CsharpSqlite
                 }
             }
             CacheMethods.sqlite3PageFree(ref hit);
-            BTreeMethods.releasePage(pPage);
+            BTreeMethods.release(pPage);
             return depth + 1;
         }
 
@@ -572,7 +572,7 @@ namespace Community.CsharpSqlite
                 }
 #endif
                 iPage = (int)Converter.sqlite3Get4byte(pOvflData);
-                PagerMethods.sqlite3PagerUnref(pOvflPage);
+                pOvflPage.Unref();
             }
         }
 
@@ -651,7 +651,7 @@ namespace Community.CsharpSqlite
 
 
 
-    namespace tree { 
+    namespace Tree { 
     // No used in C#, since we use create a class; was MemPage.Length;
     ///
     ///<summary>

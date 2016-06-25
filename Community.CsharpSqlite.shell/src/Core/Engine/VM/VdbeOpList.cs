@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Community.CsharpSqlite.Engine
 {
-    using tree;
+    using Tree;
     using u8 = System.Byte;
 
 

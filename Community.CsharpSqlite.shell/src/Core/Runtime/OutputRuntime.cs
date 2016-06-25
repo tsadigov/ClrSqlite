@@ -15,7 +15,7 @@ using Community.CsharpSqlite.Utils;
 using Community.CsharpSqlite.Engine.Core.Runtime;
 using Community.CsharpSqlite.Runtime;
 using System.Collections.Generic;
-using Community.CsharpSqlite.tree;
+using Community.CsharpSqlite.Tree;
 using Vdbe = Community.CsharpSqlite.Engine.Vdbe;
 using Operation = Community.CsharpSqlite.Engine.VdbeOp;
 

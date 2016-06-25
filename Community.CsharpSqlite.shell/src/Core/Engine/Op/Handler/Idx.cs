@@ -10,7 +10,7 @@ using i64 = System.Int64;
 namespace Community.CsharpSqlite.Engine.Op
 {
     using Community.CsharpSqlite.Engine;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Core.Runtime;
     using Utils;
     public static class Idx

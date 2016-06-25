@@ -1,7 +1,7 @@
 ﻿using Community.CsharpSqlite.Engine;
 using Community.CsharpSqlite.Metadata;
 using Community.CsharpSqlite.Runtime;
-using Community.CsharpSqlite.tree;
+using Community.CsharpSqlite.Tree;
 using Community.CsharpSqlite.Utils;
 using System;
 using System.Collections.Generic;

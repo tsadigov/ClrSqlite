@@ -14,7 +14,7 @@ namespace Community.CsharpSqlite
 	using DbPage = Cache.PgHdr;
 	using System.Text;
     using System.Linq;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
 
     namespace Paging
@@ -41,6 +41,7 @@ namespace Community.CsharpSqlite
             public static int nFrag = 7;
             public const int firstFreeBlock = 1;
             public const int SqliteVersion = 96;
+            public const int NumberOfFreePage = 36;
             internal static readonly int ChangeCounter= 92;
         }
 
@@ -202,7 +203,7 @@ namespace Community.CsharpSqlite
 
             public _OvflCell[] aOvfl = new _OvflCell[5];
 
-            public tree.BtShared pBt;
+            public Tree.BtShared pBt;
             
 
             ///<summary>
@@ -1361,7 +1362,7 @@ namespace Community.CsharpSqlite
                             while (pBt.PTRMAP_ISPAGE(pgnoOvfl) || pgnoOvfl == pBt.PENDING_BYTE_PAGE);
                         }
 #endif
-                        rc = BTreeMethods.allocateBtreePage(pBt, ref pOvfl, ref pgnoOvfl, pgnoOvfl, 0);
+                        rc = pBt.allocateBtreePage(ref pOvfl, ref pgnoOvfl, pgnoOvfl, 0);
 #if !SQLITE_OMIT_AUTOVACUUM
                         ///<param name="If the database supports auto">vacuum, and the second or subsequent</param>
                         ///<param name="overflow page is being allocated, add an entry to the pointer">map</param>
@@ -1379,13 +1380,13 @@ namespace Community.CsharpSqlite
                             pBt.ptrmapPut(pgnoOvfl, eType, pgnoPtrmap, ref rc);
                             if (rc != 0)
                             {
-                                BTreeMethods.releasePage(pOvfl);
+                                pOvfl.release();
                             }
                         }
 #endif
                         if (rc != 0)
                         {
-                            BTreeMethods.releasePage(pToRelease);
+                            pToRelease.release();
                             return rc;
                         }
                         ///If pToRelease is not zero than pPrior points into the data area
@@ -1398,7 +1399,7 @@ namespace Community.CsharpSqlite
                         //Debug.Assert( pPrior < pPage.aData || pPrior >= &pPage.aData[pBt.pageSize]
                         //      || sqlite3PagerIswriteable(pPage.pDbPage) );
                         Converter.sqlite3Put4byte(pPrior, pPriorIndex, pgnoOvfl);
-                        BTreeMethods.releasePage(pToRelease);
+                        pToRelease.release();
                         pToRelease = pOvfl;
                         pPrior = pOvfl.aData;
                         pPriorIndex = 0;
@@ -1448,7 +1449,7 @@ namespace Community.CsharpSqlite
                         pSrc = pData;
                     }
                 }
-                BTreeMethods.releasePage(pToRelease);
+                pToRelease.release();
                 return SqlResult.SQLITE_OK;
             }
 
@@ -1762,7 +1763,7 @@ namespace Community.CsharpSqlite
                 ///Make the parent page writable, so that the new divider cell may be inserted. 
                 ///If both these operations are successful, proceed.
 
-                rc = BTreeMethods.allocateBtreePage(pBt, ref pNew, ref pgnoNew, 0, 0);
+                rc = pBt.allocateBtreePage( ref pNew, ref pgnoNew, 0, 0);
                 if (rc == SqlResult.SQLITE_OK)
                 {
                     int pOut = 4;
@@ -1830,7 +1831,7 @@ namespace Community.CsharpSqlite
                     Converter.sqlite3Put4byte(this.aData, this.hdrOffset + 8, pgnoNew);
                     ///Release the reference to the new page. 
 
-                    BTreeMethods.releasePage(pNew);
+                    pNew.release();
                 }
                 return rc;
             }
@@ -2352,7 +2353,7 @@ namespace Community.CsharpSqlite
                     else
                     {
                         Debug.Assert(i > 0);
-                        rc = BTreeMethods.allocateBtreePage(pBt, ref pNew, ref pgno, pgno, 0);
+                        rc = pBt.allocateBtreePage( ref pNew, ref pgno, pgno, 0);
                         if (rc != 0)
                             goto balance_cleanup;
                         apNew[i] = pNew;
@@ -2387,7 +2388,7 @@ namespace Community.CsharpSqlite
                     apOld[i].freePage( ref rc);
                     if (rc != 0)
                         goto balance_cleanup;
-                    BTreeMethods.releasePage(apOld[i]);
+                    apOld[i].release();
                     apOld[i] = null;
                     i++;
                 }
@@ -2713,20 +2714,17 @@ ptrmapCheckPages(pParent, 1);
                     }
                 Debug.Assert(this.isInit != false);
                 Sqlite3.TRACE("BALANCE: finished: old=%d new=%d cells=%d\n", nOld, nNew, nCell);
-            ///
-            ///<summary>
             ///Cleanup before returning.
-            ///</summary>
 
                 balance_cleanup:
                 malloc_cs.sqlite3ScratchFree(apCell);
                 for (i = 0; i < nOld; i++)
                 {
-                    BTreeMethods.releasePage(apOld[i]);
+                    apOld[i].release();
                 }
                 for (i = 0; i < nNew; i++)
                 {
-                    BTreeMethods.releasePage(apNew[i]);
+                    apNew[i].release();
                 }
                 return rc;
             }
@@ -2761,7 +2759,7 @@ ptrmapCheckPages(pParent, 1);
                 var rc = PagerMethods.sqlite3PagerWrite(this.pDbPage);///Return value from subprocedures 
                 if (rc == SqlResult.SQLITE_OK)
                 {
-                    rc = BTreeMethods.allocateBtreePage(pBt, ref pChild, ref pgnoChild, this.pgno, 0);
+                    rc = pBt.allocateBtreePage( ref pChild, ref pgnoChild, this.pgno, 0);
                     this.copyNodeContentTo(pChild, ref rc);
 #if !SQLITE_OMIT_AUTOVACUUM
                     if (pBt.autoVacuum)
@@ -2774,7 +2772,7 @@ ptrmapCheckPages(pParent, 1);
                 if (rc != 0)
                 {
                     ppChild = null;
-                    BTreeMethods.releasePage(pChild);
+                    BTreeMethods.release(pChild);
                     return rc;
                 }
                 Debug.Assert(pChild.pDbPage.sqlite3PagerIswriteable());
@@ -2917,7 +2915,7 @@ ptrmapCheckPages(pParent, 1);
                     }
                     if (pOvfl != null)
                     {
-                        PagerMethods.sqlite3PagerUnref(pOvfl.pDbPage);
+                        pOvfl.pDbPage.Unref();
                     }
                     if (rc != 0)
                         return rc;

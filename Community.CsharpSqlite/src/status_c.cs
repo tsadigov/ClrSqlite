@@ -7,7 +7,7 @@ namespace Community.CsharpSqlite {
     using Community.CsharpSqlite.Metadata;
     using Community.CsharpSqlite.Paging;
     using Community.CsharpSqlite.Parsing;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using sqlite3_value = Engine.Mem;
     using Vdbe = Engine.Vdbe;

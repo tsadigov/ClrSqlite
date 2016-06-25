@@ -14,7 +14,7 @@ namespace Community.CsharpSqlite.Metadata
     using Community.CsharpSqlite.Parsing;
     using Community.CsharpSqlite.builder;
     using Community.CsharpSqlite.Metadata;
-    using Community.CsharpSqlite.tree;
+    using Community.CsharpSqlite.Tree;
     using Community.CsharpSqlite.Utils;
     using sqlite3_int64 = System.Int64;
     using Engine;
