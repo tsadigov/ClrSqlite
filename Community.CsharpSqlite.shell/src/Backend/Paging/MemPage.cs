@@ -33,6 +33,17 @@ namespace Community.CsharpSqlite
             }
         ///[---hdr|first block location:x-----next block location:y|current free size of x--------next block location:z|crrent free size of y]
 
+
+        public class Offsets
+        {
+            public const int nCell = 3;
+            public const int cellbody = 5;
+            public static int nFrag = 7;
+            public const int firstFreeBlock = 1;
+            public const int SqliteVersion = 96;
+            internal static readonly int ChangeCounter= 92;
+        }
+
         public class MemPage
         {
             public MemPage()
@@ -192,15 +203,7 @@ namespace Community.CsharpSqlite
             public _OvflCell[] aOvfl = new _OvflCell[5];
 
             public tree.BtShared pBt;
-
-            public class Offsets
-            {
-                public const int nCell = 3;
-                public const int cellbody = 5;
-                public static int nFrag = 7;
-                public const int firstFreeBlock=1;
-            }
-
+            
 
             ///<summary>
             ///Pointer to BtShared that this page is part of 
@@ -958,9 +961,9 @@ namespace Community.CsharpSqlite
             {
                 Debug.Assert(this.pBt != null);
                 Debug.Assert(this.pBt.mutex.sqlite3_mutex_held());
-                Debug.Assert(this.pgno == PagerMethods.sqlite3PagerPagenumber(this.pDbPage));
-                Debug.Assert(this == PagerMethods.sqlite3PagerGetExtra(this.pDbPage));
-                Debug.Assert(this.aData == this.pDbPage.sqlite3PagerGetData());
+                Debug.Assert(this.pgno == this.pDbPage.getPageNo());
+                Debug.Assert(this == this.pDbPage.getExtra());
+                Debug.Assert(this.aData == this.pDbPage.getData());
                 if (false == this.isInit)
                 {
                     u16 pc;///Address of a freeblock within pPage.aData[] 
@@ -1088,9 +1091,9 @@ namespace Community.CsharpSqlite
                 BtShared pBt = this.pBt;
                 u8 hdr = this.hdrOffset;
 
-                Debug.Assert(PagerMethods.sqlite3PagerPagenumber(this.pDbPage) == this.pgno);
-                Debug.Assert(PagerMethods.sqlite3PagerGetExtra(this.pDbPage) == this);
-                Debug.Assert(this.pDbPage.sqlite3PagerGetData() == data);
+                Debug.Assert(this.pDbPage.getPageNo() == this.pgno);
+                Debug.Assert(this.pDbPage.getExtra() == this);
+                Debug.Assert(this.pDbPage.getData() == data);
                 Debug.Assert(this.pDbPage.sqlite3PagerIswriteable());
                 Debug.Assert(pBt.mutex.sqlite3_mutex_held());
                 if (pBt.secureDelete)
@@ -2007,7 +2010,7 @@ namespace Community.CsharpSqlite
                 pgno = Converter.sqlite3Get4byte(this.aData, pRight);
                 while (true)
                 {
-                    rc = BTreeMethods.getAndInitPage(pBt, pgno, ref apOld[i]);
+                    rc = pBt.getAndInitPage( pgno, ref apOld[i]);
                     if (rc != 0)
                     {
                         //memset(apOld, 0, (i+1)*sizeof(MemPage*));
@@ -2381,7 +2384,7 @@ namespace Community.CsharpSqlite
 
                 while (i < nOld)
                 {
-                    BTreeMethods.freePage(apOld[i], ref rc);
+                    apOld[i].freePage( ref rc);
                     if (rc != 0)
                         goto balance_cleanup;
                     BTreeMethods.releasePage(apOld[i]);
@@ -2563,7 +2566,7 @@ namespace Community.CsharpSqlite
                     Debug.Assert(nNew == 1);
                     Debug.Assert(apNew[0].nFree == (apNew[0].aData.get2byte(5) - apNew[0].cellOffset - apNew[0].nCell * 2));
                     apNew[0].copyNodeContentTo(this, ref rc);
-                    BTreeMethods.freePage(apNew[0], ref rc);
+                    apNew[0].freePage( ref rc);
                 }
                 else
 #if !SQLITE_OMIT_AUTOVACUUM
@@ -2824,7 +2827,123 @@ ptrmapCheckPages(pParent, 1);
                     aData.put2byte(hdrOffset + Offsets.cellbody, value);
                 }
             }
+            //PagerMethods
+            public void freePage(ref SqlResult pRC)
+            {
+                MemPage pPage = this;
+                if ((pRC) == SqlResult.SQLITE_OK)
+                {
+                    pRC = pPage.pBt.freePage2( pPage, pPage.pgno);
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+            ///
+            ///<summary>
+            ///Free any overflow pages associated with the given Cell.
+            ///</summary>
+            public  SqlResult clearCell( int pCell)
+            {
+                MemPage pPage = this;
+                BtShared pBt = pPage.pBt;
+                CellInfo info = new CellInfo();
+                Pgno ovflPgno;
+                SqlResult rc;
+                int nOvfl;
+                u32 ovflPageSize;
+                Debug.Assert(pPage.pBt.mutex.sqlite3_mutex_held());
+                pPage.btreeParseCellPtr(pCell, ref info);
+                if (info.iOverflow == 0)
+                {
+                    return SqlResult.SQLITE_OK;
+                    ///
+                    ///<summary>
+                    ///No overflow pages. Return without doing anything 
+                    ///</summary>
+                }
+                ovflPgno = Converter.sqlite3Get4byte(pPage.aData, pCell, info.iOverflow);
+                Debug.Assert(pBt.usableSize > 4);
+                ovflPageSize = (u16)(pBt.usableSize - 4);
+                nOvfl = (int)((info.nPayload - info.nLocal + ovflPageSize - 1) / ovflPageSize);
+                Debug.Assert(ovflPgno == 0 || nOvfl > 0);
+                while (nOvfl-- != 0)
+                {
+                    Pgno iNext = 0;
+                    MemPage pOvfl = null;
+                    if (ovflPgno < 2 || ovflPgno > pBt.btreePagecount())
+                    {
+                        ///
+                        ///<summary>
+                        ///0 is not a legal page number and page 1 cannot be an
+                        ///overflow page. Therefore if ovflPgno<2 or past the end of the
+                        ///file the database must be corrupt. 
+                        ///</summary>
+                        return sqliteinth.SQLITE_CORRUPT_BKPT();
+                    }
+                    if (nOvfl != 0)
+                    {
+                        rc = BTreeMethods.getOverflowPage(pBt, ovflPgno, out pOvfl, out iNext);
+                        if (rc != 0)
+                            return rc;
+                    }
+                    if ((pOvfl != null || ((pOvfl = pBt.btreePageLookup(ovflPgno)) != null)) && pOvfl.pDbPage.sqlite3PagerPageRefcount() != 1)
+                    {
+                        ///
+                        ///<summary>
+                        ///There is no reason any cursor should have an outstanding reference 
+                        ///to an overflow page belonging to a cell that is being deleted/updated.
+                        ///So if there exists more than one reference to this page, then it 
+                        ///must not really be an overflow page and the database must be corrupt. 
+                        ///It is helpful to detect this before calling freePage2(), as 
+                        ///</summary>
+                        ///<param name="freePage2() may zero the page contents if secure">delete mode is</param>
+                        ///<param name="enabled. If this 'overflow' page happens to be a page that the">enabled. If this 'overflow' page happens to be a page that the</param>
+                        ///<param name="caller is iterating through or using in some other way, this">caller is iterating through or using in some other way, this</param>
+                        ///<param name="can be problematic.">can be problematic.</param>
+                        ///<param name=""></param>
+                        rc = sqliteinth.SQLITE_CORRUPT_BKPT();
+                    }
+                    else
+                    {
+                        rc = pBt.freePage2(pOvfl, ovflPgno);
+                    }
+                    if (pOvfl != null)
+                    {
+                        PagerMethods.sqlite3PagerUnref(pOvfl.pDbPage);
+                    }
+                    if (rc != 0)
+                        return rc;
+                    ovflPgno = iNext;
+                }
+                return SqlResult.SQLITE_OK;
+            }
+
+
+
+
+
+
+
+
         }
+
+
+
+
+
+
+
+
+
+       
     }
 
         

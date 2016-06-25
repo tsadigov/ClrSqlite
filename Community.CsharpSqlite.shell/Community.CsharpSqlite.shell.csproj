@@ -301,9 +301,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Accessories\Utils\Enum.cs" />
     <Compile Include="src\Accessories\Utils\Error.cs" />
+    <Compile Include="src\Accessories\Utils\LinkedList.cs" />
     <Compile Include="src\Accessories\Utils\Sync.cs" />
     <Compile Include="src\Accessories\Utils\ThreeState.cs" />
     <Compile Include="src\Backend\Cache\Comment.cs" />
+    <Compile Include="src\Backend\Cache\IReferenceCountable.cs" />
     <Compile Include="src\Backend\Cache\PCache1.cs" />
     <Compile Include="src\Backend\Cache\PCacheGlobal.cs" />
     <Compile Include="src\Backend\Cache\PgFreeslot.cs" />
@@ -311,9 +313,12 @@
     <Compile Include="src\Backend\Cache\PgHdr1.cs" />
     <Compile Include="src\Backend\Cache\PGHDR_.cs" />
     <Compile Include="src\Backend\Cache\PGroup.cs" />
+    <Compile Include="src\Backend\Os\Shm.cs" />
     <Compile Include="src\Backend\Paging\FreeSlot.cs" />
     <Compile Include="src\Backend\Paging\PagerState.cs" />
     <Compile Include="src\Backend\Paging\PagingJournalMode.cs" />
+    <Compile Include="src\Backend\tree\BtShared.cpp.cs" />
+    <Compile Include="src\Backend\tree\BtShared.h.cs" />
     <Compile Include="src\CellInfo.cs" />
     <Compile Include="src\Compiler\Ast\Expr.cs" />
     <Compile Include="src\Compiler\Ast\ExprExtensions.cs" />

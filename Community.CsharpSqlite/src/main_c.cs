@@ -366,7 +366,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 ///
 ///</summary>
     // Overloads for ap assignments
-        public static SqlResult sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
+        public static SqlResult sqlite3_config(SqliteConfig op, PCacheController ap)
     {      //  va_list ap;
       SqlResult rc = SqlResult.SQLITE_OK;
       switch ( op )
@@ -374,25 +374,25 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
           case SqliteConfig.PCACHE:
           {
             /* Specify an alternative malloc implementation */
-            sqliteinth.sqlite3GlobalConfig.pcache = ap; //sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)va_arg(ap, "sqlite3_pcache_methods");
+            sqliteinth.sqlite3GlobalConfig.CacheController = ap; //sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)va_arg(ap, "sqlite3_pcache_methods");
             break;
           }
       }
       return rc;
     }
 
-        public static SqlResult sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
+        public static SqlResult sqlite3_config(SqliteConfig op, ref PCacheController ap)
     {      //  va_list ap;
       var rc = SqlResult.SQLITE_OK;
       switch ( op )
       {
           case SqliteConfig.GETPCACHE:
           {
-            if ( sqliteinth.sqlite3GlobalConfig.pcache.xInit == null )
+            if ( sqliteinth.sqlite3GlobalConfig.CacheController.xInit == null )
             {
                             CacheMethods.sqlite3PCacheSetDefault();
             }
-            ap = sqliteinth.sqlite3GlobalConfig.pcache;//va_arg(ap, sqlite3_pcache_methods) = sqlite3GlobalConfig.pcache;
+            ap = sqliteinth.sqlite3GlobalConfig.CacheController;//va_arg(ap, sqlite3_pcache_methods) = sqlite3GlobalConfig.pcache;
             break;
           }
       }
@@ -578,7 +578,7 @@ memset( pHash, 0, sizeof( sqlite3GlobalFunctions ) );
 					break;
 				}
 				case SqliteConfig.GETPCACHE: {
-					if(sqliteinth.sqlite3GlobalConfig.pcache.xInit==null) {
+					if(sqliteinth.sqlite3GlobalConfig.CacheController.xInit==null) {
                                 CacheMethods.sqlite3PCacheSetDefault();
 					}
 					Debugger.Break();

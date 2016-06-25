@@ -75,27 +75,27 @@ namespace Community.CsharpSqlite
             ///</summary>
             public static void sqlite3PCacheBufferSetup(object pBuf, int sz, int n)
             {
-                if (pcache1.isInit)
+                if (s_pcache1.isInit)
                 {
                     PgFreeslot p;
                     sz = sz.ROUNDDOWN8();
-                    pcache1.szSlot = sz;
-                    pcache1.nSlot = pcache1.nFreeSlot = n;
-                    pcache1.nReserve = n > 90 ? 10 : (n / 10 + 1);
-                    pcache1.pStart = null;
-                    pcache1.pEnd = null;
-                    pcache1.pFree = null;
-                    pcache1.bUnderPressure = false;
+                    s_pcache1.szSlot = sz;
+                    s_pcache1.nSlot = s_pcache1.nFreeSlot = n;
+                    s_pcache1.nReserve = n > 90 ? 10 : (n / 10 + 1);
+                    s_pcache1.pStart = null;
+                    s_pcache1.pEnd = null;
+                    s_pcache1.pFree = null;
+                    s_pcache1.bUnderPressure = false;
                     while (n-- > 0)
                     {
                         p = new PgFreeslot();
                         // (PgFreeslot)pBuf;
                         p._PgHdr = new PgHdr();
-                        p.pNext = pcache1.pFree;
-                        pcache1.pFree = p;
+                        p.pNext = s_pcache1.pFree;
+                        s_pcache1.pFree = p;
                         //pBuf = (void)&((char)pBuf)[sz];
                     }
-                    pcache1.pEnd = pBuf;
+                    s_pcache1.pEnd = pBuf;
                 }
             }
 
@@ -112,30 +112,27 @@ namespace Community.CsharpSqlite
             static PgHdr pcache1Alloc(int nByte)
             {
                 PgHdr p = null;
-                Debug.Assert(pcache1.grp.mutex.sqlite3_mutex_notheld());
+                Debug.Assert(s_pcache1.grp.mutex.sqlite3_mutex_notheld());
                 Sqlite3.sqlite3StatusSet(SqliteStatus.SQLITE_STATUS_PAGECACHE_SIZE, nByte);
-                if (nByte <= pcache1.szSlot)
+                if (nByte <= s_pcache1.szSlot)
                 {
-                    pcache1.mutex.Enter();
-                    p = pcache1.pFree._PgHdr;
-                    if (p != null)
+                    using (s_pcache1.mutex.scope())
                     {
-                        pcache1.pFree = pcache1.pFree.pNext;
-                        pcache1.nFreeSlot--;
-                        pcache1.bUnderPressure = pcache1.nFreeSlot < pcache1.nReserve;
-                        Debug.Assert(pcache1.nFreeSlot >= 0);
-                        Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_USED, 1);
+                        p = s_pcache1.pFree._PgHdr;
+                        if (p != null)
+                        {
+                            s_pcache1.pFree = s_pcache1.pFree.pNext;
+                            s_pcache1.nFreeSlot--;
+                            s_pcache1.bUnderPressure = s_pcache1.nFreeSlot < s_pcache1.nReserve;
+                            Debug.Assert(s_pcache1.nFreeSlot >= 0);
+                            Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_USED, 1);
+                        }
                     }
-                    pcache1.mutex.Exit();
                 }
                 if (p == null)
                 {
-                    ///
-                    ///<summary>
                     ///Memory is not available in the SQLITE_CONFIG_PAGECACHE pool.  Get
                     ///it from malloc_cs.sqlite3Malloc instead.
-                    ///
-                    ///</summary>
 
                     p = new PgHdr();
                     // malloc_cs.sqlite3Malloc( nByte );
@@ -143,9 +140,9 @@ namespace Community.CsharpSqlite
                     {
                         int sz = nByte;
                         //malloc_cs.sqlite3MallocSize( p );
-                        pcache1.mutex.Enter();
+                        s_pcache1.mutex.Enter();
                         Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_OVERFLOW, sz);
-                        pcache1.mutex.Exit();
+                        s_pcache1.mutex.Exit();
                     }
                     sqliteinth.sqlite3MemdebugSetType(p, MemType.PCACHE);
                 }
@@ -163,26 +160,26 @@ namespace Community.CsharpSqlite
                 if (p.CacheAllocated)//if ( p >= pcache1.pStart && p < pcache1.pEnd )
                 {
                     PgFreeslot pSlot = new PgFreeslot();
-                    pcache1.mutex.Enter();
+                    s_pcache1.mutex.Enter();
                     Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_USED, -1);
                     pSlot._PgHdr = p;
                     // pSlot = (PgFreeslot)p;
-                    pSlot.pNext = pcache1.pFree;
-                    pcache1.pFree = pSlot;
-                    pcache1.nFreeSlot++;
-                    pcache1.bUnderPressure = pcache1.nFreeSlot < pcache1.nReserve;
-                    Debug.Assert(pcache1.nFreeSlot <= pcache1.nSlot);
-                    pcache1.mutex.Exit();
+                    pSlot.pNext = s_pcache1.pFree;
+                    s_pcache1.pFree = pSlot;
+                    s_pcache1.nFreeSlot++;
+                    s_pcache1.bUnderPressure = s_pcache1.nFreeSlot < s_pcache1.nReserve;
+                    Debug.Assert(s_pcache1.nFreeSlot <= s_pcache1.nSlot);
+                    s_pcache1.mutex.Exit();
                 }
                 else {
                     int iSize;
                     Debug.Assert(sqliteinth.sqlite3MemdebugHasType(p, MemType.PCACHE));
                     sqliteinth.sqlite3MemdebugSetType(p, MemType.HEAP);
-                    iSize = malloc_cs.sqlite3MallocSize(p.pData);
-                    pcache1.mutex.Enter();
+                    iSize = malloc_cs.sqlite3MallocSize(p.buffer);
+                    s_pcache1.mutex.Enter();
                     Sqlite3.sqlite3StatusAdd(SqliteStatus.SQLITE_STATUS_PAGECACHE_OVERFLOW, -iSize);
-                    pcache1.mutex.Exit();
-                    malloc_cs.sqlite3_free(ref p.pData);
+                    s_pcache1.mutex.Exit();
+                    malloc_cs.sqlite3_free(ref p.buffer);
                 }
             }
 
@@ -224,14 +221,14 @@ static int pcache1MemSize(object p){
             ///</summary>
 
             //#define pcache1 (GLOBAL(struct PCacheGlobal, pcache1_g))
-            static PCacheGlobal pcache1 = pcache;
+            static PCacheGlobal s_pcache1 = pcache;
 
 
 
             ///<summary>
             /// Allocate a new page object initially associated with cache pCache.
             ///</summary>
-            static PgHdr1 pcache1AllocPage(PCache1 pCache)
+            static PgHdr1 AllocPage(PCache1 pCache)
             {
                 //int nByte = sizeof( PgHdr1 ) + pCache.szPage;
                 PgHdr pPg = pcache1Alloc(pCache.szPage);
@@ -240,9 +237,11 @@ static int pcache1MemSize(object p){
                 //if ( pPg !=null)
                 {
                     //PAGE_TO_PGHDR1( pCache, pPg );
-                    p = new PgHdr1();
-                    p.pCache = pCache;
-                    p.pPgHdr = pPg;
+                    p = new PgHdr1()
+                    {
+                        pCache = pCache,
+                        pPgHdr = pPg
+                    };
                     if (pCache.bPurgeable)
                     {
                         pCache.pGroup.nCurrentPage++;
@@ -327,9 +326,9 @@ static int pcache1MemSize(object p){
 
             static bool pcache1UnderMemoryPressure(PCache1 pCache)
             {
-                if (pcache1.nSlot != 0 && pCache.szPage <= pcache1.szSlot)
+                if (s_pcache1.nSlot != 0 && pCache.szPage <= s_pcache1.szSlot)
                 {
-                    return pcache1.bUnderPressure;
+                    return s_pcache1.bUnderPressure;
                 }
                 else {
                     return malloc_cs.sqlite3HeapNearlyFull();
@@ -448,18 +447,17 @@ static int pcache1MemSize(object p){
             ///</summary>
             static void pcache1RemoveFromHash(PgHdr1 pPage)
             {
-                int h;
                 PCache1 pCache = pPage.pCache;
-                PgHdr1 pp;
-                PgHdr1 pPrev = null;
                 Debug.Assert(pCache.pGroup.mutex.sqlite3_mutex_held());
-                h = (int)(pPage.iKey % pCache.nHash);
-                for (pp = pCache.apHash[h]; pp != pPage; pPrev = pp, pp = pp.pNext)
-                    ;
+                var h = (int)(pPage.iKey % pCache.nHash);
+                
+                var pPrev = pCache.apHash[h].linkedList().FirstOrDefault(p=>pPage==p.pNext);
+
+                
                 if (pPrev == null)
-                    pCache.apHash[h] = pp.pNext;
+                    pCache.apHash[h] = pPage.pNext;
                 else
-                    pPrev.pNext = pp.pNext;
+                    pPrev.pNext = pPage.pNext;
                 // pCache.apHash[h] = pp.pNext;
                 pCache.nPage--;
             }
@@ -556,16 +554,16 @@ static int pcache1MemSize(object p){
             static SqlResult pcache1Init<T>(T NotUsed)
             {
                 sqliteinth.UNUSED_PARAMETER(NotUsed);
-                Debug.Assert(pcache1.isInit == false);
-                pcache1 = new PCacheGlobal();
+                Debug.Assert(s_pcache1.isInit == false);
+                s_pcache1 = new PCacheGlobal();
                 //memset(&pcache1, 0, sizeof(pcache1));
                 if (sqliteinth.sqlite3GlobalConfig.bCoreMutex)
                 {
-                    pcache1.grp.mutex = Sqlite3.sqlite3_mutex_alloc(Sqlite3.SQLITE_MUTEX_STATIC_LRU);
-                    pcache1.mutex = Sqlite3.sqlite3_mutex_alloc(Sqlite3.SQLITE_MUTEX_STATIC_PMEM);
+                    s_pcache1.grp.mutex = Sqlite3.sqlite3_mutex_alloc(Sqlite3.SQLITE_MUTEX_STATIC_LRU);
+                    s_pcache1.mutex = Sqlite3.sqlite3_mutex_alloc(Sqlite3.SQLITE_MUTEX_STATIC_PMEM);
                 }
-                pcache1.grp.mxPinned = 10;
-                pcache1.isInit = true;
+                s_pcache1.grp.mxPinned = 10;
+                s_pcache1.isInit = true;
                 return SqlResult.SQLITE_OK;
             }
 
@@ -578,51 +576,25 @@ static int pcache1MemSize(object p){
             static void pcache1Shutdown<T>(T NotUsed)
             {
                 sqliteinth.UNUSED_PARAMETER(NotUsed);
-                Debug.Assert(pcache1.isInit);
-                pcache1 = new PCacheGlobal();
+                Debug.Assert(s_pcache1.isInit);
+                s_pcache1 = new PCacheGlobal();
                 //;memset( &pcache1, 0, sizeof( pcache1 ) );
             }
 
             ///<summary>
             /// Implementation of the sqlite3_pcache.xCreate method.
-            ///
             /// Allocate a new cache.
-            ///
             ///</summary>
-            static sqlite3_pcache pcache1Create(int szPage, bool bPurgeable)
+            static PCache1 pcache1Create(int szPage, bool bPurgeable)
             {
-                PCache1 pCache;
-                ///
-                ///<summary>
-                ///The newly created page cache 
-                ///</summary>
 
-                PGroup pGroup;
-                ///
-                ///<summary>
-                ///The group the new page cache will belong to 
-                ///</summary>
-
-                int sz;
-                ///
-                ///<summary>
-                ///Bytes of memory required to allocate the new cache 
-                ///</summary>
-
-                ///
-                ///<summary>
                 ///The seperateCache variable is true if each PCache has its own private
                 ///PGroup.  In other words, separateCache is true for mode (1) where no
                 ///mutexing is required.
-                ///
-                ///</summary>
-                ///<param name="Always use a unified cache (mode">2) if ENABLE_MEMORY_MANAGEMENT</param>
-                ///<param name=""></param>
-                ///<param name="Always use a unified cache in single">threaded applications</param>
-                ///<param name=""></param>
-                ///<param name="Otherwise (if multi">threaded and ENABLE_MEMORY_MANAGEMENT is off)</param>
-                ///<param name="use separate caches (mode">1)</param>
-                ///<param name=""></param>
+                ///Always use a unified cache (mode>2) if ENABLE_MEMORY_MANAGEMENT
+                ///Always use a unified cache in single-threaded applications
+                ///Otherwise (if multi-threaded and ENABLE_MEMORY_MANAGEMENT is off)
+                ///use separate caches (mode">1)
 
 #if (SQLITE_ENABLE_MEMORY_MANAGEMENT) || !SQLITE_THREADSAF
                 const int separateCache = 0;
@@ -630,33 +602,39 @@ static int pcache1MemSize(object p){
 																																																									  int separateCache = sqliteinth.sqlite3GlobalConfig.bCoreMutex>0;
 #endif
                 //sz = sizeof( PCache1 ) + sizeof( PGroup ) * separateCache;
-                pCache = new PCache1();
+
+                PGroup pGroup;///The group the new page cache will belong to 
+
                 //(PCache1)sqlite3_malloc( sz );
                 //if ( pCache != null )
+                //{
+                //memset( pCache, 0, sz );
+                if (separateCache != 0)
                 {
-                    //memset( pCache, 0, sz );
-                    if (separateCache != 0)
+                    //pGroup = new PGroup();//(PGroup)pCache[1];
+                    //pGroup.mxPinned = 10;
+                }
+                else {
+                    pGroup = s_pcache1.grp;
+                }
+
+                var pCache = new PCache1() {///The newly created page cache
+                    pGroup = pGroup,
+                    szPage = szPage,
+                    bPurgeable = bPurgeable
+                };
+                //( bPurgeable ? 1 : 0 );
+                if (bPurgeable)
+                {
+                    pCache.nMin = 10;
+                    using (pGroup.mutex.scope())
                     {
-                        //pGroup = new PGroup();//(PGroup)pCache[1];
-                        //pGroup.mxPinned = 10;
-                    }
-                    else {
-                        pGroup = pcache1.grp;
-                    }
-                    pCache.pGroup = pGroup;
-                    pCache.szPage = szPage;
-                    pCache.bPurgeable = bPurgeable;
-                    //( bPurgeable ? 1 : 0 );
-                    if (bPurgeable)
-                    {
-                        pCache.nMin = 10;
-                        pcache1EnterMutex(pGroup);
                         pGroup.nMinPage += (int)pCache.nMin;
                         pGroup.mxPinned = pGroup.nMaxPage + 10 - pGroup.nMinPage;
-                        pcache1LeaveMutex(pGroup);
                     }
                 }
-                return (sqlite3_pcache)pCache;
+                //}
+                return pCache;
             }
 
             ///<summary>
@@ -671,13 +649,14 @@ static int pcache1MemSize(object p){
                 if (pCache.bPurgeable)
                 {
                     PGroup pGroup = pCache.pGroup;
-                    pcache1EnterMutex(pGroup);
-                    pGroup.nMaxPage += nMax - pCache.nMax;
-                    pGroup.mxPinned = pGroup.nMaxPage + 10 - pGroup.nMinPage;
-                    pCache.nMax = nMax;
-                    pCache.n90pct = pCache.nMax * 9 / 10;
-                    pcache1EnforceMaxPage(pGroup);
-                    pcache1LeaveMutex(pGroup);
+                    using (pGroup.mutex.scope())
+                    {
+                        pGroup.nMaxPage += nMax - pCache.nMax;
+                        pGroup.mxPinned = pGroup.nMaxPage + 10 - pGroup.nMinPage;
+                        pCache.nMax = nMax;
+                        pCache.n90pct = pCache.nMax * 9 / 10;
+                        pcache1EnforceMaxPage(pGroup);
+                    }
                 }
             }
 
@@ -688,10 +667,10 @@ static int pcache1MemSize(object p){
             static int pcache1Pagecount(sqlite3_pcache p)
             {
                 int n;
-                PCache1 pCache = (PCache1)p;
-                pcache1EnterMutex(pCache.pGroup);
-                n = (int)pCache.nPage;
-                pcache1LeaveMutex(pCache.pGroup);
+                using (p.pGroup.mutex.scope())
+                {
+                    n = (int)p.nPage;
+                }
                 return n;
             }
 
@@ -751,20 +730,17 @@ static int pcache1MemSize(object p){
             ///
             ///</summary>
             static PgHdr pcache1Fetch(sqlite3_pcache p, Pgno iKey, int createFlag)
-            {
-                int nPinned;
+            {   
                 PCache1 pCache = (PCache1)p;
-                PGroup pGroup;
+                
                 PgHdr1 pPage = null;
                 Debug.Assert(pCache.bPurgeable || createFlag != 1);
                 Debug.Assert(pCache.bPurgeable || pCache.nMin == 0);
                 Debug.Assert(pCache.bPurgeable == false || pCache.nMin == 10);
                 Debug.Assert(pCache.nMin == 0 || pCache.bPurgeable);
+                PGroup pGroup;
                 pcache1EnterMutex(pGroup = pCache.pGroup);
-                ///
-                ///<summary>
                 ///Step 1: Search the hash table for an existing entry. 
-                ///</summary>
 
                 if (pCache.nHash > 0)
                 {
@@ -773,21 +749,15 @@ static int pcache1MemSize(object p){
                         .linkedList()                        
                         .FirstOrDefault(x=>x.iKey == iKey);                    
                 }
-                ///
-                ///<summary>
                 ///Step 2: Abort if no existing page is found and createFlag is 0 
-                ///</summary>
 
                 if (pPage != null || createFlag == 0)
                 {
                     pcache1PinPage(pPage);
                     goto fetch_out;
                 }
-                ///
-                ///<summary>
                 ///The pGroup local variable will normally be initialized by the
                 ///pcache1EnterMutex() macro above.  But if SQLITE_MUTEX_OMIT is defined,
-                ///</summary>
                 ///<param name="then pcache1EnterMutex() is a no">op, so we have to initialize the</param>
                 ///<param name="local variable here.  Delaying the initialization of pGroup is an">local variable here.  Delaying the initialization of pGroup is an</param>
                 ///<param name="optimization:  The common case is to exit the module before reaching">optimization:  The common case is to exit the module before reaching</param>
@@ -797,12 +767,9 @@ static int pcache1MemSize(object p){
 #if SQLITE_MUTEX_OMIT
                 pGroup = pCache.pGroup;
 #endif
-                ///
-                ///<summary>
                 ///Step 3: Abort if createFlag is 1 but the cache is nearly full 
-                ///</summary>
 
-                nPinned = pCache.nPage - pCache.nRecyclable;
+                var nPinned = pCache.nPage - pCache.nRecyclable;
                 Debug.Assert(nPinned >= 0);
                 Debug.Assert(pGroup.mxPinned == pGroup.nMaxPage + 10 - pGroup.nMinPage);
                 Debug.Assert(pCache.n90pct == pCache.nMax * 9 / 10);
@@ -814,10 +781,7 @@ static int pcache1MemSize(object p){
                 {
                     goto fetch_out;
                 }
-                ///
-                ///<summary>
                 ///Step 4. Try to recycle a page. 
-                ///</summary>
 
                 if (pCache.bPurgeable && pGroup.pLruTail != null && ((pCache.nPage + 1 >= pCache.nMax) || pGroup.nCurrentPage >= pGroup.nMaxPage || pcache1UnderMemoryPressure(pCache)))
                 {
@@ -834,19 +798,15 @@ static int pcache1MemSize(object p){
                         pGroup.nCurrentPage -= (pOtherCache.bPurgeable ? 1 : 0) - (pCache.bPurgeable ? 1 : 0);
                     }
                 }
-                ///
-                ///<summary>
                 ///Step 5. If a usable page buffer has still not been found, 
                 ///attempt to allocate a new one. 
-                ///
-                ///</summary>
 
                 if (null == pPage)
                 {
                     if (createFlag == 1)
                         Sqlite3.sqlite3BeginBenignMalloc();
                     pcache1LeaveMutex(pGroup);
-                    pPage = pcache1AllocPage(pCache);
+                    pPage = AllocPage(pCache);
                     pcache1EnterMutex(pGroup);
                     if (createFlag == 1)
                         Sqlite3.sqlite3EndBenignMalloc();
@@ -880,46 +840,40 @@ static int pcache1MemSize(object p){
             /// Mark a page as unpinned (eligible for asynchronous recycling).
             ///
             ///</summary>
-            static void pcache1Unpin(sqlite3_pcache p, PgHdr pPg, bool reuseUnlikely)
+            static void Unpin(PCache1 pCache, PgHdr pPg, bool reuseUnlikely)
             {
-                PCache1 pCache = (PCache1)p;
+                
                 PgHdr1 pPage = PAGE_TO_PGHDR1(pCache, pPg);
                 PGroup pGroup = pCache.pGroup;
                 Debug.Assert(pPage.pCache == pCache);
-                pcache1EnterMutex(pGroup);
-                ///
-                ///<summary>
-                ///It is an error to call this function if the page is already 
-                ///part of the PGroup LRU list.
-                ///
-                ///</summary>
-
-                Debug.Assert(pPage.pLruPrev == null && pPage.pLruNext == null);
-                Debug.Assert(pGroup.pLruHead != pPage && pGroup.pLruTail != pPage);
-                if (reuseUnlikely || pGroup.nCurrentPage > pGroup.nMaxPage)
+                using (pGroup.mutex.scope())
                 {
-                    pcache1RemoveFromHash(pPage);
-                    pcache1FreePage(ref pPage);
-                }
-                else {
-                    ///
-                    ///<summary>
-                    ///Add the page to the PGroup LRU list. 
-                    ///</summary>
+                    ///It is an error to call this function if the page is already 
+                    ///part of the PGroup LRU list.
 
-                    if (pGroup.pLruHead != null)
+                    Debug.Assert(pPage.pLruPrev == null && pPage.pLruNext == null);
+                    Debug.Assert(pGroup.pLruHead != pPage && pGroup.pLruTail != pPage);
+                    if (reuseUnlikely || pGroup.nCurrentPage > pGroup.nMaxPage)
                     {
-                        pGroup.pLruHead.pLruPrev = pPage;
-                        pPage.pLruNext = pGroup.pLruHead;
-                        pGroup.pLruHead = pPage;
+                        pcache1RemoveFromHash(pPage);
+                        pcache1FreePage(ref pPage);
                     }
                     else {
-                        pGroup.pLruTail = pPage;
-                        pGroup.pLruHead = pPage;
+                        ///Add the page to the PGroup LRU list. 
+
+                        if (pGroup.pLruHead != null)
+                        {
+                            pGroup.pLruHead.pLruPrev = pPage;
+                            pPage.pLruNext = pGroup.pLruHead;
+                            pGroup.pLruHead = pPage;
+                        }
+                        else {
+                            pGroup.pLruTail = pPage;
+                            pGroup.pLruHead = pPage;
+                        }
+                        pCache.nRecyclable++;
                     }
-                    pCache.nRecyclable++;
                 }
-                pcache1LeaveMutex(pCache.pGroup);
             }
 
             ///<summary>
@@ -1010,40 +964,19 @@ static int pcache1MemSize(object p){
             public static void sqlite3PCacheSetDefault()
 
             {
-                sqlite3_pcache_methods defaultMethods = new sqlite3_pcache_methods(
+                PCacheController defaultMethods = new PCacheController(
                 ///pArg 
                 0, ///
-                   ///xInit 
-
-                (dxPC_Init)pcache1Init, ///
-                                        ///xShutdown 
-
-                (dxPC_Shutdown)pcache1Shutdown, ///
-                                                ///xCreate 
-
-                (dxPC_Create)pcache1Create, ///
-                                            ///xCachesize 
-
-                (dxPC_Cachesize)pcache1Cachesize, ///
-                                                  ///xPagecount 
-
-                (dxPC_Pagecount)pcache1Pagecount, ///
-                                                  ///xFetch 
-
-                (dxPC_Fetch)pcache1Fetch, ///
-                                          ///xUnpin 
-
-                (dxPC_Unpin)pcache1Unpin, ///
-                                          ///xRekey 
-
-                (dxPC_Rekey)pcache1Rekey, ///
-                                          ///xTruncate 
-
-                (dxPC_Truncate)pcache1Truncate, ///
-                                                ///xDestroy 
-
-                (dxPC_Destroy)pcache1Destroy///
-
+                (dxPC_Init)pcache1Init, ///xInit 
+                (dxPC_Shutdown)pcache1Shutdown, ///xShutdown 
+                (dxPC_Create)pcache1Create,  ///xCreate 
+                (dxPC_Cachesize)pcache1Cachesize, ///xCachesize 
+                (dxPC_Pagecount)pcache1Pagecount, ///xPagecount 
+                (dxPC_Fetch)pcache1Fetch,  ///xFetch 
+                (dxPC_Unpin)Unpin, ///xUnpin 
+                (dxPC_Rekey)pcache1Rekey, ///xRekey 
+                (dxPC_Truncate)pcache1Truncate,  ///xTruncate 
+                (dxPC_Destroy)pcache1Destroy///xDestroy 
                 );
                 Sqlite3.sqlite3_config(SqliteConfig.PCACHE, defaultMethods);
             }

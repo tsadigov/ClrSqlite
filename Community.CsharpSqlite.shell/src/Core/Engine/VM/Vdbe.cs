@@ -2064,8 +2064,8 @@ start = sqlite3Hwtime();
                         ///Call the progress callback if it is configured and the required number
                         ///of VDBE ops have been executed (either since this invocation of
                         ///sqlite3VdbeExec() or since last time the progress callback was called).
-                        ///<param name="If the progress callback returns non">zero, exit the virtual machine with</param>
-                        ///<param name="a return code SQLITE_ABORT.">a return code SQLITE_ABORT.</param>
+                        ///If the progress callback returns non-zero, exit the virtual machine with
+                        ///a return code SQLITE_ABORT.
                         if (checkProgress)
                         {
                             if (db.nProgressOps == nProgressOps)
@@ -2210,32 +2210,20 @@ start = sqlite3Hwtime();
                                     {
                                         ///A buffer to hold the data for the new record 
                                         byte[] zNewRecord;
-                                        Mem pRec;
-                                        ///The new record 
-                                        u64 nData;
-                                        ///Number of bytes of data space 
-                                        int nHdr;
-                                        ///Number of bytes of header space 
                                         i64 nByte;
                                         ///Data space required for this record 
-                                        int nZero;
-                                        ///Number of zero bytes at the end of the record 
                                         int nVarint;
                                         ///Number of bytes in a varint 
-                                        u32 serial_type;
-                                        ///Type field 
                                         //Mem pData0;            /* First field to be combined into the record */
                                         //Mem pLast;             /* Last field of the record */
-                                        int nField;
-                                        ///Number of fields in the record 
+                                         
                                         string zAffinity;
                                         ///The affinity string for the record 
                                         int file_format;
                                         ///File format to use for encoding 
                                         int i;
                                         ///Space used in zNewRecord[] 
-                                        int len;
-                                        ///Length of a field 
+                                        
                                         ///Assuming the record contains N fields, the record format looks
                                         ///like this:
                                         ///<param name=""></param>
@@ -2249,13 +2237,11 @@ start = sqlite3Hwtime();
                                         ///<param name="corresponding data element (see sqlite3VdbeSerialType()). The">corresponding data element (see sqlite3VdbeSerialType()). The</param>
                                         ///<param name="hdr">size field is also a varint which is the offset from the beginning</param>
                                         ///<param name="of the record to data0.">of the record to data0.</param>
-                                        nData = 0;
-                                        ///Number of bytes of data space 
-                                        nHdr = 0;
-                                        ///Number of bytes of header space 
-                                        nZero = 0;
-                                        ///Number of zero bytes at the end of the record 
-                                        nField = pOp.p1;
+                                        u64 nData = 0;///Number of bytes of data space 
+                                                      ///Number of bytes of data space 
+                                        int nHdr = 0;///Number of bytes of header space 
+                                        int nZero = 0;///Number of zero bytes at the end of the record 
+                                        int nField = pOp.p1;///Number of fields in the record
                                         zAffinity = (pOp.p4.z == null || pOp.p4.z.Length == 0) ? "" : pOp.p4.z;
                                         Debug.Assert(nField > 0 && pOp.p2 > 0 && pOp.p2 + nField <= this.aMem.Count() + 1);
                                         //pData0 = aMem[nField];
@@ -2271,7 +2257,7 @@ start = sqlite3Hwtime();
                                         //for (pRec = pData0; pRec <= pLast; pRec++)
                                         for (int pD0 = 0; pD0 < nField; pD0++)
                                         {
-                                            pRec = this.aMem[pOp.p1 + pD0];
+                                            var pRec = this.aMem[pOp.p1 + pD0];
                                             Debug.Assert(pRec.memIsValid());
                                             if (pD0 < zAffinity.Length && zAffinity[pD0] != '\0')
                                             {
@@ -2281,17 +2267,14 @@ start = sqlite3Hwtime();
                                             {
                                                 pRec.sqlite3VdbeMemExpandBlob();
                                             }
-                                            serial_type = vdbeaux.sqlite3VdbeSerialType(pRec, file_format);
-                                            len = (int)vdbeaux.sqlite3VdbeSerialTypeLen(serial_type);
+                                            var serial_type = vdbeaux.sqlite3VdbeSerialType(pRec, file_format);
+                                            var len = (int)vdbeaux.sqlite3VdbeSerialTypeLen(serial_type);
                                             nData += (u64)len;
                                             nHdr += utilc.sqlite3VarintLen(serial_type);
                                             if ((pRec.flags & MemFlags.MEM_Zero) != 0)
                                             {
-                                                ///
-                                                ///<summary>
-                                                ///</summary>
-                                                ///<param name="Only pure zero">filled BLOBs can be input to this Opcode.</param>
-                                                ///<param name="We do not allow blobs with a prefix and a zero">filled tail. </param>
+                                                ///Only pure zero">filled BLOBs can be input to this Opcode.</param>
+                                                ///We do not allow blobs with a prefix and a zero-filled tail. </param>
                                                 nZero += pRec.u.nZero;
                                             }
                                             else
@@ -2300,10 +2283,7 @@ start = sqlite3Hwtime();
                                                 nZero = 0;
                                             }
                                         }
-                                        ///
-                                        ///<summary>
                                         ///Add the initial header varint and total the size 
-                                        ///</summary>
                                         nHdr += nVarint = utilc.sqlite3VarintLen((u64)nHdr);
                                         if (nVarint < utilc.sqlite3VarintLen((u64)nHdr))
                                         {
@@ -2314,42 +2294,31 @@ start = sqlite3Hwtime();
                                         {
                                             return (SqlResult)ColumnResult.too_big;
                                         }
-                                        ///
-                                        ///<summary>
                                         ///Make sure the output register has a buffer large enough to store
                                         ///the new record. The output register (pOp.p3) is not allowed to
                                         ///be one of the input registers (because the following call to
                                         ///sqlite3VdbeMemGrow() could clobber the value before it is used).
-                                        ///
-                                        ///</summary>
+                                        
                                         //if ( sqlite3VdbeMemGrow( pOut, (int)nByte, 0 ) != 0 )
                                         //{
                                         //  goto no_mem;
                                         //}
                                         zNewRecord = malloc_cs.sqlite3Malloc((int)nByte);
                                         // (u8 )pOut.z;
-                                        ///
-                                        ///<summary>
+                                        
                                         ///Write the record 
-                                        ///</summary>
                                         i = utilc.putVarint32(zNewRecord, nHdr);
                                         for (int pD0 = 0; pD0 < nField; pD0++)//for (pRec = pData0; pRec <= pLast; pRec++)
                                         {
-                                            pRec = this.aMem[pOp.p1 + pD0];
-                                            serial_type = vdbeaux.sqlite3VdbeSerialType(pRec, file_format);
+                                            var pRec = this.aMem[pOp.p1 + pD0];
+                                            var serial_type = vdbeaux.sqlite3VdbeSerialType(pRec, file_format);
                                             i += utilc.putVarint32(zNewRecord, i, (int)serial_type);
-                                            ///
-                                            ///<summary>
                                             ///serial type 
-                                            ///</summary>
                                         }
                                         for (int pD0 = 0; pD0 < nField; pD0++)//for (pRec = pData0; pRec <= pLast; pRec++)
                                         {
-                                            ///
-                                            ///<summary>
                                             ///serial data 
-                                            ///</summary>
-                                            pRec = this.aMem[pOp.p1 + pD0];
+                                            var pRec = this.aMem[pOp.p1 + pD0];
                                             i += (int)vdbeaux.sqlite3VdbeSerialPut(zNewRecord, i, (int)nByte - i, pRec, file_format);
                                         }
                                         //TODO -- Remove this  for testing Debug.Assert( i == nByte );
@@ -2365,10 +2334,7 @@ start = sqlite3Hwtime();
                                             pOut.flags |= MemFlags.MEM_Zero;
                                         }
                                         pOut.enc = SqliteEncoding.UTF8;
-                                        ///
-                                        ///<summary>
                                         ///In case the blob is ever converted to text 
-                                        ///</summary>
                                         Sqlite3.REGISTER_TRACE(this, pOp.p3, pOut);
 #if SQLITE_TEST
 																																																																																																																																				              UPDATE_MAX_BLOBSIZE( pOut );
@@ -3038,61 +3004,51 @@ start = sqlite3Hwtime();
                                 ///</summary>
                                 case OpCode.OP_Rowid:
                                     {
-                                        ///
-                                        ///<summary>
-                                        ///</summary>
                                         ///<param name="out2">prerelease </param>
-                                        VdbeCursor pC;
-                                        i64 v;
-                                        sqlite3_vtab pVtab;
-                                        sqlite3_module pModule;
-                                        v = 0;
+                                        i64 result = 0;
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < this.nCursor);
-                                        pC = this.OpenCursors[pOp.p1];
-                                        Debug.Assert(pC != null);
-                                        Debug.Assert(pC.pseudoTableReg == 0);
-                                        if (pC.nullRow)
+                                        var pCursor = this.OpenCursors[pOp.p1];
+                                        Debug.Assert(pCursor != null);
+                                        Debug.Assert(pCursor.pseudoTableReg == 0);
+                                        if (pCursor.nullRow)
                                         {
                                             pOut.flags = MemFlags.MEM_Null;
                                             break;
                                         }
                                         else
-                                            if (pC.deferredMoveto)
+                                            if (pCursor.deferredMoveto)
                                         {
-                                            v = pC.movetoTarget;
+                                            result = pCursor.movetoTarget;
 #if !SQLITE_OMIT_VIRTUALTABLE
                                         }
                                         else
-                                                if (pC.pVtabCursor != null)
+                                                if (pCursor.pVtabCursor != null)
                                         {
-                                            pVtab = pC.pVtabCursor.pVtab;
-                                            pModule = pVtab.pModule;
+                                            var pVtab = pCursor.pVtabCursor.pVtab;
+                                            var pModule = pVtab.pModule;
                                             Debug.Assert(pModule.xRowid != null);
-                                            rc = pModule.xRowid(pC.pVtabCursor, out v);
+                                            rc = pModule.xRowid(pCursor.pVtabCursor, out result);
                                             Sqlite3.importVtabErrMsg(this, pVtab);
 #endif
                                         }
                                         else
                                         {
-                                            Debug.Assert(pC.pCursor != null);
-                                            rc = vdbeaux.sqlite3VdbeCursorMoveto(pC);
+                                            Debug.Assert(pCursor.pCursor != null);
+                                            rc = vdbeaux.sqlite3VdbeCursorMoveto(pCursor);
                                             if (rc != 0)
                                                 goto abort_due_to_error;
-                                            if (pC.rowidIsValid)
+                                            if (pCursor.rowidIsValid)
                                             {
-                                                v = pC.lastRowid;
+                                                result = pCursor.lastRowid;
                                             }
                                             else
                                             {
-                                                rc = pC.pCursor.sqlite3BtreeKeySize(ref v);
+                                                rc = pCursor.pCursor.sqlite3BtreeKeySize(ref result);
                                                 Debug.Assert(rc == SqlResult.SQLITE_OK);
-                                                ///
-                                                ///<summary>
                                                 ///Always so because of CursorMoveto() above 
-                                                ///</summary>
                                             }
                                         }
-                                        pOut.u.AsInteger = (long)v;
+                                        pOut.u.AsInteger = (long)result;
                                         break;
                                     }
 

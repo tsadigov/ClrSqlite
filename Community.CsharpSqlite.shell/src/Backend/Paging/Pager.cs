@@ -2150,7 +2150,7 @@ PagerMethods.sqlite3PagerUnref(p);
                             Debug.Assert(isSavepnt != 0);
                             Debug.Assert(this.doNotSpill == 0);
                             this.doNotSpill++;
-                            rc = this.sqlite3PagerAcquire(pgno, ref pPg, 1);
+                            rc = this.Acquire(pgno, ref pPg, 1);
                             Debug.Assert(this.doNotSpill == 1);
                             this.doNotSpill--;
                             if (rc != SqlResult.SQLITE_OK)
@@ -2170,7 +2170,7 @@ PagerMethods.sqlite3PagerUnref(p);
                         ///
                         ///</summary>
 
-                        byte[] pData = pPg.pData;
+                        byte[] pData = pPg.buffer;
                         Buffer.BlockCopy(aData, 0, pData, 0, this.pageSize);
                         // memcpy(pData, (u8[])aData, pPager.pageSize);
                         this.xReiniter(pPg);
@@ -3936,7 +3936,7 @@ pPager.pWal = 0;
                                 pList.pager_write_changecounter();
                             ///Encode the database 
 
-                            if (PagerMethods.CODEC2(this, pList.pData, pgno, crypto.SQLITE_ENCRYPT_WRITE_CTX, ref pData))
+                            if (PagerMethods.CODEC2(this, pList.buffer, pgno, crypto.SQLITE_ENCRYPT_WRITE_CTX, ref pData))
                                 return SqlResult.SQLITE_NOMEM;
                             //     PagerMethods.CODEC2(pPager, pList.pData, pgno, 6, return SQLITE_NOMEM, pData);
                             ///Write out the page data. 
@@ -3957,7 +3957,7 @@ pPager.pWal = 0;
                             }
                             ///Update any backup objects copying the contents of this pager. 
 
-                            this.pBackup.sqlite3BackupUpdate(pgno, pList.pData);
+                            this.pBackup.sqlite3BackupUpdate(pgno, pList.buffer);
                             PAGERTRACE("STORE %d page %d hash(%08x)\n", PagerMethods.PAGERID(this), pgno, pList.pager_pagehash());
                             sqliteinth.IOTRACE("PGOUT %p %d\n", this, pgno);
 #if SQLITE_TEST
@@ -4533,10 +4533,10 @@ pPager.pWal = 0;
 
                 )
                 {
-                    return this.sqlite3PagerAcquire(pgno, ref ppPage, 0);
+                    return this.Acquire(pgno, ref ppPage, 0);
                 }
 
-                public SqlResult sqlite3PagerAcquire(
+                public SqlResult Acquire(
                     ///<summary>
                     ///Page number to fetch 
                     ///</summary>
@@ -4562,11 +4562,8 @@ pPager.pWal = 0;
                     {
                         return sqliteinth.SQLITE_CORRUPT_BKPT();
                     }
-                    ///
-                    ///<summary>
                     ///If the pager is in the error state, return an error immediately. 
                     ///Otherwise, request the page from the PCache layer. 
-                    ///</summary>
 
                     if (this.errCode != SqlResult.SQLITE_OK)
                     {
@@ -4578,12 +4575,9 @@ pPager.pWal = 0;
                     }
                     if (rc != SqlResult.SQLITE_OK)
                     {
-                        ///
-                        ///<summary>
                         ///Either the call to sqlite3PcacheFetch() returned an error or the
-                        ///</summary>
-                        ///<param name="pager was already in the error">state when this function was called.</param>
-                        ///<param name="Set pPg to 0 and jump to the exception handler.  ">Set pPg to 0 and jump to the exception handler.  </param>
+                        ///pager was already in the error-state when this function was called.
+                        ///Set pPg to 0 and jump to the exception handler.  
 
                         pPg = null;
                         goto pager_acquire_err;
@@ -4660,7 +4654,7 @@ rc = sqlite3BitvecSet( pPager.pInJournal, pgno );          //TESTONLY( rc = ) sq
                                 Sqlite3.sqlite3EndBenignMalloc();
                             }
                             //memset(pPg.pData, 0, pPager.pageSize);
-                            Array.Clear(pPg.pData, 0, this.pageSize);
+                            Array.Clear(pPg.buffer, 0, this.pageSize);
                             sqliteinth.IOTRACE("ZERO %p %d\n", this, pgno);
                         }
                         else
@@ -5015,7 +5009,7 @@ int DIRECT_MODE = isDirectMode;
                             {
                                 u8[] zBuf = null;
                                 Debug.Assert(this.dbFileSize > 0);
-                                if (PagerMethods.CODEC2(this, pPgHdr.pData, 1, crypto.SQLITE_ENCRYPT_WRITE_CTX, ref zBuf))
+                                if (PagerMethods.CODEC2(this, pPgHdr.buffer, 1, crypto.SQLITE_ENCRYPT_WRITE_CTX, ref zBuf))
                                     return rc = SqlResult.SQLITE_NOMEM;
                                 //PagerMethods.CODEC2(pPager, pPgHdr.pData, 1, 6, rc=SQLITE_NOMEM, zBuf);
                                 if (rc == SqlResult.SQLITE_OK)
@@ -5896,7 +5890,7 @@ rc = pager_incr_changecounter(pPager, 0);
                     ///The original page number 
                     ///</summary>
 
-                    Debug.Assert(pPg.nRef > 0);
+                    Debug.Assert(pPg.ReferenceCount > 0);
                     Debug.Assert(this.eState == PagerState.PAGER_WRITER_CACHEMOD || this.eState == PagerState.PAGER_WRITER_DBMOD);
                     Debug.Assert(this.assert_pager_state());
                     ///
@@ -5940,7 +5934,7 @@ this.memDb != 0
                     ///<param name="may return SQLITE_NOMEM.">may return SQLITE_NOMEM.</param>
                     ///<param name=""></param>
 
-                    if ((pPg.flags & PGHDR.DIRTY) != 0 && pPg.subjRequiresPage() && SqlResult.SQLITE_OK != (rc = PagerMethods.subjournalPage(pPg)))
+                    if ((pPg.flags & PGHDR.DIRTY) != 0 && pPg.needsToBeWrittenToSubJournal() && SqlResult.SQLITE_OK != (rc = PagerMethods.subjournalPage(pPg)))
                     {
                         return rc;
                     }
@@ -5974,7 +5968,7 @@ this.memDb != 0
 
                     pPg.flags &= ~PGHDR.NEED_SYNC;
                     pPgOld = this.pager_lookup(pgno);
-                    Debug.Assert(null == pPgOld || pPgOld.nRef == 1);
+                    Debug.Assert(null == pPgOld || pPgOld.ReferenceCount == 1);
                     if (pPgOld != null)
                     {
                         pPg.flags |= (pPgOld.flags & PGHDR.NEED_SYNC);

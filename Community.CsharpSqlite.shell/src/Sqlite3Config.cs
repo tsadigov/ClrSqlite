@@ -21,7 +21,7 @@ namespace Community.CsharpSqlite
         ///
         ///</summary>
         // Overloads for ap assignments
-        static SqlResult sqlite3_config(SqliteConfig op, sqlite3_pcache_methods ap)
+        static SqlResult sqlite3_config(SqliteConfig op, PCacheController ap)
         {
             //  va_list ap;
             var rc = SqlResult.SQLITE_OK;
@@ -33,14 +33,14 @@ namespace Community.CsharpSqlite
                         ///<summary>
                         ///Specify an alternative malloc implementation 
                         ///</summary>
-                        sqliteinth.sqlite3GlobalConfig.pcache = ap;
+                        sqliteinth.sqlite3GlobalConfig.CacheController = ap;
                         //sqliteinth.sqlite3GlobalConfig.pcache = (sqlite3_pcache_methods)_Custom.va_arg(ap, "sqlite3_pcache_methods");
                         break;
                     }
             }
             return rc;
         }
-        static SqlResult sqlite3_config(SqliteConfig op, ref sqlite3_pcache_methods ap)
+        static SqlResult sqlite3_config(SqliteConfig op, ref PCacheController ap)
         {
             //  va_list ap;
             var rc = SqlResult.SQLITE_OK;
@@ -48,11 +48,11 @@ namespace Community.CsharpSqlite
             {
                 case SqliteConfig.GETPCACHE:
                     {
-                        if (sqliteinth.sqlite3GlobalConfig.pcache.xInit == null)
+                        if (sqliteinth.sqlite3GlobalConfig.CacheController.xInit == null)
                         {
                             Cache.CacheMethods.sqlite3PCacheSetDefault();
                         }
-                        ap = sqliteinth.sqlite3GlobalConfig.pcache;
+                        ap = sqliteinth.sqlite3GlobalConfig.CacheController;
                         //_Custom.va_arg(ap, sqlite3_pcache_methods) = sqliteinth.sqlite3GlobalConfig.pcache;
                         break;
                     }
@@ -113,8 +113,8 @@ namespace Community.CsharpSqlite
             public sqlite3_mem_methods m; /* Low-level memory allocation interface */
             public sqlite3_mutex_methods mutex; /* Low-level mutex interface */
 
-            sqlite3_pcache_methods m_pcache;
-            public sqlite3_pcache_methods pcache {
+            PCacheController m_pcache;
+            public PCacheController CacheController {
                 get {
                     return m_pcache;
                 }
@@ -159,7 +159,7 @@ namespace Community.CsharpSqlite
                 , int nLookaside
                 , sqlite3_mem_methods m
                 , sqlite3_mutex_methods mutex
-                , sqlite3_pcache_methods pcache
+                , PCacheController pcache
                 , byte[] pHeap
                 , int nHeap
                 , int mnReq
@@ -193,7 +193,7 @@ namespace Community.CsharpSqlite
                 this.nLookaside = nLookaside;
                 this.m = m;
                 this.mutex = mutex;
-                this.pcache = pcache;
+                this.CacheController = pcache;
                 this.pHeap = pHeap;
                 this.nHeap = nHeap;
                 this.mnReq = mnReq;

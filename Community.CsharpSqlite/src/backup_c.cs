@@ -379,7 +379,7 @@ namespace Community.CsharpSqlite {
                                 rc = pSrcPager.sqlite3PagerGet((u32)iSrcPg, ref pSrcPg);
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
-                                    rc = this.backupOnePage(iSrcPg, pSrcPg.sqlite3PagerGetData());
+                                    rc = this.backupOnePage(iSrcPg, pSrcPg.getData());
                                     PagerMethods.sqlite3PagerUnref(pSrcPg);
                                 }
                             }
@@ -473,7 +473,7 @@ namespace Community.CsharpSqlite {
                                     rc = pSrcPager.sqlite3PagerGet(iSrcPg, ref pSrcPg);
                                     if (rc == SqlResult.SQLITE_OK)
                                     {
-                                        byte[] zData = pSrcPg.sqlite3PagerGetData();
+                                        byte[] zData = pSrcPg.getData();
                                         rc = os.sqlite3OsWrite(pFile, zData, pgszSrc, iOff);
                                     }
                                     PagerMethods.sqlite3PagerUnref(pSrcPg);
@@ -670,7 +670,7 @@ namespace Community.CsharpSqlite {
                 if (SqlResult.SQLITE_OK == (rc = pDestPager.sqlite3PagerGet(iDest, ref pDestPg)) && SqlResult.SQLITE_OK == (rc = PagerMethods.sqlite3PagerWrite(pDestPg)))
                 {
                     //string zIn = &zSrcData[iOff%nSrcPgsz];
-                    byte[] zDestData = pDestPg.sqlite3PagerGetData();
+                    byte[] zDestData = pDestPg.getData();
                     //string zOut = &zDestData[iOff % nDestPgsz];
                     ///
                     ///<summary>
@@ -684,7 +684,7 @@ namespace Community.CsharpSqlite {
                     ///</summary>
                     Buffer.BlockCopy(zSrcData, (int)(iOff % nSrcPgsz), zDestData, (int)(iOff % nDestPgsz), nCopy);
                     // memcpy( zOut, zIn, nCopy );
-                    PagerMethods.sqlite3PagerGetExtra(pDestPg).isInit = false;
+                    pDestPg.getExtra().isInit = false;
                     // (  PagerMethods.sqlite3PagerGetExtra ( pDestPg ) )[0] = 0;
                 }
                 PagerMethods.sqlite3PagerUnref(pDestPg);

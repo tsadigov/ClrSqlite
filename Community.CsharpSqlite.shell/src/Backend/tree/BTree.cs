@@ -727,7 +727,7 @@ checkAppendMsg(sCheck, 0, "Page %d is never used", i);
                     rc = pBt.saveAllCursors((Pgno)iTable, null);
                     if (SqlResult.SQLITE_OK == rc)
                     {
-                        rc = BTreeMethods.clearDatabasePage(pBt, (Pgno)iTable, 0, ref pnChange);
+                        rc = pBt.clearDatabasePage( (Pgno)iTable, 0, ref pnChange);
                     }
                 }
                 return rc;
@@ -780,7 +780,7 @@ releasePage(pPage);
                         {
                             ///<param name="If the table being dropped is the table with the largest root">page</param>
                             ///<param name="number in the database, put the root page on the free list.">number in the database, put the root page on the free list.</param>
-                            BTreeMethods.freePage(pPage, ref rc);
+                            pPage.freePage( ref rc);
                             BTreeMethods.releasePage(pPage);
                             if (rc != SqlResult.SQLITE_OK)
                             {
@@ -807,7 +807,7 @@ releasePage(pPage);
                             }
                             pMove = null;
                             rc = pBt.btreeGetPage(maxRootPgno, ref pMove, 0);
-                            BTreeMethods.freePage(pMove, ref rc);
+                            pMove.freePage( ref rc);
                             BTreeMethods.releasePage(pMove);
                             if (rc != SqlResult.SQLITE_OK)
                             {
@@ -833,7 +833,7 @@ releasePage(pPage);
                     }
                     else
                     {
-                        BTreeMethods.freePage(pPage, ref rc);
+                        pPage.freePage( ref rc);
                         BTreeMethods.releasePage(pPage);
                     }
 #endif

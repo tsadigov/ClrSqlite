@@ -14,19 +14,27 @@ namespace Community.CsharpSqlite.Cache
     public class PgHdr1:ILinkedListNode<PgHdr1>
     {
         ///<summary>
+        ///Pointer to Actual Page Header 
+        ///</summary>
+        // For C#
+        public PgHdr pPgHdr = new PgHdr();
+
+        ///<summary>
+        ///Cache that currently owns this page 
+        ///</summary>
+        public PCache1 pCache;
+
+        ///<summary>
         ///Key value (page number) 
         ///</summary>
-        public Pgno iKey;
+        public Pgno iKey { get; set; }
 
         ///<summary>
         ///Next in hash table chain 
         ///</summary>
         public PgHdr1 pNext { get; set; }
 
-        ///<summary>
-        ///Cache that currently owns this page 
-        ///</summary>
-        public PCache1 pCache;
+        
 
         ///<summary>
         ///Next in LRU list of unpinned pages 
@@ -37,14 +45,6 @@ namespace Community.CsharpSqlite.Cache
         ///Previous in LRU list of unpinned pages
         ///</summary>
         public PgHdr1 pLruPrev;
-
-
-        ///<summary>
-        ///Pointer to Actual Page Header 
-        ///</summary>
-        // For C#
-        public PgHdr pPgHdr = new PgHdr();
-        
 
         public void Clear()
         {

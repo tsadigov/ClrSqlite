@@ -38,12 +38,12 @@ namespace Community.CsharpSqlite.Cache
     ///
     ///</summary>
 
-    public class PgHdr
+    public class PgHdr:ReferenceCounted,ILinkedListNode<PgHdr>,IBackwardLinkedListNode<PgHdr>
     {
         ///<summary>
-        ///Content of this page 
+        ///pData Content of this page 
         ///</summary>
-        public byte[] pData;
+        public byte[] buffer;
 
         ///<summary>
         ///Extra content 
@@ -82,21 +82,10 @@ namespace Community.CsharpSqlite.Cache
         ///</summary>
         public PGHDR flags;
 
-        ///
-
-
-        ///
         ///<summary>
-        ///
         ///Elements above are public.  All that follows is private to pcache.c
         ///and should not be accessed by other modules.
-        ///
         ///</summary>
-
-        ///<summary>
-        ///Number of users of this page 
-        ///</summary>
-        public int nRef;
 
 
         ///<summary>
@@ -110,21 +99,20 @@ namespace Community.CsharpSqlite.Cache
         public bool CacheAllocated;
 
 
-
         ///<summary>
+        ///pDirtyNext
         ///Next element in list of dirty pages 
         ///</summary>
-        public PgHdr pDirtyNext;
-
+        public PgHdr pNext { get; set; }
 
         ///<summary>
         ///Previous element in list of dirty pages 
         ///</summary>
-        public PgHdr pDirtyPrev;
-
+        public PgHdr pPrev { get; set; }
 
 
         ///<summary>
+        ///PgHdr1
         ///Cache page header this this page
         ///</summary>
         public PgHdr1 pPgHdr1;
@@ -136,9 +124,9 @@ namespace Community.CsharpSqlite.Cache
         }
 
         public void Clear()
-        {
-            malloc_cs.sqlite3_free(ref this.pData);
-            this.pData = null;
+        {            
+            malloc_cs.sqlite3_free(ref this.buffer);
+            this.buffer = null;
             this.pExtra = null;
             this.pDirty = null;
             this.pgno = 0;
@@ -147,15 +135,15 @@ namespace Community.CsharpSqlite.Cache
 																																																																																this.pageHash=0;
 #endif
             this.flags = 0;
-            this.nRef = 0;
+            this.ReferenceCount = 0;
             this.CacheAllocated = false;
             this.pCache = null;
-            this.pDirtyNext = null;
-            this.pDirtyPrev = null;
+            this.pNext = null;
+            this.pPrev = null;
             this.pPgHdr1 = null;
         }
 
-        public///<summary>
+        public///<summary>subjRequiresPage
               /// Return true if it is necessary to write page *pPg into the sub-journal.
               /// A page needs to be written into the sub-journal if there exists one
               /// or more open savepoints for which:
@@ -164,7 +152,7 @@ namespace Community.CsharpSqlite.Cache
               ///   * The bit corresponding to the page-number is not set in
               ///     PagerSavepoint.pInSavepoint.
               ///</summary>
-            bool subjRequiresPage()
+            bool needsToBeWrittenToSubJournal()
         {
             u32 pgno = this.pgno;
             Pager pPager = this.pPager;
@@ -180,11 +168,11 @@ namespace Community.CsharpSqlite.Cache
             return false;
         }
 
-        public///<summary>
-              /// Return true if the page is already in the journal file.
-              ///
-              ///</summary>
-            bool pageInJournal()
+        ///<summary>
+        /// Return true if the page is already in the journal file.
+        ///
+        ///</summary>
+        public bool pageInJournal()
         {
             return this.pPager.pInJournal.sqlite3BitvecTest(this.pgno) != 0;
         }
@@ -198,10 +186,42 @@ namespace Community.CsharpSqlite.Cache
         {
         }
 
+#if !NDEBUG || SQLITE_TEST
+																																						    ///<summary>
+/// Return the page number for page pPg.
+///</summary>
+    static Pgno sqlite3PagerPagenumber( DbPage pPg )
+    {
+      return pPg.pgno;
+    }
+#else
+        /// <summary>
+        /// sqlite3PagerPagenumber
+        /// </summary>
+        /// <returns></returns>
+        public Pgno getPageNo()
+        {
+            return this.pgno;
+        }
+
+#endif
+
+
+        ///<summary>
+        ///sqlite3PagerGetExtra
+        /// Return a pointer to the Pager.nExtra bytes of "extra" space
+        /// allocated along with the specified page.
+        ///
+        ///</summary>
+        public MemPage getExtra()
+        {
+            return this.pExtra;
+        }
+
         public MemPage btreePageFromDbPage(Pgno pgno, tree.BtShared pBt)
         {
-            MemPage pPage = (MemPage)PagerMethods.sqlite3PagerGetExtra(this);
-            pPage.aData = this.sqlite3PagerGetData();
+            MemPage pPage = this.getExtra();
+            pPage.aData = this.getData();
             pPage.pDbPage = this;
             pPage.pBt = pBt;
             pPage.pgno = pgno;
@@ -210,13 +230,14 @@ namespace Community.CsharpSqlite.Cache
         }
 
         ///<summary>
+        ///sqlite3PagerGetData
         /// Return a pointer to the data for the specified page.
         ///</summary>
-        public byte[] sqlite3PagerGetData()
+        public byte[] getData()
         {
             PgHdr pPg = this;
-            Debug.Assert(pPg.nRef > 0 || pPg.pPager.memDb != 0);
-            return pPg.pData;
+            Debug.Assert(pPg.ReferenceCount > 0 || pPg.pPager.memDb != 0);
+            return pPg.buffer;
         }
 
 
@@ -226,8 +247,8 @@ namespace Community.CsharpSqlite.Cache
         ///</summary>
         public void sqlite3PcacheRef()
         {
-            Debug.Assert(this.nRef > 0);
-            this.nRef++;
+            Debug.Assert(this.ReferenceCount > 0);
+            this.ReferenceCount++;
         }
 
         ///<summary>
@@ -242,16 +263,16 @@ namespace Community.CsharpSqlite.Cache
         public void pager_write_changecounter()
         {
             PgHdr pPg = this;
-            u32 change_counter;
+            
             ///Increment the value just read and write it back to byte 24. 
 
-            change_counter = Converter.sqlite3Get4byte(pPg.pPager.dbFileVers, 0) + 1;
-            Converter.put32bits(pPg.pData, 24, change_counter);
+            u32 change_counter = Converter.sqlite3Get4byte(pPg.pPager.dbFileVers, 0) + 1;
+            Converter.put32bits(pPg.buffer, 24, change_counter);
 
             ///Also store the SQLite version number in bytes 96..99 and in
             ///bytes 92..95 store the change counter for which the version number
-            Converter.put32bits(pPg.pData, 92, change_counter);
-            Converter.put32bits(pPg.pData, 96, Sqlite3.SQLITE_VERSION_NUMBER);
+            Converter.put32bits(pPg.buffer, Offsets.ChangeCounter, change_counter);
+            Converter.put32bits(pPg.buffer, Offsets.SqliteVersion, Sqlite3.SQLITE_VERSION_NUMBER);
         }
 
         ///<summary>
@@ -260,7 +281,7 @@ namespace Community.CsharpSqlite.Cache
         ///</summary>
         public int sqlite3PcachePageRefcount()
         {
-            return this.nRef;
+            return this.ReferenceCount;
         }
 
         ///<summary>

@@ -5591,7 +5591,23 @@ namespace Community.CsharpSqlite
     //};
     namespace Paging
     {
-        public class sqlite3_pcache_methods
+        using u32 = System.UInt32;
+        public  interface CacheExtensionMethods {
+            SqlResult dxPC_Init(object NotUsed);
+            void dxPC_Shutdown(object NotUsed);
+            void dxPC_Cachesize(Cache.PCache1 pCache, int nCachesize);
+            int dxPC_Pagecount(Cache.PCache1 pCache);
+            Cache.PgHdr dxPC_Fetch(Cache.PCache1 pCache, u32 key, int createFlag);
+            void dxPC_Unpin(Cache.PCache1 pCache, Cache.PgHdr p2, bool discard);
+            void dxPC_Rekey(Cache.PCache1 pCache, Cache.PgHdr p2, u32 oldKey, u32 newKey);
+            void dxPC_Truncate(Cache.PCache1 pCache, u32 iLimit);
+            void dxPC_Destroy(ref Cache.PCache1 pCache);
+
+        }
+        /// <summary>
+        /// sqlite3_pcache_methods
+        /// </summary>
+        public class PCacheController
         {
             public object pArg;
 
@@ -5630,11 +5646,11 @@ namespace Community.CsharpSqlite
             public dxPC_Destroy xDestroy;
 
             //public void (*xDestroy)(sqlite3_pcache);
-            public sqlite3_pcache_methods()
+            public PCacheController()
             {
             }
 
-            public sqlite3_pcache_methods(object pArg, dxPC_Init xInit, dxPC_Shutdown xShutdown, dxPC_Create xCreate, dxPC_Cachesize xCachesize, dxPC_Pagecount xPagecount, dxPC_Fetch xFetch, dxPC_Unpin xUnpin, dxPC_Rekey xRekey, dxPC_Truncate xTruncate, dxPC_Destroy xDestroy)
+            public PCacheController(object pArg, dxPC_Init xInit, dxPC_Shutdown xShutdown, dxPC_Create xCreate, dxPC_Cachesize xCachesize, dxPC_Pagecount xPagecount, dxPC_Fetch xFetch, dxPC_Unpin xUnpin, dxPC_Rekey xRekey, dxPC_Truncate xTruncate, dxPC_Destroy xDestroy)
             {
                 this.pArg = pArg;
                 this.xInit = xInit;

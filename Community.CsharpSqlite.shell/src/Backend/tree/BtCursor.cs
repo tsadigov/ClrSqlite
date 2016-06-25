@@ -488,7 +488,7 @@ aOverflow= null;
                 rc = PagerMethods.sqlite3PagerWrite(pPage.pDbPage);
                 if (rc != 0)
                     return rc;
-                rc = BTreeMethods.clearCell(pPage, pCell);
+                rc = pPage.clearCell( pCell);
                 pPage.dropCell(iCellIdx, pPage.cellSizePtr(pCell), ref rc);
                 if (rc != 0)
                     return rc;
@@ -648,7 +648,7 @@ aOverflow= null;
                         newCellTemp[3] = pPage.aData[oldCellAddress + 3];
                     }
                     var szOld = pPage.cellSizePtr(oldCellAddress);
-                    rc = BTreeMethods.clearCell(pPage, oldCellAddress);
+                    rc = pPage.clearCell( oldCellAddress);
                     pPage.dropCell(idx, szOld, ref rc);
                     if (rc != 0)
                         goto end_insert;
@@ -1377,7 +1377,7 @@ aOverflow= null;
                 }
                 else
                 {
-                    rc = BTreeMethods.getAndInitPage(pBt, this.pgnoRoot, ref this.PageStack[0]);
+                    rc = pBt.getAndInitPage( this.pgnoRoot, ref this.PageStack[0]);
                     if (rc != SqlResult.SQLITE_OK)
                     {
                         this.State = BtCursorState.CURSOR_INVALID;
@@ -1452,7 +1452,7 @@ aOverflow= null;
                 {
                     return sqliteinth.SQLITE_CORRUPT_BKPT();
                 }
-                var rc = BTreeMethods.getAndInitPage(pBt, newPgno, ref pNewPage);
+                var rc = pBt.getAndInitPage( newPgno, ref pNewPage);
                 if (rc != 0)
                     return rc;
                 this.PageStack[stackIdx + 1] = pNewPage;
@@ -1719,7 +1719,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                             rc = pBt.pPager.sqlite3PagerGet(nextPage, ref pDbPage);
                             if (rc == SqlResult.SQLITE_OK)
                             {
-                                aPayload = (pDbPage.sqlite3PagerGetData());
+                                aPayload = (pDbPage.getData());
                                 nextPage = Converter.sqlite3Get4byte(aPayload);
                                 if (a + offset > ovflSize)
                                 {

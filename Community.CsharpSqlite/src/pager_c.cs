@@ -32,6 +32,7 @@ static void PAGERTRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace 
         //#define PAGERTRACE(X)
         public static void PAGERTRACE(string T, params object[] ap)
         {
+            sqliteinth.IOTRACE(T, ap);
         }
 
 #endif
@@ -646,20 +647,13 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
         ///</summary>
         public static SqlResult readDbPage(PgHdr pPg)
         {
-            Pager pPager = pPg.pPager;
-            ///Pager object associated with page pPg 
+            Pager pPager = pPg.pPager;///Pager object associated with page pPg 
+            
+            var rc = SqlResult.SQLITE_OK;///Return code 
 
-            Pgno pgno = pPg.pgno;
-            ///Page number to read 
+            int isInWal = 0;///True if page is in log file 
 
-            var rc = SqlResult.SQLITE_OK;
-            ///Return code 
-
-            int isInWal = 0;
-            ///True if page is in log file 
-
-            int pgsz = pPager.pageSize;
-            ///Number of bytes to read 
+            int pgsz = pPager.pageSize;///Number of bytes to read 
 
             Debug.Assert(pPager.eState >= PagerState.PAGER_READER &&
 #if SQLITE_OMIT_MEMORYDB
@@ -672,7 +666,7 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
             if (NEVER(!pPager.fileDescriptor.isOpen))
             {
                 Debug.Assert(pPager.tempFile);
-                Array.Clear(pPg.pData, 0, pPager.pageSize);
+                Array.Clear(pPg.buffer, 0, pPager.pageSize);
                 // memset(pPg.pData, 0, pPager.pageSize);
                 return SqlResult.SQLITE_OK;
             }
@@ -681,18 +675,18 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
                 
                 ///Try to pull the page from the write-ahead log. 
 
-                rc = wal.sqlite3WalRead(pPager.pWal, pgno, ref isInWal, pgsz, pPg.pData);
+                rc = wal.sqlite3WalRead(pPager.pWal, pPg.pgno, ref isInWal, pgsz, pPg.buffer);
             }
             if (rc == SqlResult.SQLITE_OK && 0 == isInWal)
             {
-                i64 iOffset = (pgno - 1) * (i64)pPager.pageSize;
-                rc = os.sqlite3OsRead(pPager.fileDescriptor, pPg.pData, pgsz, iOffset);
+                i64 iOffset = (pPg.pgno - 1) * (i64)pPager.pageSize;
+                rc = os.sqlite3OsRead(pPager.fileDescriptor, pPg.buffer, pgsz, iOffset);
                 if (rc == SqlResult.SQLITE_IOERR_SHORT_READ)
                 {
                     rc = SqlResult.SQLITE_OK;
                 }
             }
-            if (pgno == 1)
+            if (pPg.pgno == 1)
             {
                 if (rc != 0)
                 {
@@ -719,11 +713,11 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
                 else
                 {
                     //u8[] dbFileVers = pPg.pData[24];
-                    Buffer.BlockCopy(pPg.pData, 24, pPager.dbFileVers, 0, pPager.dbFileVers.Length);
+                    Buffer.BlockCopy(pPg.buffer, 24, pPager.dbFileVers, 0, pPager.dbFileVers.Length);
                     //memcpy(&pPager.dbFileVers, dbFileVers, sizeof(pPager.dbFileVers));
                 }
             }
-            if (CODEC1(pPager, pPg.pData, pgno, crypto.SQLITE_DECRYPT))
+            if (CODEC1(pPager, pPg.buffer, pPg.pgno, crypto.SQLITE_DECRYPT))
                 rc = SqlResult.SQLITE_NOMEM;
             //CODEC1(pPager, pPg.pData, pgno, 3, rc = SQLITE_NOMEM);
 #if SQLITE_TEST
@@ -739,8 +733,8 @@ assert( (pPg->flags&PGHDR.DIRTY) || pPg->pageHash==pager_pagehash(pPg) );
 																																																									
       PAGER_INCR( ref pPager.nRead );
 #endif
-            sqliteinth.IOTRACE("PGIN %p %d\n", pPager, pgno);
-            PAGERTRACE("FETCH %d page %d hash(%08x)\n", PagerMethods.PAGERID(pPager), pgno, pPg.pager_pagehash());
+            sqliteinth.IOTRACE("PGIN %p %d\n", pPager, pPg.pgno);
+            PAGERTRACE("FETCH %d page %d hash(%08x)\n", PagerMethods.PAGERID(pPager), pPg.pgno, pPg.pager_pagehash());
             return rc;
         }
 
@@ -1036,21 +1030,7 @@ return rc;
         }
 
 #endif
-#if !NDEBUG || SQLITE_TEST
-																																						    ///<summary>
-/// Return the page number for page pPg.
-///</summary>
-    static Pgno sqlite3PagerPagenumber( DbPage pPg )
-    {
-      return pPg.pgno;
-    }
-#else
-        public static Pgno sqlite3PagerPagenumber(DbPage pPg)
-        {
-            return pPg.pgno;
-        }
 
-#endif
         ///<summary>
         /// Increment the reference count for page pPg.
         ///</summary>
@@ -1097,7 +1077,7 @@ return rc;
 
                 if (rc == SqlResult.SQLITE_OK)
                 {
-                    byte[] pData = pPg.pData;
+                    byte[] pData = pPg.buffer;
                     i64 offset = pPager.nSubRec * (4 + pPager.pageSize);
                     byte[] pData2 = null;
                     if (CODEC2(pPager, pData, pPg.pgno, crypto.SQLITE_ENCRYPT_READ_CTX, ref pData2))
@@ -1186,7 +1166,7 @@ return rc;
                 ///Write a single frame for this page to the log. 
                 ///</summary>
 
-                if (pPg.subjRequiresPage())
+                if (pPg.needsToBeWrittenToSubJournal())
                 {
                     rc = subjournalPage(pPg);
                 }
@@ -1237,7 +1217,7 @@ return rc;
                 ///<param name="executed.">executed.</param>
                 ///<param name=""></param>
 
-                if (NEVER(rc == SqlResult.SQLITE_OK && pPg.pgno > pPager.dbSize && pPg.subjRequiresPage()))
+                if (NEVER(rc == SqlResult.SQLITE_OK && pPg.pgno > pPager.dbSize && pPg.needsToBeWrittenToSubJournal()))
                 {
                     rc = subjournalPage(pPg);
                 }
@@ -1827,7 +1807,7 @@ szPageDflt = ii;
         ///</summary>
         static SqlResult pager_write(PgHdr pPg)
         {
-            byte[] pData = pPg.pData;
+            byte[] pData = pPg.buffer;
             Pager pPager = pPg.pPager;
             var rc = SqlResult.SQLITE_OK;
             ///
@@ -1887,7 +1867,7 @@ szPageDflt = ii;
             ///</summary>
 
             PCacheMethods.sqlite3PcacheMakeDirty(pPg);
-            if (pPg.pageInJournal() && !pPg.subjRequiresPage())
+            if (pPg.pageInJournal() && !pPg.needsToBeWrittenToSubJournal())
             {
                 Debug.Assert(!pPager.pagerUseWal());
             }
@@ -1986,7 +1966,7 @@ szPageDflt = ii;
                 ///
                 ///</summary>
 
-                if (pPg.subjRequiresPage())
+                if (pPg.needsToBeWrittenToSubJournal())
                 {
                     rc = subjournalPage(pPg);
                 }
@@ -2221,15 +2201,7 @@ szPageDflt = ii;
 #endif
 
 
-        ///<summary>
-        /// Return a pointer to the Pager.nExtra bytes of "extra" space
-        /// allocated along with the specified page.
-        ///
-        ///</summary>
-        public static MemPage sqlite3PagerGetExtra(DbPage pPg)
-        {
-            return pPg.pExtra;
-        }
+        
 #if !SQLITE_OMIT_WAL
 																			///<summary>
 /// This function is called when the user invokes "PRAGMA wal_checkpoint",

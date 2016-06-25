@@ -606,7 +606,7 @@ namespace Community.CsharpSqlite
 ///mutex 
 ///</summary>
 
-		new sqlite3_pcache_methods (), ///
+		new PCacheController (), ///
 ///<summary>
 ///pcache 
 ///</summary>
