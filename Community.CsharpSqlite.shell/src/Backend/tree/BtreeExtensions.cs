@@ -11,13 +11,13 @@ namespace Community.CsharpSqlite.Tree
 		public static string GetFilename (this Btree _this)
 		{
 			Debug.Assert (_this.pBt.pPager != null);
-			return _this.pBt.pPager.Filename ();
+			return _this.pBt.pPager.Filename ;
 		}
 
 		public static string GetJournalname (this Btree _this)
 		{
 			Debug.Assert (_this.pBt.pPager != null);
-			return _this.pBt.pPager.sqlite3PagerJournalname ();
+			return _this.pBt.pPager.JournalName ;
 		}
 
 		public static bool sqlite3BtreeIsInTrans (this Btree _this)

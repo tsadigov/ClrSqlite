@@ -1798,7 +1798,7 @@ sqlite3IoTrace( "SQL %s\n", z.Trim() );
                         needXcommit = true;
                         if (i != 1)
                             nTrans++;
-                        rc = pBt.sqlite3BtreePager().sqlite3PagerExclusiveLock();
+                        rc = pBt.Pager.sqlite3PagerExclusiveLock();
                     }
                 }
                 if (rc != SqlResult.SQLITE_OK)

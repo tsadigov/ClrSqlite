@@ -200,7 +200,7 @@ namespace Community.CsharpSqlite {
             db.flags &= ~(SqliteFlags.SQLITE_ForeignKeys | SqliteFlags.SQLITE_ReverseOrder);
 			db.xTrace=null;
 			pMain=db.Backends[0].BTree;
-			isMemDb=pMain.sqlite3BtreePager().sqlite3PagerIsMemdb();
+			isMemDb=pMain.Pager.sqlite3PagerIsMemdb();
 			///
 			///<summary>
 			///Attach the temporary database as 'vacuum_db'. The synchronous pragma
@@ -263,7 +263,7 @@ namespace Community.CsharpSqlite {
 			///<summary>
 			///Do not attempt to change the page size for a WAL database 
 			///</summary>
-            if (pMain.sqlite3BtreePager().sqlite3PagerGetJournalMode() == Paging.JournalMode.PAGER_JOURNALMODE_WAL)
+            if (pMain.Pager.sqlite3PagerGetJournalMode() == Paging.JournalMode.PAGER_JOURNALMODE_WAL)
             {
 				db.nextPagesize=0;
 			}

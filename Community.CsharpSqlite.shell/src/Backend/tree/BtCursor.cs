@@ -1681,7 +1681,7 @@ nextPage = pCur.aOverflow[iIdx+1];
                             ///range of data that is being read (eOp==null) or written (eOp!=null).
                             PgHdr pDbPage = new PgHdr();
                             int a = (int)amt;
-                            rc = pBt.pPager.sqlite3PagerGet(nextPage, ref pDbPage);
+                            rc = pBt.pPager.Get(nextPage, ref pDbPage);
                             if (rc == SqlResult.SQLITE_OK)
                             {
                                 aPayload = (pDbPage.getData());

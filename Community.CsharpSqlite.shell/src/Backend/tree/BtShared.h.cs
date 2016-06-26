@@ -417,7 +417,7 @@ public u8 isPending;            /* If waiting for read-locks to clear */
                 return;
             }
             iPtrmap = this.PTRMAP_PAGENO(key);
-            rc = this.pPager.sqlite3PagerGet(iPtrmap, ref pDbPage);
+            rc = this.pPager.Get(iPtrmap, ref pDbPage);
             if (rc != SqlResult.SQLITE_OK)
             {
                 pRC = rc;
@@ -447,34 +447,15 @@ public u8 isPending;            /* If waiting for read-locks to clear */
 
         public SqlResult ptrmapGet(Pgno key, ref u8 pEType, ref Pgno pPgno)
         {
-            PgHdr pDbPage = new PgHdr();
-            ///
-            ///<summary>
-            ///The pointer map page 
-            ///</summary>
-
-            int iPtrmap;
-            ///
-            ///<summary>
-            ///Pointer map page index 
-            ///</summary>
-
-            u8[] pPtrmap;
-            ///
-            ///<summary>
-            ///Pointer map page data 
-            ///</summary>
-
-            int offset;
-            ///
-            ///<summary>
-            ///Offset of entry in pointer map 
-            ///</summary>
+            PgHdr pDbPage = new PgHdr();///The pointer map page 
+            int iPtrmap;///Pointer map page index 
+            u8[] pPtrmap;///Pointer map page data 
+            int offset;///Offset of entry in pointer map 
 
             SqlResult rc;
             Debug.Assert(this.mutex.sqlite3_mutex_held());
             iPtrmap = (int)this.PTRMAP_PAGENO(key);
-            rc = this.pPager.sqlite3PagerGet((u32)iPtrmap, ref pDbPage);
+            rc = this.pPager.Get((u32)iPtrmap, ref pDbPage);
             if (rc != 0)
             {
                 return rc;
@@ -499,35 +480,9 @@ public u8 isPending;            /* If waiting for read-locks to clear */
             return SqlResult.SQLITE_OK;
         }
 
-        public SqlResult GetPage(
-            Pgno pgno, ///Number of the page to fetch 
-            ref MemPage ppPage, ///Return the page in this parameter 
-            int noContent///Do not load page content if true 
-        )
-        {
-            SqlResult rc;
-            DbPage pDbPage = null;
-            Debug.Assert(this.mutex.sqlite3_mutex_held());
-            rc = this.pPager.Acquire(pgno, ref pDbPage, (u8)noContent);
-            if (rc != 0)
-                return rc;
-            ppPage = pDbPage.btreePageFromDbPage(pgno, this);
-            return SqlResult.SQLITE_OK;
-        }
+        
 
-        public MemPage btreePageLookup(Pgno pgno)
-        {
-            DbPage pDbPage;
-            Debug.Assert(this.mutex.sqlite3_mutex_held());
-            pDbPage = this.pPager.sqlite3PagerLookup(pgno);
-            if (pDbPage)
-            {
-                return pDbPage.btreePageFromDbPage(pgno, this);
-            }
-            return null;
-        }
-
-        public Pgno btreePagecount()
+        public Pgno GetPageCount()
         {
             return this.nPage;
         }

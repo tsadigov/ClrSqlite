@@ -43,6 +43,8 @@ namespace Community.CsharpSqlite
             public const int SqliteVersion = 96;
             public const int NumberOfFreePage = 36;
             internal static readonly int ChangeCounter= 92;
+            internal static readonly int DatabaseSize=28;
+            
         }
 
         public class MemPage
@@ -2828,10 +2830,9 @@ ptrmapCheckPages(pParent, 1);
             //PagerMethods
             public void freePage(ref SqlResult pRC)
             {
-                MemPage pPage = this;
                 if ((pRC) == SqlResult.SQLITE_OK)
                 {
-                    pRC = pPage.pBt.freePage2( pPage, pPage.pgno);
+                    pRC = this.pBt.freePage2(this, this.pgno);
                 }
             }
 
@@ -2876,7 +2877,7 @@ ptrmapCheckPages(pParent, 1);
                 {
                     Pgno iNext = 0;
                     MemPage pOvfl = null;
-                    if (ovflPgno < 2 || ovflPgno > pBt.btreePagecount())
+                    if (ovflPgno < 2 || ovflPgno > pBt.GetPageCount())
                     {
                         ///
                         ///<summary>
@@ -2892,7 +2893,7 @@ ptrmapCheckPages(pParent, 1);
                         if (rc != 0)
                             return rc;
                     }
-                    if ((pOvfl != null || ((pOvfl = pBt.btreePageLookup(ovflPgno)) != null)) && pOvfl.pDbPage.sqlite3PagerPageRefcount() != 1)
+                    if ((pOvfl != null || ((pOvfl = pBt.Lookup(ovflPgno)) != null)) && pOvfl.pDbPage.sqlite3PagerPageRefcount() != 1)
                     {
                         ///
                         ///<summary>

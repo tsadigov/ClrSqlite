@@ -12,6 +12,27 @@ namespace Community.CsharpSqlite.Cache
         public void RemoveFromDirtyList() {
             this.pCache.RemoveFromDirtyList(this);
         }
+        
+
+        ///<summary>
+        /// Increment the reference count for page pPg.
+        ///</summary>
+        public  void PagerAddRef()
+        {
+            this.PcacheAddRef();
+        }
+
+        ///<summary>
+        /// Increase the reference count of a supplied page by 1.
+        ///
+        ///</summary>
+        public void PcacheAddRef()
+        {
+            Debug.Assert(this.ReferenceCount > 0);
+            this.ReferenceCount++;
+        }
+
+
         ///<summary>
         /// Release a page reference.
         ///
@@ -42,7 +63,7 @@ namespace Community.CsharpSqlite.Cache
             if (p.ReferenceCount == 0)
             {
                 p.pCache.nRef--;
-                if ((p.flags & PGHDR.DIRTY) == 0)
+                if (!p.flags.HasFlag( PGHDR.DIRTY) )
                 {
                     PCacheMethods.Unpin(p);
                 }

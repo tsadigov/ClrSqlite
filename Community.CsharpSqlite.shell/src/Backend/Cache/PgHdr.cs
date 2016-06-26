@@ -241,15 +241,7 @@ namespace Community.CsharpSqlite.Cache
         }
 
 
-        ///<summary>
-        /// Increase the reference count of a supplied page by 1.
-        ///
-        ///</summary>
-        public void sqlite3PcacheRef()
-        {
-            Debug.Assert(this.ReferenceCount > 0);
-            this.ReferenceCount++;
-        }
+        
 
         ///<summary>
         /// Update the value of the change-counter at offsets 24 and 92 in

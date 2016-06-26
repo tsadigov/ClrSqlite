@@ -2954,9 +2954,9 @@ error_out:
 					Pager pPager;
 					sqlite3_file fd;
                     pBtree.Enter();
-					pPager=pBtree.sqlite3BtreePager();
+					pPager=pBtree.Pager;
 					Debug.Assert(pPager!=null);
-					fd=pPager.sqlite3PagerFile();
+					fd=pPager.FileDescriptor;
 					Debug.Assert(fd!=null);
 					if(op==SQLITE_FCNTL_FILE_POINTER) {
 						#if (SQLITE_SILVERLIGHT || WINDOWS_MOBILE)

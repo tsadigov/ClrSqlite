@@ -173,6 +173,112 @@ namespace Community.CsharpSqlite.Cache
         }
 
 
+
+        ///<summary>
+        /// Try to obtain a page from the cache.
+        ///
+        ///</summary>
+        public  SqlResult Fetch(
+            u32 pgno, ///Page number to obtain 
+            bool createFlag, ///If true, create page if it does not exist already 
+            ref PgHdr ppPage///Write the page here 
+        )
+        {
+            PgHdr pPage = null;
+
+            PCache pCache = this;
+            Debug.Assert(pCache != null);
+            //Debug.Assert(createFlag == 1 || createFlag == 0);
+            Debug.Assert(pgno > 0);
+            ///If the pluggable cache (sqlite3_pcache*) has not been allocated,
+            ///allocate it now.
+
+            if (null == pCache.pCache && createFlag != false)
+            {
+                int nByte = pCache.szPage + pCache.szExtra + 0;
+                // sizeof( PgHdr );
+                PCache1 p = sqliteinth.sqlite3GlobalConfig.CacheController.xCreate(nByte, pCache.bPurgeable);
+                //if ( null == p )
+                //{
+                //  return SQLITE_NOMEM;
+                //}
+                sqliteinth.sqlite3GlobalConfig.CacheController.xCachesize(p, pCache.nMax);
+                pCache.pCache = p;
+            }
+            int eCreate = createFlag?  (1 + ((!pCache.bPurgeable || null == pCache.Head) ? 1 : 0)) :0;
+            if (pCache.pCache != null)
+            {
+                pPage = sqliteinth.sqlite3GlobalConfig.CacheController.xFetch(pCache.pCache, pgno, eCreate);
+            }
+            if (null == pPage && eCreate == 1)
+            {
+                PgHdr pPg;
+                ///Find a dirty page to write">out and recycle. First try to find a</param>
+                ///page that does not require a journal">sync (one with PGHDR.NEED_SYNC</param>
+                ///cleared), but if that is not possible settle for any other
+                ///unreferenced dirty page.
+
+#if SQLITE_ENABLE_EXPENSIVE_ASSERT
+																																																																												expensive_assert( pcacheCheckSynced(pCache) );
+#endif
+                var dirty_pages = Utils.MyLinqExtensions.path(pCache.pSynced, x => x.pPrev);
+                pPg = dirty_pages.FirstOrDefault(p => (p.ReferenceCount != 0 || (p.flags & PGHDR.NEED_SYNC) != 0));
+
+                pCache.pSynced = pPg;
+                if (null == pPg)
+                {
+                    pPg = dirty_pages.FirstOrDefault(p => (p.ReferenceCount != 0));
+                }
+                if (pPg != null)
+                {
+
+#if SQLITE_LOG_CACHE_SPILL
+																																																																																															      io.sqlite3_log(SQLITE_FULL, 
+                  "spill page %d making room for %d - cache used: %d/%d",
+                  pPg->pgno, pgno,
+                  sqliteinth.sqlite3GlobalConfig.pcache.xPagecount(pCache->pCache),
+                  pCache->nMax);
+#endif
+                    var rc = pCache.xStress(pCache.pStress, pPg);
+                    if (rc != SqlResult.SQLITE_OK && rc != SqlResult.SQLITE_BUSY)
+                    {
+                        return rc;
+                    }
+                }
+                pPage = sqliteinth.sqlite3GlobalConfig.CacheController.xFetch(pCache.pCache, pgno, 2);
+            }
+            if (pPage != null)
+            {
+                if (null == pPage.buffer)
+                {
+                    //          memset(pPage, 0, sizeof(PgHdr));
+                    pPage.buffer = malloc_cs.sqlite3Malloc(pCache.szPage);
+                    //          pPage->pData = (void*)&pPage[1];
+                    //pPage->pExtra = (void*)&((char*)pPage->pData)[pCache->szPage];
+                    //memset(pPage->pExtra, 0, pCache->szExtra);
+                    pPage.pCache = pCache;
+                    pPage.pgno = pgno;
+                }
+                Debug.Assert(pPage.pCache == pCache);
+                Debug.Assert(pPage.pgno == pgno);
+                //assert(pPage->pData == (void*)&pPage[1]);
+                //assert(pPage->pExtra == (void*)&((char*)&pPage[1])[pCache->szPage]);
+                if (0 == pPage.ReferenceCount)
+                {
+                    pCache.nRef++;
+                }
+                pPage.ReferenceCount++;
+                if (pgno == 1)
+                {
+                    pCache.FirstPage = pPage;
+                }
+            }
+            ppPage = pPage;
+            return (pPage == null && eCreate != 0) ? SqlResult.SQLITE_NOMEM : SqlResult.SQLITE_OK;
+        }
+
+
+
     };
 
    
@@ -357,125 +463,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
                 pCache.szPage = szPage;
             }
 
-            ///<summary>
-            /// Try to obtain a page from the cache.
-            ///
-            ///</summary>
-            public static SqlResult sqlite3PcacheFetch(this PCache pCache, ///
-                ///<summary>
-                ///Obtain the page from this cache 
-                ///</summary>
-
-            u32 pgno, ///
-                ///<summary>
-                ///Page number to obtain 
-                ///</summary>
-
-            int createFlag, ///
-                ///<summary>
-                ///If true, create page if it does not exist already 
-                ///</summary>
-
-            ref PgHdr ppPage///
-                ///<summary>
-                ///Write the page here 
-                ///</summary>
-
-            )
-            {
-                PgHdr pPage = null;
-               
-                Debug.Assert(pCache != null);
-                Debug.Assert(createFlag == 1 || createFlag == 0);
-                Debug.Assert(pgno > 0);
-                ///If the pluggable cache (sqlite3_pcache*) has not been allocated,
-                ///allocate it now.
-
-                if (null == pCache.pCache && createFlag != 0)
-                {                    
-                    int nByte = pCache.szPage + pCache.szExtra + 0;
-                // sizeof( PgHdr );
-                    PCache1 p = sqliteinth.sqlite3GlobalConfig.CacheController.xCreate(nByte, pCache.bPurgeable);
-                    //if ( null == p )
-                    //{
-                    //  return SQLITE_NOMEM;
-                    //}
-                    sqliteinth.sqlite3GlobalConfig.CacheController.xCachesize(p, pCache.nMax);
-                    pCache.pCache = p;
-                }
-                int eCreate = createFlag * (1 + ((!pCache.bPurgeable || null == pCache.Head) ? 1 : 0));
-                if (pCache.pCache != null)
-                {
-                    pPage = sqliteinth.sqlite3GlobalConfig.CacheController.xFetch(pCache.pCache, pgno, eCreate);
-                }
-                if (null == pPage && eCreate == 1)
-                {
-                    PgHdr pPg;
-                ///Find a dirty page to write">out and recycle. First try to find a</param>
-                ///page that does not require a journal">sync (one with PGHDR.NEED_SYNC</param>
-                ///cleared), but if that is not possible settle for any other
-                ///unreferenced dirty page.
-
-#if SQLITE_ENABLE_EXPENSIVE_ASSERT
-																																																																												expensive_assert( pcacheCheckSynced(pCache) );
-#endif
-                    var dirty_pages = Utils.MyLinqExtensions.path(pCache.pSynced,x=>x.pPrev);
-                    pPg = dirty_pages.FirstOrDefault(p=> (p.ReferenceCount != 0 || (p.flags & PGHDR.NEED_SYNC) != 0));
-                    
-                    pCache.pSynced = pPg;
-                    if (null == pPg)
-                    {
-                        pPg = dirty_pages.FirstOrDefault(p => (p.ReferenceCount != 0 ));
-                    }
-                    if (pPg != null)
-                    {
-                        
-#if SQLITE_LOG_CACHE_SPILL
-																																																																																															      io.sqlite3_log(SQLITE_FULL, 
-                  "spill page %d making room for %d - cache used: %d/%d",
-                  pPg->pgno, pgno,
-                  sqliteinth.sqlite3GlobalConfig.pcache.xPagecount(pCache->pCache),
-                  pCache->nMax);
-#endif
-                        var rc = pCache.xStress(pCache.pStress, pPg);
-                        if (rc != SqlResult.SQLITE_OK && rc != SqlResult.SQLITE_BUSY)
-                        {
-                            return rc;
-                        }
-                    }
-                    pPage = sqliteinth.sqlite3GlobalConfig.CacheController.xFetch(pCache.pCache, pgno, 2);
-                }
-                if (pPage != null)
-                {
-                    if (null == pPage.buffer)
-                    {
-                        //          memset(pPage, 0, sizeof(PgHdr));
-                        pPage.buffer = malloc_cs.sqlite3Malloc(pCache.szPage);
-                        //          pPage->pData = (void*)&pPage[1];
-                        //pPage->pExtra = (void*)&((char*)pPage->pData)[pCache->szPage];
-                        //memset(pPage->pExtra, 0, pCache->szExtra);
-                        pPage.pCache = pCache;
-                        pPage.pgno = pgno;
-                    }
-                    Debug.Assert(pPage.pCache == pCache);
-                    Debug.Assert(pPage.pgno == pgno);
-                    //assert(pPage->pData == (void*)&pPage[1]);
-                    //assert(pPage->pExtra == (void*)&((char*)&pPage[1])[pCache->szPage]);
-                    if (0 == pPage.ReferenceCount)
-                    {
-                        pCache.nRef++;
-                    }
-                    pPage.ReferenceCount++;
-                    if (pgno == 1)
-                    {
-                        pCache.FirstPage = pPage;
-                    }
-                }
-                ppPage = pPage;
-                return (pPage == null && eCreate != 0) ? SqlResult.SQLITE_NOMEM : SqlResult.SQLITE_OK;
-            }
-
-            
+             
 
 
 
@@ -489,7 +477,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
             {
                 PCache pCache;
                 Debug.Assert(p.ReferenceCount == 1);
-                if ((p.flags & PGHDR.DIRTY) != 0)
+                if (p.flags.HasFlag( PGHDR.DIRTY))
                 {
                     p.RemoveFromDirtyList();
                 }
@@ -511,7 +499,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
             {
                 p.flags &= ~PGHDR.DONT_WRITE;
                 Debug.Assert(p.ReferenceCount > 0);
-                if (0 == (p.flags & PGHDR.DIRTY))
+                if (!p.flags.HasFlag(PGHDR.DIRTY))
                 {
                     p.flags |= PGHDR.DIRTY;
                     p.AddToDirtyList();
@@ -525,7 +513,7 @@ return (p==null || p.nRef!=0 || (p.flags&PGHDR.NEED_SYNC)==0)?1:0;
             ///</summary>
             public static void sqlite3PcacheMakeClean(PgHdr p)
             {
-                if ((p.flags & PGHDR.DIRTY) != 0)
+                if (p.flags.HasFlag( PGHDR.DIRTY))
                 {
                     p.RemoveFromDirtyList();
                     p.flags &= ~(PGHDR.DIRTY | PGHDR.NEED_SYNC);

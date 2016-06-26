@@ -19,6 +19,44 @@ namespace Community.CsharpSqlite.Tree
     using DbPage = Cache.PgHdr;
     public partial class BtShared
     {
+
+
+        public SqlResult GetPage(
+            Pgno pgno, ///Number of the page to fetch 
+            ref MemPage ppPage, ///Return the page in this parameter 
+            int noContent///Do not load page content if true 
+        )
+        {
+            SqlResult rc;
+            DbPage pDbPage = null;
+            Debug.Assert(this.mutex.sqlite3_mutex_held());
+            rc = this.pPager.Acquire(pgno, ref pDbPage, noContent != 0);
+            if (rc != 0)
+                return rc;
+            ppPage = pDbPage.btreePageFromDbPage(pgno, this);
+            return SqlResult.SQLITE_OK;
+        }
+
+        public MemPage Lookup(Pgno pgno)
+        {
+            Debug.Assert(this.mutex.sqlite3_mutex_held());
+            var pDbPage = this.pPager.PagerLookup(pgno);
+            if (pDbPage)
+            {
+                return pDbPage.btreePageFromDbPage(pgno, this);
+            }
+            return null;
+        }
+
+        #region table
+
+
+
+
+
+
+        #endregion
+
         ///<summary>
         /// Convert a DbPage obtained from the pager into a MemPage used by
         /// the btree layer.
@@ -60,7 +98,7 @@ namespace Community.CsharpSqlite.Tree
             BtShared pBt = this;///The database file 
             SqlResult rc;
             Debug.Assert(pBt.mutex.sqlite3_mutex_held());
-            if (pgno > pBt.btreePagecount())
+            if (pgno > pBt.GetPageCount())
             {
                 rc = sqliteinth.SQLITE_CORRUPT_BKPT();
             }
@@ -92,26 +130,17 @@ namespace Community.CsharpSqlite.Tree
         ///the page to the freelist.
         ///</summary>
         public  SqlResult clearDatabasePage(
-            Pgno pgno,///<summary>
-                      ///Page number to clear 
-                      ///</summary>
-            int freePageFlag,///<summary>
-                             ///Deallocate page if true 
-                             ///</summary>
-            ref int pnChange///<summary>
-                            ///Add number of Cells freed to this counter 
-                            ///</summary>
+            Pgno pgno,///Page number to clear 
+            int freePageFlag,///Deallocate page if true 
+            ref int pnChange///Add number of Cells freed to this counter 
             )
         {
-            BtShared pBt = this;///<summary>
-                               ///The BTree that contains the table 
-                               ///</summary>
+            BtShared pBt = this;///The BTree that contains the table 
             MemPage pPage = new MemPage();
             SqlResult rc;
-            byte[] pCell;
             int i;
             Debug.Assert(pBt.mutex.sqlite3_mutex_held());
-            if (pgno > pBt.btreePagecount())
+            if (pgno > pBt.GetPageCount())
             {
                 return sqliteinth.SQLITE_CORRUPT_BKPT();
             }
@@ -121,7 +150,7 @@ namespace Community.CsharpSqlite.Tree
             for (i = 0; i < pPage.nCell; i++)
             {
                 int iCell = pPage.findCellAddress(i);
-                pCell = pPage.aData;
+                var pCell = pPage.aData;
                 //        pCell = findCell( pPage, i );
                 if (false == pPage.IsLeaf)
                 {
@@ -158,53 +187,51 @@ namespace Community.CsharpSqlite.Tree
             return rc;
         }
 
-
-        ///
-        ///<summary>
-        ///</summary>
-        ///<param name="This function is used to add page iPage to the database file free">list.</param>
-        ///<param name="It is assumed that the page is not already a part of the free">list.</param>
-        ///<param name=""></param>
-        ///<param name="The value passed as the second argument to this function is optional.">The value passed as the second argument to this function is optional.</param>
-        ///<param name="If the caller happens to have a pointer to the MemPage object">If the caller happens to have a pointer to the MemPage object</param>
-        ///<param name="corresponding to page iPage handy, it may pass it as the second value.">corresponding to page iPage handy, it may pass it as the second value.</param>
-        ///<param name="Otherwise, it may pass NULL.">Otherwise, it may pass NULL.</param>
-        ///<param name=""></param>
-        ///<param name="If a pointer to a MemPage object is passed as the second argument,">If a pointer to a MemPage object is passed as the second argument,</param>
-        ///<param name="its reference count is not altered by this function.">its reference count is not altered by this function.</param>
+        
+        ///This function is used to add page iPage to the database file fre-list.
+        ///It is assumed that the page is not already a part of the free">list.</param>
+        ///The value passed as the second argument to this function is optional.
+        ///If the caller happens to have a pointer to the MemPage object
+        ///corresponding to page iPage handy, it may pass it as the second value.
+        ///Otherwise, it may pass NULL.
+        ///If a pointer to a MemPage object is passed as the second argument,
+        ///its reference count is not altered by this function.
         public SqlResult freePage2( MemPage pMemPage, Pgno iPage)
         {
             BtShared pBt = this;
             MemPage pTrunk = null;
-            ///<param name="Free">list trunk page </param>
+            ///Free-list trunk page
             Pgno iTrunk = 0;
-            ///<param name="Page number of free">list trunk page </param>
+            ///Page number of free-list trunk page
             MemPage pPage1 = pBt.pPage1;
             ///Local reference to page 1 
             MemPage pPage;
             ///Page being freed. May be NULL. 
             SqlResult rc;
             ///Return Code 
-            int nFree;
-            ///<param name="Initial number of pages on free">list </param>
+            
             Debug.Assert(pBt.mutex.sqlite3_mutex_held());
             Debug.Assert(iPage > 1);
             Debug.Assert(null == pMemPage || pMemPage.pgno == iPage);
             if (pMemPage != null)
             {
                 pPage = pMemPage;
-                PagerMethods.sqlite3PagerRef(pPage.pDbPage);
+                pPage.pDbPage.PagerAddRef();
             }
             else
             {
-                pPage = pBt.btreePageLookup(iPage);
+                pPage = pBt.Lookup(iPage);
             }
             ///Increment the free page count on pPage1 
             rc = PagerMethods.sqlite3PagerWrite(pPage1.pDbPage);
             if (rc != 0)
                 goto freepage_out;
-            nFree = (int)Converter.sqlite3Get4byte(pPage1.aData, 36);
-            Converter.sqlite3Put4byte(pPage1.aData, 36, nFree + 1);
+
+            
+            int nFree = (int)Converter.sqlite3Get4byte(pPage1.aData, Offsets.NumberOfFreePage);
+            ///<param name="Initial number of pages on free">list </param>
+
+            Converter.sqlite3Put4byte(pPage1.aData, Offsets.NumberOfFreePage, nFree + 1);
             if (pBt.secureDelete)
             {
                 ///If the secure_delete option is enabled, then
@@ -229,23 +256,16 @@ namespace Community.CsharpSqlite.Tree
                 if (rc != 0)
                     goto freepage_out;
             }
-            ///
-            ///<summary>
-            ///</summary>
-            ///<param name="Now manipulate the actual database free">list structure. There are two</param>
-            ///<param name="possibilities. If the free">list is currently empty, or if the first</param>
-            ///<param name="trunk page in the free">list is full, then this page will become a</param>
-            ///<param name="new free">list trunk page. Otherwise, it will become a leaf of the</param>
-            ///<param name="first trunk page in the current free">list. This block tests if it</param>
-            ///<param name="is possible to add the page as a new free">list leaf.</param>
-            ///<param name=""></param>
+            ///Now manipulate the actual database free">list structure. There are two</param>
+            ///possibilities. If the free">list is currently empty, or if the first</param>
+            ///trunk page in the free">list is full, then this page will become a</param>
+            ///new free">list trunk page. Otherwise, it will become a leaf of the</param>
+            ///first trunk page in the current free">list. This block tests if it</param>
+            ///is possible to add the page as a new free">list leaf.</param>
             if (nFree != 0)
             {
                 u32 nLeaf;
-                ///
-                ///<summary>
                 ///Initial number of leaf cells on trunk page 
-                ///</summary>
                 iTrunk = Converter.sqlite3Get4byte(pPage1.aData, 32);
                 rc = pBt.GetPage(iTrunk, ref pTrunk, 0);
                 if (rc != SqlResult.SQLITE_OK)
@@ -261,23 +281,18 @@ namespace Community.CsharpSqlite.Tree
                 }
                 if (nLeaf < (u32)pBt.usableSize / 4 - 8)
                 {
-                    ///
-                    ///<summary>
                     ///In this case there is room on the trunk page to insert the page
                     ///being freed as a new leaf.
-                    ///
                     ///Note that the trunk page is not really full until it contains
-                    ///</summary>
-                    ///<param name="usableSize/4 "> 8 entries as we have</param>
-                    ///<param name="coded.  But due to a coding error in versions of SQLite prior to">coded.  But due to a coding error in versions of SQLite prior to</param>
-                    ///<param name="3.6.0, databases with freelist trunk pages holding more than">3.6.0, databases with freelist trunk pages holding more than</param>
-                    ///<param name="usableSize/4 "> 8 entries will be reported as corrupt.  In order</param>
-                    ///<param name="to maintain backwards compatibility with older versions of SQLite,">to maintain backwards compatibility with older versions of SQLite,</param>
-                    ///<param name="we will continue to restrict the number of entries to usableSize/4 "> 8</param>
-                    ///<param name="for now.  At some point in the future (once everyone has upgraded">for now.  At some point in the future (once everyone has upgraded</param>
-                    ///<param name="to 3.6.0 or later) we should consider fixing the conditional above">to 3.6.0 or later) we should consider fixing the conditional above</param>
-                    ///<param name="to read "usableSize/4">8".</param>
-                    ///<param name=""></param>
+                    ///usableSize/4 - 8 entries as we have</param>
+                    ///coded.  But due to a coding error in versions of SQLite prior to
+                    ///3.6.0, databases with freelist trunk pages holding more than
+                    ///usableSize/4 "> 8 entries will be reported as corrupt.  In order
+                    ///to maintain backwards compatibility with older versions of SQLite,
+                    ///we will continue to restrict the number of entries to usableSize/4 - 8
+                    ///for now.  At some point in the future (once everyone has upgraded
+                    ///to 3.6.0 or later) we should consider fixing the conditional above
+                    ///to read "usableSize/4-8
                     rc = PagerMethods.sqlite3PagerWrite(pTrunk.pDbPage);
                     if (rc == SqlResult.SQLITE_OK)
                     {
@@ -320,8 +335,8 @@ namespace Community.CsharpSqlite.Tree
             {
                 pPage.isInit = false;
             }
-            BTreeMethods.release(pPage);
-            BTreeMethods.release(pTrunk);
+            pPage.release();
+            pTrunk.release();
             return rc;
         }
 
@@ -362,7 +377,7 @@ namespace Community.CsharpSqlite.Tree
             ///Total size of the database file 
             Debug.Assert(pBt.mutex.sqlite3_mutex_held());
             var pPage1 = pBt.pPage1;
-            mxPage = pBt.btreePagecount();
+            mxPage = pBt.GetPageCount();
             var n = Converter.sqlite3Get4byte(pPage1.aData, Offsets.NumberOfFreePage);///Number of pages on the freelist 
             sqliteinth.testcase(n == mxPage - 1);
             if (n >= mxPage)
@@ -659,7 +674,7 @@ namespace Community.CsharpSqlite.Tree
                     }
                 }
 #endif
-                Converter.sqlite3Put4byte(pBt.pPage1.aData, (u32)28, pBt.nPage);
+                Converter.sqlite3Put4byte(pBt.pPage1.aData, (u32)Offsets.DatabaseSize, pBt.nPage);
                 pPgno = pBt.nPage;
                 Debug.Assert(pPgno != pBt.PENDING_BYTE_PAGE);
                 rc = pBt.GetPage(pPgno, ref ppPage, 1);
@@ -807,9 +822,9 @@ return removed;
                 return rc;
             ///Do some checking to help insure the file we opened really is
             ///a valid database file.
-            nPage = nPageHeader = Converter.sqlite3Get4byte(pPage1.aData, 28);
+            nPage = nPageHeader = Converter.sqlite3Get4byte(pPage1.aData, Offsets.DatabaseSize);
             //get4byte(28+(u8*)pPage1->aData);
-            pBt.pPager.sqlite3PagerPagecount(out nPageFile);
+            pBt.pPager.GetPagecount(out nPageFile);
             if (nPage == 0 || _Custom.memcmp(pPage1.aData, 24, pPage1.aData, 92, 4) != 0)//_Custom.memcmp(24 + (u8*)pPage1.aData, 92 + (u8*)pPage1.aData, 4) != 0)
             {
                 nPage = nPageFile;
@@ -862,13 +877,10 @@ return SqlResult.SQLITE_OK;
 rc = SQLITE_NOTADB;
 }
 #endif
-                ///
-                ///<summary>
                 ///The maximum embedded fraction must be exactly 25%.  And the minimum
-                ///</summary>
-                ///<param name="embedded fraction must be 12.5% for both leaf">data.</param>
-                ///<param name="The original design allowed these amounts to vary, but as of">The original design allowed these amounts to vary, but as of</param>
-                ///<param name="version 3.6.0, we require them to be fixed.">version 3.6.0, we require them to be fixed.</param>
+                ///embedded fraction must be 12.5% for both leaf-data.
+                ///The original design allowed these amounts to vary, but as of
+                ///version 3.6.0, we require them to be fixed.
                 if (_Custom.memcmp(page1, 21, "\x0040\x0020\x0020", 3) != 0)//   "\100\040\040"
                 {
                     goto page1_init_failed;
@@ -882,16 +894,12 @@ rc = SQLITE_NOTADB;
                 usableSize = pageSize - page1[20];
                 if (pageSize != pBt.pageSize)
                 {
-                    ///
-                    ///<summary>
                     ///After reading the first page of the database assuming a page size
-                    ///</summary>
-                    ///<param name="of BtShared.pageSize, we have discovered that the page">size is</param>
-                    ///<param name="actually pageSize. Unlock the database, leave pBt.pPage1 at">actually pageSize. Unlock the database, leave pBt.pPage1 at</param>
-                    ///<param name="zero and return SqlResult.SQLITE_OK. The caller will call this function">zero and return SqlResult.SQLITE_OK. The caller will call this function</param>
-                    ///<param name="again with the correct page">size.</param>
-                    ///<param name=""></param>
-                    BTreeMethods.release(pPage1);
+                    ///of BtShared.pageSize, we have discovered that the page-size is
+                    ///actually pageSize. Unlock the database, leave pBt.pPage1 at
+                    ///zero and return SqlResult.SQLITE_OK. The caller will call this function
+                    ///again with the correct page-size.
+                    pPage1.release();
                     pBt.usableSize = usableSize;
                     pBt.pageSize = pageSize;
                     //          freeTempSpace(pBt);

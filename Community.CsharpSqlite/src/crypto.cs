@@ -547,7 +547,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                     ctx.read_ctx.iv = new byte[ctx.read_ctx.iv_sz];
                     //malloc_cs.sqlite3Malloc( ctx.iv_sz );
                     Buffer.BlockCopy(Encoding.UTF8.GetBytes(Globals.SQLITE_FILE_HEADER), 0, ctx.read_ctx.iv, 0, FILE_HEADER_SZ);
-                    pDb.BTree.sqlite3BtreePager().sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec, null, sqlite3FreeCodecArg, ctx);
+                    pDb.BTree.Pager.sqlite3pager_sqlite3PagerSetCodec(sqlite3Codec, null, sqlite3FreeCodecArg, ctx);
                     codec_set_cipher_name(db, nDb, CIPHER, 0);
                     codec_set_pass_key(db, nDb, zKey, nKey, 0);
                     cipher_ctx_copy(ctx.write_ctx, ctx.read_ctx);
@@ -681,7 +681,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                         ///<summary>
                         ///begin write transaction 
                         ///</summary>
-                        pPager.sqlite3PagerPagecount(out page_count);
+                        pPager.GetPagecount(out page_count);
                         for (pgno = 1; rc == SqlResult.SQLITE_OK && pgno <= page_count; pgno++)
                         {
                             ///
@@ -694,7 +694,7 @@ static void CODEC_TRACE( string T, params object[] ap ) { if ( sqlite3PagerTrace
                                 ///<summary>
                                 ///skip this page (see pager.c:pagerAcquire for reasoning) 
                                 ///</summary>
-                                rc = pPager.sqlite3PagerGet(pgno, ref page);
+                                rc = pPager.Get(pgno, ref page);
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
                                     ///

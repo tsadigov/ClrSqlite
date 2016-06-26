@@ -199,7 +199,7 @@ namespace Community.CsharpSqlite {
 				for(i=0;i<db.BackendCount;i++) {
 					Btree pBt=db.Backends[i].BTree;
 					if(pBt!=null) {
-						Pager pPager=pBt.sqlite3BtreePager();
+						Pager pPager=pBt.Pager;
 						totalUsed+=pPager.sqlite3PagerMemUsed();
 					}
 				}

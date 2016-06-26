@@ -133,7 +133,7 @@ namespace Community.CsharpSqlite {
 						zErrDyn=io.sqlite3MPrintf(db,"attached databases must use the same text encoding as main database");
 						rc=SqlResult.SQLITE_ERROR;
 					}
-					pPager=aNew.BTree.sqlite3BtreePager();
+					pPager=aNew.BTree.Pager;
 					pPager.sqlite3PagerLockingMode(db.dfltLockMode);
 					aNew.BTree.sqlite3BtreeSecureDelete(db.Backends[0].BTree.sqlite3BtreeSecureDelete(-1));
 				}

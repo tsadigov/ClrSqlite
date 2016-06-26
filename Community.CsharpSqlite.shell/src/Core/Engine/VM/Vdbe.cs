@@ -3561,7 +3561,7 @@ cDebug.Ase  OpCode.OP_Checkpoint: {
                                         Debug.Assert(eNew == JournalMode.PAGER_JOURNALMODE_DELETE || eNew == JournalMode.PAGER_JOURNALMODE_TRUNCATE || eNew == JournalMode.PAGER_JOURNALMODE_PERSIST || eNew == JournalMode.PAGER_JOURNALMODE_OFF || eNew == JournalMode.PAGER_JOURNALMODE_MEMORY || eNew == JournalMode.PAGER_JOURNALMODE_WAL || eNew == JournalMode.PAGER_JOURNALMODE_QUERY);
                                         Debug.Assert(pOp.p1 >= 0 && pOp.p1 < db.BackendCount);
                                         pBt = db.Backends[pOp.p1].BTree;
-                                        pPager = pBt.sqlite3BtreePager();
+                                        pPager = pBt.Pager;
                                         eOld = pPager.sqlite3PagerGetJournalMode();
                                         if (eNew == JournalMode.PAGER_JOURNALMODE_QUERY)
                                             eNew = eOld;

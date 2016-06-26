@@ -315,9 +315,9 @@ namespace Community.CsharpSqlite {
                     rc = this.rc;
                     if (!Sqlite3.isFatalError(rc))
                     {
-                        Pager pSrcPager = this.pSrc.sqlite3BtreePager();
+                        Pager pSrcPager = this.pSrc.Pager;
                         ///Source pager 
-                        Pager pDestPager = this.pDest.sqlite3BtreePager();
+                        Pager pDestPager = this.pDest.Pager;
                         ///Dest pager 
                         int ii;
                         ///Iterator variable 
@@ -351,14 +351,11 @@ namespace Community.CsharpSqlite {
                             rc = this.pSrc.sqlite3BtreeBeginTrans(0);
                             bCloseTrans = 1;
                         }
-                        ///
-                        ///<summary>
                         ///Do not allow backup if the destination database is in WAL mode
                         ///and the page sizes are different between source and destination 
-                        ///</summary>
                         pgszSrc = this.pSrc.GetPageSize();
                         pgszDest = this.pDest.GetPageSize();
-                        destMode = this.pDest.sqlite3BtreePager().sqlite3PagerGetJournalMode();
+                        destMode = this.pDest.Pager.sqlite3PagerGetJournalMode();
                         if (SqlResult.SQLITE_OK == rc && destMode == JournalMode.PAGER_JOURNALMODE_WAL && pgszSrc != pgszDest)
                         {
                             rc = SqlResult.SQLITE_READONLY;
@@ -376,7 +373,7 @@ namespace Community.CsharpSqlite {
                             {
                                 DbPage pSrcPg = null;
                                 ///Source page object 
-                                rc = pSrcPager.sqlite3PagerGet((u32)iSrcPg, ref pSrcPg);
+                                rc = pSrcPager.Get((u32)iSrcPg, ref pSrcPg);
                                 if (rc == SqlResult.SQLITE_OK)
                                 {
                                     rc = this.backupOnePage(iSrcPg, pSrcPg.getData());
@@ -449,7 +446,7 @@ namespace Community.CsharpSqlite {
                                 ///<param name="pending">byte page in the source database may need to be</param>
                                 ///<param name="copied into the destination database.">copied into the destination database.</param>
                                 int iSize = (int)(pgszSrc * nSrcPage);
-                                sqlite3_file pFile = pDestPager.sqlite3PagerFile();
+                                sqlite3_file pFile = pDestPager.FileDescriptor;
                                 i64 iOff;
                                 i64 iEnd;
                                 Debug.Assert(pFile != null);
@@ -470,7 +467,7 @@ namespace Community.CsharpSqlite {
                                 {
                                     PgHdr pSrcPg = null;
                                     u32 iSrcPg = (u32)((iOff / pgszSrc) + 1);
-                                    rc = pSrcPager.sqlite3PagerGet(iSrcPg, ref pSrcPg);
+                                    rc = pSrcPager.Get(iSrcPg, ref pSrcPg);
                                     if (rc == SqlResult.SQLITE_OK)
                                     {
                                         byte[] zData = pSrcPg.getData();
@@ -554,12 +551,12 @@ namespace Community.CsharpSqlite {
                     }
                     if (this.isAttached != 0)
                     {
-                        pp = this.pSrc.sqlite3BtreePager().sqlite3PagerBackupPtr();
+                        pp = this.pSrc.Pager.sqlite3PagerBackupPtr();
                         while (pp != this)
                         {
                             pp = (pp).pNext;
                         }
-                        this.pSrc.sqlite3BtreePager().pBackup = this.pNext;
+                        this.pSrc.Pager.pBackup = this.pNext;
                     }
                     ///If a transaction is still open on the Btree, roll it back. 
                     this.pDest.sqlite3BtreeRollback();
@@ -602,7 +599,7 @@ namespace Community.CsharpSqlite {
             ///</summary>
         SqlResult backupOnePage(Pgno iSrcPg, byte[] zSrcData)
         {
-            Pager pDestPager = this.pDest.sqlite3BtreePager();
+            Pager pDestPager = this.pDest.Pager;
             int nSrcPgsz = this.pSrc.GetPageSize();
             int nDestPgsz = this.pDest.GetPageSize();
             int nCopy = MathExtensions.MIN(nSrcPgsz, nDestPgsz);
@@ -667,7 +664,7 @@ namespace Community.CsharpSqlite {
                 u32 iDest = (u32)(iOff / nDestPgsz) + 1;
                 if (iDest == this.pDest.pBt.PENDING_BYTE_PAGE)
                     continue;
-                if (SqlResult.SQLITE_OK == (rc = pDestPager.sqlite3PagerGet(iDest, ref pDestPg)) && SqlResult.SQLITE_OK == (rc = PagerMethods.sqlite3PagerWrite(pDestPg)))
+                if (SqlResult.SQLITE_OK == (rc = pDestPager.Get(iDest, ref pDestPg)) && SqlResult.SQLITE_OK == (rc = PagerMethods.sqlite3PagerWrite(pDestPg)))
                 {
                     //string zIn = &zSrcData[iOff%nSrcPgsz];
                     byte[] zDestData = pDestPg.getData();
@@ -699,9 +696,9 @@ namespace Community.CsharpSqlite {
         {
             sqlite3_backup pp;
             Debug.Assert(Sqlite3.sqlite3BtreeHoldsMutex(this.pSrc));
-            pp = this.pSrc.sqlite3BtreePager().sqlite3PagerBackupPtr();
+            pp = this.pSrc.Pager.sqlite3PagerBackupPtr();
             this.pNext = pp;
-            this.pSrc.sqlite3BtreePager().pBackup = this;
+            this.pSrc.Pager.pBackup = this;
             //*pp = p;
             this.isAttached = 1;
         }

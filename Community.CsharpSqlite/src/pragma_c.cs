@@ -681,12 +681,12 @@ goto pragma_out;
 											int ii;
 											Debug.Assert(pDb==db.Backends[0]);
 											for(ii=2;ii<db.BackendCount;ii++) {
-												pPager=db.Backends[ii].BTree.sqlite3BtreePager();
+												pPager=db.Backends[ii].BTree.Pager;
 												pPager.sqlite3PagerLockingMode(eMode);
 											}
 											db.dfltLockMode=(u8)eMode;
 										}
-										pPager=pDb.BTree.sqlite3BtreePager();
+										pPager=pDb.BTree.Pager;
 										eMode=pPager.sqlite3PagerLockingMode(eMode)?1:0;
 									}
 									Debug.Assert(eMode==Globals.Paging.PAGER_LOCKINGMODE_NORMAL||eMode==Globals.Paging.PAGER_LOCKINGMODE_EXCLUSIVE);
@@ -769,7 +769,7 @@ goto pragma_out;
 										///
 										///</summary>
 										if(zLeft.Equals("journal_size_limit",StringComparison.InvariantCultureIgnoreCase)) {
-											Pager pPager=pDb.BTree.sqlite3BtreePager();
+											Pager pPager=pDb.BTree.Pager;
 											i64 iLimit=-2;
 											if(!String.IsNullOrEmpty(zRight)) {
 												Converter.sqlite3Atoi64(zRight,ref iLimit,1000000,SqliteEncoding.UTF8);

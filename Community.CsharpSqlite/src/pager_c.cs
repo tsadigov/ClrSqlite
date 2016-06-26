@@ -1031,13 +1031,7 @@ return rc;
 
 #endif
 
-        ///<summary>
-        /// Increment the reference count for page pPg.
-        ///</summary>
-        public static void sqlite3PagerRef(DbPage pPg)
-        {
-            pPg.sqlite3PcacheRef();
-        }
+        
 
         ///<summary>
         /// Append a record of the current state of page pPg to the sub-journal.
@@ -1524,8 +1518,8 @@ return rc;
                 //.Substring( nPathname + 1 );//memcpy( &pPager.zFilename[nPathname + 1], zUri, nUri );
                 //memcpy(pPager.zJournal, zPathname, nPathname);
                 //memcpy(&pPager.zJournal[nPathname], "-journal", 8);
-                pPager.zJournal = pPager.zFilename + "-journal";
-                sqliteinth.sqlite3FileSuffix3(pPager.zFilename, pPager.zJournal);
+                pPager.journalName = pPager.zFilename + "-journal";
+                sqliteinth.sqlite3FileSuffix3(pPager.zFilename, pPager.journalName);
 #if !SQLITE_OMIT_WAL
 																																																																												pPager.zWal = &pPager.zJournal[nPathname+8+1];
 memcpy(pPager.zWal, zPathname, nPathname);
@@ -2048,7 +2042,7 @@ szPageDflt = ii;
                     {
                         if (pg != ((Sqlite3.PENDING_BYTE / (pPager.pageSize)) + 1))//PAGER_MJ_PGNO(pPager))
                         {
-                            rc = pPager.sqlite3PagerGet(pg, ref pPage);
+                            rc = pPager.Get(pg, ref pPage);
                             if (rc == SqlResult.SQLITE_OK)
                             {
                                 rc = pager_write(pPage);
@@ -2061,7 +2055,7 @@ szPageDflt = ii;
                         }
                     }
                     else
-                        if ((pPage = pPager.pager_lookup(pg)) != null)
+                        if ((pPage = pPager.lookup(pg)) != null)
                         {
                             if ((pPage.flags & PGHDR.NEED_SYNC) != 0)
                             {
@@ -2091,7 +2085,7 @@ szPageDflt = ii;
 );
                     for (ii = 0; ii < nPage; ii++)
                     {
-                        PgHdr pPage = pPager.pager_lookup((u32)(pg1 + ii));
+                        PgHdr pPage = pPager.lookup((u32)(pg1 + ii));
                         if (pPage != null)
                         {
                             pPage.flags |= PGHDR.NEED_SYNC;
@@ -2124,15 +2118,15 @@ szPageDflt = ii;
         /// Tests show that this optimization can quadruple the speed of large
         /// DELETE operations.
         ///</summary>
-        public static void sqlite3PagerDontWrite(PgHdr pPg)
+        public static void sqlite3PagerDontWrite(PgHdr page)
         {
-            Pager pPager = pPg.pPager;
-            if ((pPg.flags & PGHDR.DIRTY) != 0 && pPager.nSavepoint == 0)
+            Pager pPager = page.pPager;
+            if ((page.flags & PGHDR.DIRTY) != 0 && pPager.nSavepoint == 0)
             {
-                PAGERTRACE("DONT_WRITE page %d of %d\n", pPg.pgno, PagerMethods.PAGERID(pPager));
-                sqliteinth.IOTRACE("CLEAN %p %d\n", pPager, pPg.pgno);
-                pPg.flags |= PGHDR.DONT_WRITE;
-                pPg.pager_set_pagehash();
+                PAGERTRACE("DONT_WRITE page %d of %d\n", page.pgno, PagerMethods.PAGERID(pPager));
+                sqliteinth.IOTRACE("CLEAN %p %d\n", pPager, page.pgno);
+                page.flags |= PGHDR.DONT_WRITE;
+                page.pager_set_pagehash();
             }
         }
 

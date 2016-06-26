@@ -517,7 +517,7 @@ namespace Community.CsharpSqlite
                 }
                 if (this.checkRef((u32)iPage, zContext) != 0)
                     break;
-                if (this.pPager.sqlite3PagerGet((Pgno)iPage, ref pOvflPage) != 0)
+                if (this.pPager.Get((Pgno)iPage, ref pOvflPage) != 0)
                 {
                     this.checkAppendMsg(zContext, "failed to get page %d", iPage);
                     break;

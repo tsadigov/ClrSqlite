@@ -449,7 +449,7 @@ namespace Community.CsharpSqlite.Core.Runtime
                 {
                     int pgno = 0;
                     Debug.Assert(pOp.p4type == P4Usage.P4_KEYINFO);
-                    cpu.rc = pCx.pBt.sqlite3BtreeCreateTable(ref pgno, Sqlite3.BTREE_BLOBKEY);
+                    cpu.rc = pCx.pBt.CreateTable(ref pgno, Sqlite3.BTREE_BLOBKEY);
                     if (cpu.rc == SqlResult.SQLITE_OK)
                     {
                         Debug.Assert(pgno == sqliteinth.MASTER_ROOT + 1);

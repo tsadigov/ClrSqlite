@@ -1168,7 +1168,7 @@ static u16 cellSize( MemPage pPage, int iCell )
                     ///<summary>
                     ///Database size before freeing 
                     ///</summary>
-                    nOrig = pBt.btreePagecount();
+                    nOrig = pBt.GetPageCount();
                     if (PTRMAP_ISPAGE(pBt, nOrig) || nOrig == (pBt.PENDING_BYTE_PAGE))
                     {
                         ///
@@ -1203,7 +1203,7 @@ static u16 cellSize( MemPage pPage, int iCell )
                         rc = PagerMethods.sqlite3PagerWrite(pBt.pPage1.pDbPage);
                         Converter.sqlite3Put4byte(pBt.pPage1.aData, 32, 0);
                         Converter.sqlite3Put4byte(pBt.pPage1.aData, 36, 0);
-                        Converter.sqlite3Put4byte(pBt.pPage1.aData, (u32)28, nFin);
+                        Converter.sqlite3Put4byte(pBt.pPage1.aData, (u32)Offsets.DatabaseSize, nFin);
                         pBt.pPager.sqlite3PagerTruncateImage(nFin);
                         pBt.nPage = nFin;
                     }
@@ -1574,7 +1574,7 @@ static bool sqlite3BtreeCursorIsValid( BtCursor pCur )
                     {
                         iGuess++;
                     }
-                    if (iGuess <= pBt.btreePagecount())
+                    if (iGuess <= pBt.GetPageCount())
                     {
                         rc = pBt.ptrmapGet(iGuess, ref eType, ref pgno);
                         if (rc == SqlResult.SQLITE_OK && eType == PTRMAP.OVERFLOW2 && pgno == ovfl)
@@ -2077,190 +2077,7 @@ return 1;
             ///is left pointing at a arbitrary location.
             ///</summary>
             ///
-            ///<summary>
-            ///Create a new BTree table.  Write into piTable the page
-            ///number for the root page of the new table.
-            ///
-            ///The type of type is determined by the flags parameter.  Only the
-            ///following values of flags are currently in use.  Other values for
-            ///flags might not work:
-            ///
-            ///BTREE_INTKEY|BTREE_LEAFDATA     Used for SQL tables with rowid keys
-            ///BTREE_ZERODATA                  Used for SQL indices
-            ///</summary>
-            public static SqlResult btreeCreateTable(Btree p, ref int piTable, int createTabFlags)
-            {
-                BtShared pBt = p.pBt;
-                MemPage pRoot = new MemPage();
-                Pgno pgnoRoot = 0;
-                SqlResult rc;
-                PTF ptfFlags;
-                ///
-                ///<summary>
-                ///</summary>
-                ///<param name="Page">type flage for the root page of new table </param>
-                Debug.Assert(Sqlite3.sqlite3BtreeHoldsMutex(p));
-                Debug.Assert(pBt.inTransaction == TransType.TRANS_WRITE);
-                Debug.Assert(!pBt.readOnly);
-#if SQLITE_OMIT_AUTOVACUUM
-																																																																											rc = allocateBtreePage(pBt, ref pRoot, ref pgnoRoot, 1, 0);
-if( rc !=0){
-return rc;
-}
-#else
-                if (pBt.autoVacuum)
-                {
-                    Pgno pgnoMove = 0;
-                    ///<param name="Move a page here to make room for the root">page </param>
-                    MemPage pPageMove = new MemPage();
-                    ///The page to move to. 
-                    ///Creating a new table may probably require moving an existing database
-                    ///to make room for the new tables root page. In case this page turns
-                    ///<param name="out to be an overflow page, delete all overflow page">map caches</param>
-                    ///<param name="held by open cursors.">held by open cursors.</param>
-                    ///<param name=""></param>
-                    pBt.invalidateAllOverflowCache();
-                    ///
-                    ///<summary>
-                    ///Read the value of meta[3] from the database to determine where the
-                    ///</summary>
-                    ///<param name="root page of the new table should go. meta[3] is the largest root">page</param>
-                    ///<param name="created so far, so the new root">page is (meta[3]+1).</param>
-                    ///<param name=""></param>
-                    pgnoRoot = p.sqlite3BtreeGetMeta(BTreeProp.LARGEST_ROOT_PAGE);
-                    pgnoRoot++;
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="The new root">map page, or the</param>
-                    ///<param name="PENDING_BYTE page.">PENDING_BYTE page.</param>
-                    ///<param name=""></param>
-                    while (pgnoRoot == pBt.ptrmapPageno(pgnoRoot) || pgnoRoot == (pBt.PENDING_BYTE_PAGE))
-                    {
-                        pgnoRoot++;
-                    }
-                    Debug.Assert(pgnoRoot >= 3);
-                    ///
-                    ///<summary>
-                    ///Allocate a page. The page that currently resides at pgnoRoot will
-                    ///be moved to the allocated page (unless the allocated page happens
-                    ///to reside at pgnoRoot).
-                    ///
-                    ///</summary>
-                    rc = pBt.allocateBtreePage( ref pPageMove, ref pgnoMove, pgnoRoot, 1);
-                    if (rc != SqlResult.SQLITE_OK)
-                    {
-                        return rc;
-                    }
-                    if (pgnoMove != pgnoRoot)
-                    {
-                        ///
-                        ///<summary>
-                        ///</summary>
-                        ///<param name="pgnoRoot is the page that will be used for the root">page of</param>
-                        ///<param name="the new table (assuming an error did not occur). But we were">the new table (assuming an error did not occur). But we were</param>
-                        ///<param name="allocated pgnoMove. If required (i.e. if it was not allocated">allocated pgnoMove. If required (i.e. if it was not allocated</param>
-                        ///<param name="by extending the file), the current page at position pgnoMove">by extending the file), the current page at position pgnoMove</param>
-                        ///<param name="is already journaled.">is already journaled.</param>
-                        ///<param name=""></param>
-                        u8 eType = 0;
-                        Pgno iPtrPage = 0;
-                        BTreeMethods.release(pPageMove);
-                        ///
-                        ///<summary>
-                        ///Move the page currently at pgnoRoot to pgnoMove. 
-                        ///</summary>
-                        rc = pBt.GetPage(pgnoRoot, ref pRoot, 0);
-                        if (rc != SqlResult.SQLITE_OK)
-                        {
-                            return rc;
-                        }
-                        rc = pBt.ptrmapGet(pgnoRoot, ref eType, ref iPtrPage);
-                        if (eType == PTRMAP.ROOTPAGE || eType == PTRMAP.FREEPAGE)
-                        {
-                            rc = sqliteinth.SQLITE_CORRUPT_BKPT();
-                        }
-                        if (rc != SqlResult.SQLITE_OK)
-                        {
-                            release(pRoot);
-                            return rc;
-                        }
-                        Debug.Assert(eType != PTRMAP.ROOTPAGE);
-                        Debug.Assert(eType != PTRMAP.FREEPAGE);
-                        rc = BTreeMethods.relocatePage(pBt, pRoot, eType, iPtrPage, pgnoMove, 0);
-                        BTreeMethods.release(pRoot);
-                        ///
-                        ///<summary>
-                        ///Obtain the page at pgnoRoot 
-                        ///</summary>
-                        if (rc != SqlResult.SQLITE_OK)
-                        {
-                            return rc;
-                        }
-                        rc = pBt.GetPage(pgnoRoot, ref pRoot, 0);
-                        if (rc != SqlResult.SQLITE_OK)
-                        {
-                            return rc;
-                        }
-                        rc = PagerMethods.sqlite3PagerWrite(pRoot.pDbPage);
-                        if (rc != SqlResult.SQLITE_OK)
-                        {
-                            BTreeMethods.release(pRoot);
-                            return rc;
-                        }
-                    }
-                    else
-                    {
-                        pRoot = pPageMove;
-                    }
-                    ///
-                    ///<summary>
-                    ///</summary>
-                    ///<param name="Update the pointer">page number. </param>
-                    pBt.ptrmapPut(pgnoRoot, PTRMAP.ROOTPAGE, 0, ref rc);
-                    if (rc != 0)
-                    {
-                        BTreeMethods.release(pRoot);
-                        return rc;
-                    }
-                    ///
-                    ///<summary>
-                    ///When the new root page was allocated, page 1 was made writable in
-                    ///order either to increase the database filesize, or to decrement the
-                    ///freelist count.  Hence, the sqlite3BtreeUpdateMeta() call cannot fail.
-                    ///
-                    ///</summary>
-                    Debug.Assert(pBt.pPage1.pDbPage.sqlite3PagerIswriteable());
-                    rc = p.sqlite3BtreeUpdateMeta(BTreeProp.LARGEST_ROOT_PAGE, pgnoRoot);
-                    if (NEVER(rc != 0))
-                    {
-                        BTreeMethods.release(pRoot);
-                        return rc;
-                    }
-                }
-                else
-                {
-                    rc = pBt.allocateBtreePage( ref pRoot, ref pgnoRoot, 1, 0);
-                    if (rc != 0)
-                        return rc;
-                }
-#endif
-                Debug.Assert(pRoot.pDbPage.sqlite3PagerIswriteable());
-                if ((createTabFlags & Sqlite3.BTREE_INTKEY) != 0)
-                {
-                    ptfFlags = PTF.INTKEY | PTF.LEAFDATA | PTF.LEAF;
-                }
-                else
-                {
-                    ptfFlags = PTF.ZERODATA | PTF.LEAF;
-                }
-                pRoot.zeroPage(ptfFlags);
-                pRoot.pDbPage.Unref();
-                Debug.Assert((pBt.openFlags & Sqlite3.BTREE_SINGLE) == 0 || pgnoRoot == 2);
-                piTable = (int)pgnoRoot;
-                return SqlResult.SQLITE_OK;
-            }
-
+           
             private static bool NEVER(bool p)
             {
                 return Sqlite3.NEVER(p);
